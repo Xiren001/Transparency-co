@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -32,7 +33,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -42,10 +43,23 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign default 'user' role
+        $user->assignRole('user');
+
+        // If this is the very first user, assign admin role instead
+        if (User::count() === 1) {
+            $user->syncRoles('admin');
+        }
+
         event(new Registered($user));
 
         Auth::login($user);
 
-        return to_route('dashboard');
+        // Redirect based on role
+        if ($user->hasRole('admin')) {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('home');
     }
 }
