@@ -56,8 +56,8 @@ export default function Welcome() {
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
-            <div className="font-milk min-h- flex flex-col items-center bg-[#FDFDFC] px-8 tracking-tighter text-[#1b1b18] uppercase lg:justify-center dark:bg-[#0a0a0a]">
-                <header className="sticky top-0 z-50 w-full max-w-[1000px] bg-white py-6 text-sm not-has-[nav]:hidden lg:max-w-[2000px]">
+            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 tracking-tighter text-[#1b1b18] uppercase sm:px-8 lg:justify-center dark:bg-[#0a0a0a]">
+                <header className="sticky top-0 z-50 w-full max-w-[1000px] rounded-b-sm border-b bg-white py-6 text-sm not-has-[nav]:hidden lg:max-w-[2000px] dark:bg-[#0a0a0a]">
                     <nav className="flex items-center justify-center gap-4">
                         <div className="flex flex-1 items-center justify-between">
                             {/* Logo */}
@@ -65,7 +65,7 @@ export default function Welcome() {
                                 <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
                                     <span className="text-primary-foreground text-lg font-bold">T</span>
                                 </div>
-                                <span className="font-schoolbell text-xl font-bold tracking-widest capitalize">Transparency Co.</span>
+                                <span className="font-schoolbell text-xl font-bold tracking-widest capitalize dark:text-white">Transparency Co.</span>
                             </a>
 
                             {/* Desktop Navigation */}
@@ -74,7 +74,7 @@ export default function Welcome() {
                                     <a
                                         key={item.name}
                                         href={item.href}
-                                        className="hover:text-primary cursor-pointer text-sm font-medium transition-colors"
+                                        className="hover:text-primary cursor-pointer text-sm font-medium transition-colors dark:text-gray-200"
                                     >
                                         {item.name}
                                     </a>
@@ -107,14 +107,14 @@ export default function Welcome() {
                                             </Avatar>
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                                    <DropdownMenuContent className="w-56 dark:border-[#2d2d35] dark:bg-[#23232a]" align="end" forceMount>
                                         {auth.user ? (
                                             <>
                                                 {auth.isAdmin && (
                                                     <DropdownMenuItem asChild>
                                                         <a
                                                             href={route('dashboard')}
-                                                            className="font-milk flex w-full items-center gap-2 text-sm uppercase"
+                                                            className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                                         >
                                                             <User className="h-4 w-4" />
                                                             Dashboard
@@ -126,7 +126,7 @@ export default function Welcome() {
                                                         href={route('logout')}
                                                         method="post"
                                                         as="button"
-                                                        className="font-milk flex w-full items-center gap-2 text-sm uppercase"
+                                                        className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                                     >
                                                         <LogOut className="h-4 w-4" />
                                                         Logout
@@ -136,7 +136,10 @@ export default function Welcome() {
                                         ) : (
                                             <>
                                                 <DropdownMenuItem asChild>
-                                                    <a href={route('login')} className="font-milk flex w-full items-center gap-2 text-sm uppercase">
+                                                    <a
+                                                        href={route('login')}
+                                                        className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                                    >
                                                         <User className="h-4 w-4" />
                                                         Log in
                                                     </a>
@@ -144,7 +147,7 @@ export default function Welcome() {
                                                 <DropdownMenuItem asChild>
                                                     <a
                                                         href={route('register')}
-                                                        className="font-milk flex w-full items-center gap-2 text-sm uppercase"
+                                                        className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                                     >
                                                         <User className="h-4 w-4" />
                                                         Sign up
@@ -291,7 +294,7 @@ export default function Welcome() {
                     </nav>
                 </header>
                 <div className="flex w-full items-start justify-center opacity-100 transition-opacity duration-750 starting:opacity-0">
-                    <main className="flex w-full max-w-[1000px] flex-col lg:max-w-[2000px] lg:flex-col">
+                    <main className="flex w-full max-w-[1000px] flex-col gap-4 lg:max-w-[2000px] lg:flex-col">
                         <HeroSection />
                         <CategoriesSection />
                         <FeaturedSection />
@@ -301,7 +304,7 @@ export default function Welcome() {
                         {/* <Laravel12Default /> */}
                     </main>
                 </div>
-                <div className="hidden h-8 lg:block"></div>
+                <div className="hidden h-4 lg:block"></div>
             </div>
         </>
     );

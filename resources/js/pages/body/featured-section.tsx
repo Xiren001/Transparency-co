@@ -142,11 +142,11 @@ export default function FeaturedSection() {
     const canScrollLeft = currentIndex > 0;
 
     return (
-        <section className="bg-white py-16">
+        <section className="rounded-lg bg-white py-16 dark:bg-[#1a1a1f]">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="mb-8 flex items-center justify-between">
-                    <h2 className="text-3xl font-light text-gray-900 md:text-4xl">Featured</h2>
+                    <h2 className="text-3xl font-light text-gray-900 md:text-4xl dark:text-[#e0e0e5]">Featured</h2>
 
                     {/* Navigation Controls */}
                     <div className="flex items-center space-x-4">
@@ -157,7 +157,7 @@ export default function FeaturedSection() {
                                     key={index}
                                     onClick={() => setCurrentIndex(index * 4)}
                                     className={`h-2 w-2 rounded-full transition-colors ${
-                                        Math.floor(currentIndex / 4) === index ? 'bg-gray-800' : 'bg-gray-300'
+                                        Math.floor(currentIndex / 4) === index ? 'bg-gray-800 dark:bg-[#e0e0e5]' : 'bg-gray-300 dark:bg-[#6b6b75]'
                                     }`}
                                 />
                             ))}
@@ -165,10 +165,22 @@ export default function FeaturedSection() {
 
                         {/* Arrow Controls */}
                         <div className="flex space-x-2">
-                            <Button variant="outline" size="icon" onClick={scrollLeft} disabled={!canScrollLeft} className="h-8 w-8">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={scrollLeft}
+                                disabled={!canScrollLeft}
+                                className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                            >
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
-                            <Button variant="outline" size="icon" onClick={scrollRight} disabled={!canScrollRight} className="h-8 w-8">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={scrollRight}
+                                disabled={!canScrollRight}
+                                className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                            >
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
                         </div>
@@ -189,9 +201,9 @@ export default function FeaturedSection() {
                                 className="w-full flex-shrink-0 cursor-pointer px-1 sm:w-full sm:px-2 md:w-1/2 lg:w-1/4"
                                 onClick={() => handleProductClick(product)}
                             >
-                                <div className="group rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
+                                <div className="group rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50">
                                     {/* Product Image */}
-                                    <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100">
+                                    <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
                                         <img
                                             src={product.image || '/placeholder.svg'}
                                             alt={product.name}
@@ -218,11 +230,11 @@ export default function FeaturedSection() {
                                                 e.stopPropagation();
                                                 toggleFavorite(product.id);
                                             }}
-                                            className="absolute top-2 right-2 rounded-full bg-white p-1 shadow-sm transition-all duration-200 hover:shadow-md sm:top-3 sm:right-3 sm:p-2"
+                                            className="absolute top-2 right-2 rounded-full bg-white p-1 shadow-sm transition-all duration-200 hover:shadow-md sm:top-3 sm:right-3 sm:p-2 dark:bg-[#23232a]"
                                         >
                                             <Heart
                                                 className={`h-3 w-3 sm:h-4 sm:w-4 ${
-                                                    favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'
+                                                    favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400 dark:text-[#6b6b75]'
                                                 }`}
                                             />
                                         </button>
@@ -236,20 +248,26 @@ export default function FeaturedSection() {
                                                 <Star
                                                     key={index}
                                                     className={`h-3 w-3 sm:h-4 sm:w-4 ${
-                                                        index < product.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                                                        index < product.rating
+                                                            ? 'fill-yellow-400 text-yellow-400'
+                                                            : 'text-gray-300 dark:text-[#6b6b75]'
                                                     }`}
                                                 />
                                             ))}
                                         </div>
 
                                         {/* Product Name */}
-                                        <h3 className="mb-1 line-clamp-2 text-sm font-medium text-gray-900 sm:mb-2 sm:text-base">{product.name}</h3>
+                                        <h3 className="mb-1 line-clamp-2 text-sm font-medium text-gray-900 sm:mb-2 sm:text-base dark:text-[#e0e0e5]">
+                                            {product.name}
+                                        </h3>
 
                                         {/* Price */}
                                         <div className="flex items-center space-x-1 sm:space-x-2">
-                                            <span className="text-base font-semibold text-gray-900 sm:text-lg">${product.price.toFixed(2)}</span>
+                                            <span className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">
+                                                ${product.price.toFixed(2)}
+                                            </span>
                                             {product.originalPrice && (
-                                                <span className="text-xs text-gray-500 line-through sm:text-sm">
+                                                <span className="text-xs text-gray-500 line-through sm:text-sm dark:text-[#b8b8c0]">
                                                     ${product.originalPrice.toFixed(2)}
                                                 </span>
                                             )}
@@ -262,24 +280,26 @@ export default function FeaturedSection() {
                 </div>
 
                 {/* Mobile Scroll Indicator */}
-                <div className="mt-4 text-center text-sm text-gray-500 md:hidden">Swipe to see more products</div>
+                <div className="mt-4 text-center text-sm text-gray-500 md:hidden dark:text-[#b8b8c0]">Swipe to see more products</div>
             </div>
 
             {/* Product Detail Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="max-h-[90vh] w-full !max-w-7xl overflow-y-auto">
+                <DialogContent className="max-h-[90vh] w-full !max-w-7xl overflow-y-auto dark:bg-[#1a1a1f] dark:text-[#e0e0e5]">
                     {selectedProduct && (
                         <>
                             <DialogHeader>
-                                <DialogTitle className="text-2xl font-light">{selectedProduct.name}</DialogTitle>
-                                <DialogDescription>Premium quality product with excellent craftsmanship</DialogDescription>
+                                <DialogTitle className="text-2xl font-light dark:text-[#e0e0e5]">{selectedProduct.name}</DialogTitle>
+                                <DialogDescription className="dark:text-[#b8b8c0]">
+                                    Premium quality product with excellent craftsmanship
+                                </DialogDescription>
                             </DialogHeader>
 
                             <div className="mt-6 grid gap-6 md:grid-cols-2">
                                 {/* Product Image Gallery */}
                                 <div className="space-y-4">
                                     {/* Main Image */}
-                                    <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                                    <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-[#23232a]">
                                         <img
                                             src={selectedProduct.images[selectedImageIndex] || '/placeholder.svg'}
                                             alt={`${selectedProduct.name} view ${selectedImageIndex + 1}`}
@@ -293,10 +313,10 @@ export default function FeaturedSection() {
                                             <button
                                                 key={index}
                                                 onClick={() => handleImageSelect(index)}
-                                                className={`h-16 w-16 rounded border-2 bg-gray-100 transition-all duration-200 ${
+                                                className={`h-16 w-16 rounded border-2 bg-gray-100 transition-all duration-200 dark:bg-[#23232a] ${
                                                     selectedImageIndex === index
                                                         ? 'border-primary ring-primary/20 ring-2'
-                                                        : 'border-transparent hover:border-gray-300'
+                                                        : 'border-transparent hover:border-gray-300 dark:hover:border-[#3d3d45]'
                                                 }`}
                                             >
                                                 <img
@@ -309,7 +329,7 @@ export default function FeaturedSection() {
                                     </div>
 
                                     {/* Image Counter */}
-                                    <div className="text-center text-sm text-gray-500">
+                                    <div className="text-center text-sm text-gray-500 dark:text-[#b8b8c0]">
                                         {selectedImageIndex + 1} of {selectedProduct.images.length}
                                     </div>
                                 </div>
@@ -323,27 +343,31 @@ export default function FeaturedSection() {
                                                 <Star
                                                     key={index}
                                                     className={`h-5 w-5 ${
-                                                        index < selectedProduct.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                                                        index < selectedProduct.rating
+                                                            ? 'fill-yellow-400 text-yellow-400'
+                                                            : 'text-gray-300 dark:text-[#6b6b75]'
                                                     }`}
                                                 />
                                             ))}
                                         </div>
-                                        <span className="text-sm text-gray-600">(127 reviews)</span>
+                                        <span className="text-sm text-gray-600 dark:text-[#b8b8c0]">(127 reviews)</span>
                                     </div>
 
                                     {/* Price */}
                                     <div className="space-y-2">
                                         <div className="flex items-center space-x-3">
-                                            <span className="text-3xl font-semibold text-gray-900">${selectedProduct.price.toFixed(2)}</span>
+                                            <span className="text-3xl font-semibold text-gray-900 dark:text-[#e0e0e5]">
+                                                ${selectedProduct.price.toFixed(2)}
+                                            </span>
                                             {selectedProduct.originalPrice && (
-                                                <span className="text-xl text-gray-500 line-through">
+                                                <span className="text-xl text-gray-500 line-through dark:text-[#b8b8c0]">
                                                     ${selectedProduct.originalPrice.toFixed(2)}
                                                 </span>
                                             )}
                                             {selectedProduct.isHot && <Badge className="bg-red-500 text-white">HOT</Badge>}
                                         </div>
                                         {selectedProduct.originalPrice && (
-                                            <p className="text-sm text-green-600">
+                                            <p className="text-sm text-green-600 dark:text-green-400">
                                                 Save ${(selectedProduct.originalPrice - selectedProduct.price).toFixed(2)}(
                                                 {Math.round(
                                                     ((selectedProduct.originalPrice - selectedProduct.price) / selectedProduct.originalPrice) * 100,
@@ -355,8 +379,8 @@ export default function FeaturedSection() {
 
                                     {/* Description */}
                                     <div className="space-y-3">
-                                        <h3 className="font-semibold text-gray-900">Description</h3>
-                                        <p className="leading-relaxed text-gray-600">
+                                        <h3 className="font-semibold text-gray-900 dark:text-[#e0e0e5]">Description</h3>
+                                        <p className="leading-relaxed text-gray-600 dark:text-[#b8b8c0]">
                                             Premium quality {selectedProduct.name.toLowerCase()} made from sustainable, eco-friendly materials.
                                             Perfect for modern homes with elegant design and superior craftsmanship.
                                         </p>
@@ -364,8 +388,8 @@ export default function FeaturedSection() {
 
                                     {/* Features */}
                                     <div className="space-y-3">
-                                        <h3 className="font-semibold text-gray-900">Key Features</h3>
-                                        <ul className="space-y-2 text-gray-600">
+                                        <h3 className="font-semibold text-gray-900 dark:text-[#e0e0e5]">Key Features</h3>
+                                        <ul className="space-y-2 text-gray-600 dark:text-[#b8b8c0]">
                                             <li className="flex items-center space-x-2">
                                                 <div className="bg-primary h-1.5 w-1.5 rounded-full"></div>
                                                 <span>Premium sustainable materials</span>
@@ -384,23 +408,26 @@ export default function FeaturedSection() {
                                     {/* Buy Now Button */}
                                     <div className="space-y-4">
                                         <a href="" target="_blank" rel="noopener noreferrer" className="block">
-                                            <Button className="w-full py-3 text-lg font-medium">Buy Now</Button>
+                                            <Button className="w-full py-3 text-lg font-medium dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]">
+                                                Buy Now
+                                            </Button>
                                         </a>
                                     </div>
 
                                     {/* Additional Info */}
-                                    <div className="space-y-2 border-t pt-4 text-sm text-gray-600">
+                                    <div className="space-y-2 border-t border-gray-200 pt-4 text-sm text-gray-600 dark:border-[#2d2d35] dark:text-[#b8b8c0]">
                                         <p>
-                                            <span className="font-medium">SKU:</span> {selectedProduct.id.toString().padStart(6, '0')}
+                                            <span className="font-medium dark:text-[#e0e0e5]">SKU:</span>{' '}
+                                            {selectedProduct.id.toString().padStart(6, '0')}
                                         </p>
                                         <p>
-                                            <span className="font-medium">Category:</span> Kitchen & Home
+                                            <span className="font-medium dark:text-[#e0e0e5]">Category:</span> Kitchen & Home
                                         </p>
                                         <p>
-                                            <span className="font-medium">Shipping:</span> Free shipping on orders over $50
+                                            <span className="font-medium dark:text-[#e0e0e5]">Shipping:</span> Free shipping on orders over $50
                                         </p>
                                         <p>
-                                            <span className="font-medium">Return Policy:</span> 30-day return guarantee
+                                            <span className="font-medium dark:text-[#e0e0e5]">Return Policy:</span> 30-day return guarantee
                                         </p>
                                     </div>
                                 </div>

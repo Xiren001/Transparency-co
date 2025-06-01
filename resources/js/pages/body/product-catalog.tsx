@@ -308,21 +308,21 @@ export default function ProductCatalog() {
     }, [selectedCertificates, selectedPriceRange, sortBy]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen rounded-lg bg-gray-50 dark:bg-[#1a1a1f]">
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col gap-8 lg:flex-row">
                     {/* Sidebar Filters */}
                     <div className="w-full flex-shrink-0 lg:w-64">
-                        <div className="rounded-lg bg-white p-6 shadow-sm">
+                        <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-[#23232a]">
                             {/* Filter Header */}
                             <div className="mb-6 flex items-center gap-2">
-                                <Filter className="h-4 w-4" />
-                                <span className="text-sm font-medium tracking-wider">FILTER</span>
+                                <Filter className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
+                                <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">FILTER</span>
                             </div>
 
                             {/* Certificates */}
                             <div className="mb-8">
-                                <h3 className="mb-4 text-sm font-medium tracking-wider">CERTIFICATES</h3>
+                                <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
                                 <div className="space-y-3">
                                     {certificates.map((cert) => (
                                         <div key={cert} className="flex items-center space-x-2">
@@ -331,7 +331,10 @@ export default function ProductCatalog() {
                                                 checked={selectedCertificates.includes(cert)}
                                                 onCheckedChange={() => toggleCertificate(cert)}
                                             />
-                                            <label htmlFor={cert} className="cursor-pointer text-sm text-gray-700 hover:text-gray-900">
+                                            <label
+                                                htmlFor={cert}
+                                                className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                            >
                                                 {cert}
                                             </label>
                                         </div>
@@ -341,7 +344,7 @@ export default function ProductCatalog() {
 
                             {/* Price */}
                             <div>
-                                <h3 className="mb-4 text-sm font-medium tracking-wider">PRICE</h3>
+                                <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">PRICE</h3>
                                 <div className="space-y-3">
                                     {priceRanges.map((range) => (
                                         <div key={range.value} className="flex items-center space-x-2">
@@ -350,7 +353,10 @@ export default function ProductCatalog() {
                                                 checked={selectedPriceRange === range.value}
                                                 onCheckedChange={() => setSelectedPriceRange(range.value)}
                                             />
-                                            <label htmlFor={range.value} className="cursor-pointer text-sm text-gray-700 hover:text-gray-900">
+                                            <label
+                                                htmlFor={range.value}
+                                                className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                            >
                                                 {range.label}
                                             </label>
                                         </div>
@@ -364,23 +370,26 @@ export default function ProductCatalog() {
                     <div className="flex-1">
                         {/* Header */}
                         <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                            <h1 className="text-2xl font-light tracking-wider">PLASTIC FREE</h1>
+                            <h1 className="text-2xl font-light tracking-wider text-gray-900 dark:text-[#e0e0e5]">PLASTIC FREE</h1>
 
                             <div className="flex w-full flex-col items-start gap-4 sm:w-auto sm:flex-row sm:items-center">
                                 {/* Sort By */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="gap-2">
+                                        <Button
+                                            variant="outline"
+                                            className="gap-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                        >
                                             <span className="text-sm tracking-wider">SORT BY</span>
                                             <ChevronDown className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
+                                    <DropdownMenuContent className="dark:border-[#2d2d35] dark:bg-[#23232a]">
                                         {sortOptions.map((option) => (
                                             <DropdownMenuItem
                                                 key={option}
                                                 onClick={() => setSortBy(option)}
-                                                className={sortBy === option ? 'bg-gray-100' : ''}
+                                                className={sortBy === option ? 'bg-gray-100 dark:bg-[#2d2d35]' : 'dark:text-[#e0e0e5]'}
                                             >
                                                 {option}
                                             </DropdownMenuItem>
@@ -394,7 +403,7 @@ export default function ProductCatalog() {
                                         variant={gridView === '2-col' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('2-col')}
-                                        className="h-8 w-8"
+                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         <Grid2X2 className="h-4 w-4" />
                                     </Button>
@@ -402,7 +411,7 @@ export default function ProductCatalog() {
                                         variant={gridView === '3-col' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('3-col')}
-                                        className="h-8 w-8"
+                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         <Grid3X3 className="h-4 w-4" />
                                     </Button>
@@ -410,7 +419,7 @@ export default function ProductCatalog() {
                                         variant={gridView === 'list' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('list')}
-                                        className="h-8 w-8"
+                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         <List className="h-4 w-4" />
                                     </Button>
@@ -423,14 +432,14 @@ export default function ProductCatalog() {
                             {displayedProducts.map((product) => (
                                 <div
                                     key={product.id}
-                                    className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md ${
+                                    className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
                                         gridView === 'list' ? 'flex' : ''
                                     }`}
                                     onClick={() => handleProductClick(product)}
                                 >
                                     {/* Product Image */}
                                     <div
-                                        className={`relative flex-shrink-0 overflow-hidden bg-gray-100 ${
+                                        className={`relative flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#2d2d35] ${
                                             gridView === 'list' ? 'h-16 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'
                                         }`}
                                     >
@@ -466,13 +475,13 @@ export default function ProductCatalog() {
                                                 e.stopPropagation();
                                                 toggleFavorite(product.id);
                                             }}
-                                            className={`absolute rounded-full bg-white shadow-sm transition-all duration-200 hover:shadow-md ${
+                                            className={`absolute rounded-full bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a] ${
                                                 gridView === 'list' ? 'top-1 right-1 p-1' : 'top-2 right-2 p-1.5'
                                             }`}
                                         >
                                             <Heart
                                                 className={`${gridView === 'list' ? 'h-3 w-3' : 'h-3.5 w-3.5'} ${
-                                                    favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'
+                                                    favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400 dark:text-[#6b6b75]'
                                                 }`}
                                             />
                                         </button>
@@ -487,7 +496,9 @@ export default function ProductCatalog() {
                                                     <Star
                                                         key={index}
                                                         className={`${gridView === 'list' ? 'h-2.5 w-2.5' : 'h-3 w-3'} ${
-                                                            index < product.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                                                            index < product.rating
+                                                                ? 'fill-yellow-400 text-yellow-400'
+                                                                : 'text-gray-300 dark:text-[#6b6b75]'
                                                         }`}
                                                     />
                                                 ))}
@@ -495,7 +506,7 @@ export default function ProductCatalog() {
 
                                             {/* Product Name */}
                                             <h3
-                                                className={`mb-1.5 font-medium text-gray-900 ${
+                                                className={`mb-1.5 font-medium text-gray-900 dark:text-[#e0e0e5] ${
                                                     gridView === 'list' ? 'line-clamp-1 text-xs sm:line-clamp-2 sm:text-base' : 'line-clamp-2 text-sm'
                                                 }`}
                                             >
@@ -504,7 +515,7 @@ export default function ProductCatalog() {
 
                                             {/* Description for list view - Hidden on mobile */}
                                             {gridView === 'list' && (
-                                                <p className="mb-3 line-clamp-2 hidden text-sm text-gray-600 sm:block">
+                                                <p className="mb-3 line-clamp-2 hidden text-sm text-gray-600 sm:block dark:text-[#b8b8c0]">
                                                     Premium quality {product.name.toLowerCase()} made from sustainable, eco-friendly materials.
                                                     Perfect for modern homes with elegant design.
                                                 </p>
@@ -514,7 +525,11 @@ export default function ProductCatalog() {
                                             {gridView === 'list' && (
                                                 <div className="mb-3 hidden flex-wrap gap-1 sm:flex">
                                                     {product.certificates.slice(0, 3).map((cert) => (
-                                                        <Badge key={cert} variant="outline" className="text-xs">
+                                                        <Badge
+                                                            key={cert}
+                                                            variant="outline"
+                                                            className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                        >
                                                             {cert}
                                                         </Badge>
                                                     ))}
@@ -526,14 +541,16 @@ export default function ProductCatalog() {
                                             {/* Price */}
                                             <div className="flex items-center space-x-1.5">
                                                 <span
-                                                    className={`font-semibold text-gray-900 ${
+                                                    className={`font-semibold text-gray-900 dark:text-[#e0e0e5] ${
                                                         gridView === 'list' ? 'text-sm sm:text-lg' : 'text-base'
                                                     }`}
                                                 >
                                                     ${product.price.toFixed(2)}
                                                 </span>
                                                 {product.originalPrice && (
-                                                    <span className={`text-gray-500 line-through ${gridView === 'list' ? 'text-xs' : 'text-xs'}`}>
+                                                    <span
+                                                        className={`text-gray-500 line-through dark:text-[#b8b8c0] ${gridView === 'list' ? 'text-xs' : 'text-xs'}`}
+                                                    >
                                                         ${product.originalPrice.toFixed(2)}
                                                     </span>
                                                 )}
@@ -547,7 +564,7 @@ export default function ProductCatalog() {
                                                         // Handle buy now action
                                                     }}
                                                     size="sm"
-                                                    className="ml-3 hidden uppercase sm:block"
+                                                    className="ml-3 hidden uppercase sm:block dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
                                                 >
                                                     Buy Now
                                                 </Button>
@@ -563,7 +580,12 @@ export default function ProductCatalog() {
                             <div className="mt-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
                                 {/* Left side - Previous button and page info */}
                                 <div className="order-2 flex items-center space-x-4 sm:order-1">
-                                    <Button variant="outline" onClick={goToPrevious} disabled={currentPage === 1} className="px-3 py-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={goToPrevious}
+                                        disabled={currentPage === 1}
+                                        className="px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                    >
                                         <ChevronLeft className="mr-1 h-4 w-4" />
                                         Previous
                                     </Button>
@@ -571,17 +593,22 @@ export default function ProductCatalog() {
                                     {/* Page selector dropdown */}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="outline" className="min-w-[120px] gap-2">
+                                            <Button
+                                                variant="outline"
+                                                className="min-w-[120px] gap-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                            >
                                                 <span>Page {currentPage}</span>
                                                 <ChevronDown className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="max-h-60 overflow-y-auto">
+                                        <DropdownMenuContent className="max-h-60 overflow-y-auto dark:border-[#2d2d35] dark:bg-[#23232a]">
                                             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                                                 <DropdownMenuItem
                                                     key={page}
                                                     onClick={() => goToPage(page)}
-                                                    className={currentPage === page ? 'bg-gray-100 font-medium' : ''}
+                                                    className={
+                                                        currentPage === page ? 'bg-gray-100 font-medium dark:bg-[#2d2d35]' : 'dark:text-[#e0e0e5]'
+                                                    }
                                                 >
                                                     Page {page}
                                                 </DropdownMenuItem>
@@ -598,11 +625,11 @@ export default function ProductCatalog() {
                                             <Button
                                                 variant={1 === currentPage ? 'default' : 'outline'}
                                                 onClick={() => goToPage(1)}
-                                                className="min-w-[40px] px-3 py-2"
+                                                className="min-w-[40px] px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 1
                                             </Button>
-                                            {currentPage > 4 && <span className="px-2 py-2">...</span>}
+                                            {currentPage > 4 && <span className="px-2 py-2 text-gray-600 dark:text-[#b8b8c0]">...</span>}
                                         </>
                                     )}
 
@@ -616,7 +643,7 @@ export default function ProductCatalog() {
                                                 key={page}
                                                 variant={page === currentPage ? 'default' : 'outline'}
                                                 onClick={() => goToPage(page)}
-                                                className="min-w-[40px] px-3 py-2"
+                                                className="min-w-[40px] px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 {page}
                                             </Button>
@@ -625,11 +652,11 @@ export default function ProductCatalog() {
                                     {/* Last page */}
                                     {currentPage < totalPages - 2 && (
                                         <>
-                                            {currentPage < totalPages - 3 && <span className="px-2 py-2">...</span>}
+                                            {currentPage < totalPages - 3 && <span className="px-2 py-2 text-gray-600 dark:text-[#b8b8c0]">...</span>}
                                             <Button
                                                 variant={totalPages === currentPage ? 'default' : 'outline'}
                                                 onClick={() => goToPage(totalPages)}
-                                                className="min-w-[40px] px-3 py-2"
+                                                className="min-w-[40px] px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 {totalPages}
                                             </Button>
@@ -639,7 +666,12 @@ export default function ProductCatalog() {
 
                                 {/* Right side - Next button */}
                                 <div className="order-3 flex items-center space-x-4">
-                                    <Button variant="outline" onClick={goToNext} disabled={currentPage === totalPages} className="px-3 py-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={goToNext}
+                                        disabled={currentPage === totalPages}
+                                        className="px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                    >
                                         Next
                                         <ChevronRight className="ml-1 h-4 w-4" />
                                     </Button>
@@ -648,7 +680,7 @@ export default function ProductCatalog() {
                         )}
 
                         {/* Results Info */}
-                        <div className="mt-4 text-center text-sm text-gray-600">
+                        <div className="mt-4 text-center text-sm text-gray-600 dark:text-[#b8b8c0]">
                             Showing {startIndex + 1}-{Math.min(endIndex, sortedProducts.length)} of {sortedProducts.length} products
                         </div>
                     </div>
@@ -657,18 +689,20 @@ export default function ProductCatalog() {
 
             {/* Product Detail Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="font-milk max-h-[90vh] w-full !max-w-7xl overflow-y-auto tracking-tighter uppercase">
+                <DialogContent className="font-milk max-h-[90vh] w-full !max-w-7xl overflow-y-auto tracking-tighter uppercase dark:bg-[#1a1a1f] dark:text-[#e0e0e5]">
                     {selectedProduct && (
                         <>
                             <DialogHeader>
-                                <DialogTitle className="text-2xl font-light">{selectedProduct.name}</DialogTitle>
-                                <DialogDescription>Premium quality product with excellent craftsmanship</DialogDescription>
+                                <DialogTitle className="text-2xl font-light dark:text-[#e0e0e5]">{selectedProduct.name}</DialogTitle>
+                                <DialogDescription className="dark:text-[#b8b8c0]">
+                                    Premium quality product with excellent craftsmanship
+                                </DialogDescription>
                             </DialogHeader>
 
                             <div className="mt-6 grid gap-6 md:grid-cols-2">
                                 {/* Product Image Gallery */}
                                 <div className="space-y-4">
-                                    <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                                    <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-[#23232a]">
                                         <img
                                             src={selectedProduct.images[selectedImageIndex] || '/placeholder.svg'}
                                             alt={`${selectedProduct.name} view ${selectedImageIndex + 1}`}
@@ -681,10 +715,10 @@ export default function ProductCatalog() {
                                             <button
                                                 key={index}
                                                 onClick={() => handleImageSelect(index)}
-                                                className={`h-16 w-16 rounded border-2 bg-gray-100 transition-all duration-200 ${
+                                                className={`h-16 w-16 rounded border-2 bg-gray-100 transition-all duration-200 dark:bg-[#23232a] ${
                                                     selectedImageIndex === index
-                                                        ? 'border-primary ring-primary/20 ring-2'
-                                                        : 'border-transparent hover:border-gray-300'
+                                                        ? 'border-primary ring-primary/20 dark:border-primary dark:ring-primary/20 ring-2'
+                                                        : 'border-transparent hover:border-gray-300 dark:hover:border-[#3d3d45]'
                                                 }`}
                                             >
                                                 <img
@@ -696,7 +730,7 @@ export default function ProductCatalog() {
                                         ))}
                                     </div>
 
-                                    <div className="text-center text-sm text-gray-500">
+                                    <div className="text-center text-sm text-gray-500 dark:text-[#b8b8c0]">
                                         {selectedImageIndex + 1} of {selectedProduct.images.length}
                                     </div>
                                 </div>
@@ -709,26 +743,30 @@ export default function ProductCatalog() {
                                                 <Star
                                                     key={index}
                                                     className={`h-5 w-5 ${
-                                                        index < selectedProduct.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                                                        index < selectedProduct.rating
+                                                            ? 'fill-yellow-400 text-yellow-400'
+                                                            : 'text-gray-300 dark:text-[#6b6b75]'
                                                     }`}
                                                 />
                                             ))}
                                         </div>
-                                        <span className="text-sm text-gray-600">(127 reviews)</span>
+                                        <span className="text-sm text-gray-600 dark:text-[#b8b8c0]">(127 reviews)</span>
                                     </div>
 
                                     <div className="space-y-2">
                                         <div className="flex items-center space-x-3">
-                                            <span className="text-3xl font-semibold text-gray-900">${selectedProduct.price.toFixed(2)}</span>
+                                            <span className="text-3xl font-semibold text-gray-900 dark:text-[#e0e0e5]">
+                                                ${selectedProduct.price.toFixed(2)}
+                                            </span>
                                             {selectedProduct.originalPrice && (
-                                                <span className="text-xl text-gray-500 line-through">
+                                                <span className="text-xl text-gray-500 line-through dark:text-[#b8b8c0]">
                                                     ${selectedProduct.originalPrice.toFixed(2)}
                                                 </span>
                                             )}
                                             {selectedProduct.isNew && <Badge className="bg-green-500 text-white">NEW</Badge>}
                                         </div>
                                         {selectedProduct.originalPrice && (
-                                            <p className="text-sm text-green-600">
+                                            <p className="text-sm text-green-600 dark:text-green-400">
                                                 Save ${(selectedProduct.originalPrice - selectedProduct.price).toFixed(2)}(
                                                 {Math.round(
                                                     ((selectedProduct.originalPrice - selectedProduct.price) / selectedProduct.originalPrice) * 100,
@@ -739,18 +777,18 @@ export default function ProductCatalog() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <h3 className="font-semibold text-gray-900">Description</h3>
-                                        <p className="leading-relaxed text-gray-600">
+                                        <h3 className="font-semibold text-gray-900 dark:text-[#e0e0e5]">Description</h3>
+                                        <p className="leading-relaxed text-gray-600 dark:text-[#b8b8c0]">
                                             Premium quality {selectedProduct.name.toLowerCase()} made from sustainable, eco-friendly materials.
                                             Perfect for modern homes with elegant design and superior craftsmanship.
                                         </p>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <h3 className="font-semibold text-gray-900">Certificates</h3>
+                                        <h3 className="font-semibold text-gray-900 dark:text-[#e0e0e5]">Certificates</h3>
                                         <div className="flex flex-wrap gap-2">
                                             {selectedProduct.certificates.map((cert) => (
-                                                <Badge key={cert} variant="outline" className="text-xs">
+                                                <Badge key={cert} variant="outline" className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]">
                                                     {cert}
                                                 </Badge>
                                             ))}
@@ -759,22 +797,25 @@ export default function ProductCatalog() {
 
                                     <div className="space-y-4">
                                         <a href="" target="_blank" rel="noopener noreferrer" className="block">
-                                            <Button className="w-full py-3 text-lg font-medium uppercase">Buy Now</Button>
+                                            <Button className="w-full py-3 text-lg font-medium uppercase dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]">
+                                                Buy Now
+                                            </Button>
                                         </a>
                                     </div>
 
-                                    <div className="space-y-2 border-t pt-4 text-sm text-gray-600">
+                                    <div className="space-y-2 border-t border-gray-200 pt-4 text-sm text-gray-600 dark:border-[#2d2d35] dark:text-[#b8b8c0]">
                                         <p>
-                                            <span className="font-medium">SKU:</span> {selectedProduct.id.toString().padStart(6, '0')}
+                                            <span className="font-medium dark:text-[#e0e0e5]">SKU:</span>{' '}
+                                            {selectedProduct.id.toString().padStart(6, '0')}
                                         </p>
                                         <p>
-                                            <span className="font-medium">Category:</span> Kitchen & Home
+                                            <span className="font-medium dark:text-[#e0e0e5]">Category:</span> Kitchen & Home
                                         </p>
                                         <p>
-                                            <span className="font-medium">Shipping:</span> Free shipping on orders over $50
+                                            <span className="font-medium dark:text-[#e0e0e5]">Shipping:</span> Free shipping on orders over $50
                                         </p>
                                         <p>
-                                            <span className="font-medium">Return Policy:</span> 30-day return guarantee
+                                            <span className="font-medium dark:text-[#e0e0e5]">Return Policy:</span> 30-day return guarantee
                                         </p>
                                     </div>
                                 </div>

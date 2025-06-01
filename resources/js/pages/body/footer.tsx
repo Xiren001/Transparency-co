@@ -2,9 +2,7 @@
 
 import type React from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Instagram, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Footer() {
@@ -49,122 +47,126 @@ export default function Footer() {
             ),
             href: 'https://www.tiktok.com/@topshelf.america',
         },
-        { name: 'YouTube', icon: Youtube, href: 'https://youtube.com' },
     ];
 
     return (
-        <footer className="w-full rounded-lg">
-            {/* Newsletter Section */}
-            <section className="relative bg-cover bg-center bg-no-repeat py-16" style={{ backgroundImage: "url('/images/footer-bg.jpg')" }}>
-                {/* Overlay for better text readability */}
-                <div className="absolute inset-0 rounded-lg bg-white/80"></div>
+        <footer className="relative rounded-lg bg-white py-16 dark:bg-[#1a1a1f]">
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0 rounded-lg bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/footer-bg.png')" }}>
+                <div className="absolute inset-0 rounded-lg bg-black/20 dark:bg-black/40"></div>
+            </div>
 
-                <div className="relative z-10 container mx-auto px-4">
-                    <div className="mx-auto max-w-md text-center">
-                        {/* Newsletter Heading */}
-                        <h2 className="mb-3 text-2xl font-light text-gray-900 md:text-3xl">Join Our Newsletter</h2>
+            <div className="relative z-10 container mx-auto px-4">
+                {/* Newsletter Section */}
+                <div className="mx-auto max-w-2xl text-center">
+                    <h2 className="mb-4 text-3xl font-light tracking-wide text-gray-900 md:text-4xl dark:text-[#e0e0e5]">Join Our Newsletter</h2>
+                    <p className="mb-8 text-sm text-gray-600 dark:text-[#b8b8c0]">
+                        Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
+                    </p>
 
-                        {/* Newsletter Subtext */}
-                        <p className="mb-8 text-sm tracking-wider text-gray-600 uppercase">Subscribe for deals, new products and promotions</p>
-
-                        {/* Newsletter Form */}
-                        <form onSubmit={handleSubscribe} className="space-y-4">
-                            <div className="flex flex-col gap-3 sm:flex-row">
-                                <Input
-                                    type="email"
-                                    placeholder="E-MAIL ADDRESS"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    className="h-12 flex-1 border-gray-300 px-4 text-sm tracking-wider placeholder:text-gray-500 focus:border-gray-900 focus:ring-gray-900"
-                                    disabled={isLoading}
-                                />
-                                <Button
-                                    type="submit"
-                                    disabled={isLoading || !email}
-                                    className="h-12 bg-gray-900 px-8 text-sm font-medium tracking-wider text-white hover:bg-gray-800"
-                                >
-                                    {isLoading ? 'SUBSCRIBING...' : 'SUBSCRIBE'}
-                                </Button>
-                            </div>
-
-                            {/* Success Message */}
-                            {isSubscribed && (
-                                <p className="text-sm font-medium text-green-600">Thank you for subscribing! Check your email for confirmation.</p>
-                            )}
-                        </form>
+                    {/* Email Input */}
+                    <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            className="font-milk focus:border-primary focus:ring-primary flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm uppercase focus:ring-1 focus:outline-none dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:placeholder-[#6b6b75]"
+                        />
+                        <button className="font-milk rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white uppercase transition-colors duration-200 hover:bg-gray-800 dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]">
+                            Subscribe
+                        </button>
                     </div>
                 </div>
-            </section>
 
-            {/* Main Footer */}
-            <section className="rounded-lg bg-gray-900 py-12 text-white">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col items-center justify-between space-y-6 lg:flex-row lg:space-y-0">
-                        {/* Company Name */}
-                        <div className="flex items-center">
-                            <h3 className="text-xl font-light tracking-wider">Transparency Co</h3>
-                        </div>
-
-                        {/* Navigation Links */}
-                        <nav className="flex flex-wrap items-center justify-center gap-6 lg:gap-8">
-                            {navigationLinks.map((link) => (
-                                <a
-                                    key={link.name}
-                                    href={link.href}
-                                    className="text-sm tracking-wider text-gray-300 transition-colors duration-200 hover:text-white"
-                                >
-                                    {link.name}
+                {/* Footer Links */}
+                <div className="mt-16 grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+                    {/* Company Info */}
+                    <div>
+                        <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">Company</h3>
+                        <ul className="space-y-2 text-sm text-gray-600 dark:text-[#b8b8c0]">
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    About Us
                                 </a>
-                            ))}
-                        </nav>
-
-                        {/* Social Media Links */}
-                        <div className="flex items-center space-x-4">
-                            {socialLinks.map((social) => {
-                                const IconComponent = social.icon;
-                                return (
-                                    <a
-                                        key={social.name}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 text-gray-400 transition-colors duration-200 hover:text-white"
-                                        aria-label={social.name}
-                                    >
-                                        <IconComponent />
-                                    </a>
-                                );
-                            })}
-                        </div>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Careers
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Contact Us
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
-                    {/* Bottom Section */}
-                    <div className="mt-8 border-t border-gray-800 pt-8">
-                        <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
-                            {/* Copyright */}
-                            <p className="text-xs tracking-wider text-gray-400">
-                                COPYRIGHT - {new Date().getFullYear()} TRANSPARENCY CO, ALL RIGHTS RESERVED
-                            </p>
-                            {/* Legal Links */}
-                            <div className="flex items-center space-x-6">
-                                <a
-                                    href="/privacy-policy"
-                                    className="text-xs tracking-wider text-gray-400 transition-colors duration-200 hover:text-white"
-                                >
-                                    PRIVACY POLICY
+                    {/* Customer Service */}
+                    <div>
+                        <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">Customer Service</h3>
+                        <ul className="space-y-2 text-sm text-gray-600 dark:text-[#b8b8c0]">
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Help Center
                                 </a>
-                                <a
-                                    href="/terms-of-use"
-                                    className="text-xs tracking-wider text-gray-400 transition-colors duration-200 hover:text-white"
-                                >
-                                    TERMS OF USE
+                            </li>
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Shipping Info
                                 </a>
-                            </div>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Returns & Exchanges
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Legal */}
+                    <div>
+                        <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">Legal</h3>
+                        <ul className="space-y-2 text-sm text-gray-600 dark:text-[#b8b8c0]">
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Privacy Policy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Terms of Service
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:text-primary transition-colors">
+                                    Cookie Policy
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Social Media */}
+                    <div>
+                        <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">Follow Us</h3>
+                        <div className="flex space-x-4">
+                            <a href="#" className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]">
+                                <Facebook className="h-5 w-5" />
+                            </a>
+                            <a href="#" className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]">
+                                <Twitter className="h-5 w-5" />
+                            </a>
+                            <a href="#" className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]">
+                                <Instagram className="h-5 w-5" />
+                            </a>
                         </div>
                     </div>
                 </div>
-            </section>
+
+                {/* Copyright */}
+                <div className="mt-16 border-t border-gray-200 pt-8 text-center text-sm text-gray-600 dark:border-[#2d2d35] dark:text-[#b8b8c0]">
+                    <p className="text-l tracking-wider text-black">COPYRIGHT - {new Date().getFullYear()} TRANSPARENCY CO, ALL RIGHTS RESERVED</p>
+                </div>
+            </div>
         </footer>
     );
 }
