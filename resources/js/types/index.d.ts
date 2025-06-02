@@ -31,7 +31,14 @@ export interface SharedData {
     sidebarOpen: boolean;
     products?: {
         data: Product[];
-        links: any;
+        links: Array<{ url: string | null; label: string; active: boolean }>;
+        current_page: number;
+        last_page: number;
+        from: number | null;
+        to: number | null;
+        total: number;
+        prev_page_url: string | null;
+        next_page_url: string | null;
     };
     [key: string]: unknown;
 }

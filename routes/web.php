@@ -28,10 +28,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
     Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
     Route::post('products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::delete('pro                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ducts/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 });
 
 Route::get('/productst', [ProductController::class, 'customerView'])->name('products.customer');
+Route::get('/products/customer-view', [ProductController::class, 'customerView'])->name('products.customer-view');
+
+Route::get('/api/products/filter', [App\Http\Controllers\Api\ProductFilterController::class, 'filter'])->name('api.products.filter');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

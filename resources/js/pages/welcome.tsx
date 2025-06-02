@@ -298,7 +298,26 @@ export default function Welcome() {
                         <HeroSection />
                         <CategoriesSection />
                         <FeaturedSection />
-                        <ProductCatalog products={products ?? { data: [], links: {} }} />
+                        <ProductCatalog
+                            products={
+                                products ?? {
+                                    data: [],
+                                    links: [],
+                                    current_page: 1,
+                                    last_page: 1,
+                                    from: null,
+                                    to: null,
+                                    total: 0,
+                                    prev_page_url: null,
+                                    next_page_url: null,
+                                }
+                            }
+                            filters={{
+                                certificates: [],
+                                price_range: '',
+                                sort_by: '',
+                            }}
+                        />
                         <TrendingBrands />
                         <Footer />
                         {/* <Laravel12Default /> */}

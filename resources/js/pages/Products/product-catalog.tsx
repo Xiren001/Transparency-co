@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type Product } from '@/types';
+import axios from 'axios';
 import { ChevronDown, ChevronLeft, ChevronRight, Filter, Grid2X2, Grid3X3, Heart, List, Star } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeGrid as Grid } from 'react-window';
 
@@ -38,53 +40,66 @@ const sortOptions = ['Featured', 'Price: Low to High', 'Price: High to Low', 'Ne
 interface Props {
     products: {
         data: Product[];
-        links: any;
+        links: Array<{ url: string | null; label: string; active: boolean }>;
+        current_page: number;
+        last_page: number;
+        from: number | null;
+        to: number | null;
+        total: number;
+        prev_page_url: string | null;
+        next_page_url: string | null;
+    };
+    filters: {
+        certificates: string[];
+        price_range: string;
+        sort_by: string;
     };
 }
 
-export default function CustomerView({ products }: Props) {
-    const [selectedCertificates, setSelectedCertificates] = useState<string[]>(['ALL CERTIFICATE']);
-    const [selectedPriceRange, setSelectedPriceRange] = useState('all');
-    const [sortBy, setSortBy] = useState('Featured');
+export default function CustomerView({ products: initialProducts, filters: initialFilters }: Props) {
+    const [products, setProducts] = useState(initialProducts);
+    const [selectedCertificates, setSelectedCertificates] = useState<string[]>(initialFilters.certificates);
+    const [selectedPriceRange, setSelectedPriceRange] = useState(initialFilters.price_range);
+    const [sortBy, setSortBy] = useState(initialFilters.sort_by);
     const [gridView, setGridView] = useState('3-col');
     const [favorites, setFavorites] = useState<number[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(9);
+    const [isLoading, setIsLoading] = useState(false);
     const gridRef = useRef<any>(null);
     const productGridWrapperRef = useRef<HTMLDivElement>(null);
 
-    // Debounced filter states
-    const [debouncedCertificates, setDebouncedCertificates] = useState(selectedCertificates);
-    const [debouncedPriceRange, setDebouncedPriceRange] = useState(selectedPriceRange);
-    const [debouncedSortBy, setDebouncedSortBy] = useState(sortBy);
-
-    // Effect to debounce filter changes
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedCertificates(selectedCertificates);
-            setDebouncedPriceRange(selectedPriceRange);
-            setDebouncedSortBy(sortBy);
-        }, 300); // 300ms debounce delay
-
-        return () => {
-            // Cancel the timeout if filters change before the delay
-            clearTimeout(handler);
-        };
-    }, [selectedCertificates, selectedPriceRange, sortBy]);
-
-    // Reset scroll position and pagination when debounced filters change
-    useEffect(() => {
-        if (gridRef.current) {
-            gridRef.current.scrollTo({
-                scrollLeft: 0,
-                scrollTop: 0,
-            });
+    const fetchFilteredProducts = useCallback(async (params: URLSearchParams) => {
+        try {
+            setIsLoading(true);
+            const response = await axios.get(route('api.products.filter'), { params });
+            setProducts(response.data.products);
+        } catch (error) {
+            console.error('Error fetching filtered products:', error);
+        } finally {
+            setIsLoading(false);
         }
-        setCurrentPage(1); // Reset to first page on filter/sort/view changes
-    }, [debouncedCertificates, debouncedPriceRange, debouncedSortBy, gridView]);
+    }, []);
+
+    // Effect to handle filter changes
+    useEffect(() => {
+        const params = new URLSearchParams();
+
+        if (selectedCertificates.length > 0) {
+            selectedCertificates.forEach((cert) => params.append('certificates[]', cert));
+        }
+
+        if (selectedPriceRange !== 'all') {
+            params.append('price_range', selectedPriceRange);
+        }
+
+        if (sortBy !== 'Featured') {
+            params.append('sort_by', sortBy);
+        }
+
+        fetchFilteredProducts(params);
+    }, [selectedCertificates, selectedPriceRange, sortBy, fetchFilteredProducts]);
 
     const toggleCertificate = (cert: string) => {
         if (cert === 'ALL CERTIFICATE') {
@@ -109,74 +124,30 @@ export default function CustomerView({ products }: Props) {
         setSelectedImageIndex(index);
     };
 
-    // Memoize filtered products
-    const filteredProducts = useMemo(() => {
-        return products.data.filter((product) => {
-            // Certificate filter using debounced state
-            if (debouncedCertificates.length > 0 && !debouncedCertificates.includes('ALL CERTIFICATE')) {
-                const hasMatchingCert = debouncedCertificates.some((cert) => product.certificates?.includes(cert));
-                if (!hasMatchingCert) return false;
-            }
-
-            // Price filter using debounced state
-            if (debouncedPriceRange !== 'all') {
-                const price = product.price;
-                switch (debouncedPriceRange) {
-                    case '0-9.99':
-                        if (price >= 10) return false;
-                        break;
-                    case '100-199.99':
-                        if (price < 100 || price >= 200) return false;
-                        break;
-                    case '200-299.99':
-                        if (price < 200 || price >= 300) return false;
-                        break;
-                    case '300-399.99':
-                        if (price < 300 || price >= 400) return false;
-                        break;
-                    case '400+':
-                        if (price < 400) return false;
-                        break;
-                }
-            }
-
-            return true;
-        });
-    }, [products.data, debouncedCertificates, debouncedPriceRange]);
-
-    // Memoize sorted products
-    const sortedProducts = useMemo(() => {
-        return [...filteredProducts].sort((a, b) => {
-            // Sorting using debounced state
-            switch (debouncedSortBy) {
-                case 'Price: Low to High':
-                    return a.price - b.price;
-                case 'Price: High to Low':
-                    return b.price - a.price;
-                case 'Newest':
-                    return b.id - a.id;
-                default:
-                    return 0;
-            }
-        });
-    }, [filteredProducts, debouncedSortBy]);
-
-    // Calculate products for the current page
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const pagedProducts = sortedProducts.slice(startIndex, endIndex);
+    const handlePageChange = async (url: string) => {
+        try {
+            setIsLoading(true);
+            const response = await axios.get(url);
+            setProducts(response.data.products);
+            productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error('Error fetching page:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const itemsPerRow = gridView === '2-col' ? 2 : gridView === '3-col' ? 3 : 1;
-    const rowCount = Math.ceil(pagedProducts.length / itemsPerRow); // Row count for the current page
-    const totalPages = Math.ceil(sortedProducts.length / itemsPerPage); // Total pages based on all filtered/sorted products
-    const rowHeight = gridView === 'list' ? 180 : gridView === '2-col' ? 550 : 400; // Approximate row height for list and grid views
+    const rowCount = Math.ceil(products.data.length / itemsPerRow);
+    const totalPages = products.last_page;
+    const rowHeight = gridView === 'list' ? 180 : gridView === '2-col' ? 550 : 400;
 
-    // Memoize the Cell component rendering
+    // Update the Cell component to use products.data directly
     const Cell = useMemo(
         () =>
             ({ columnIndex, rowIndex, style }: any) => {
                 const index = rowIndex * itemsPerRow + columnIndex;
-                const product = pagedProducts[index]; // Get product from the paged list
+                const product = products.data[index];
 
                 if (!product) {
                     return null;
@@ -318,7 +289,7 @@ export default function CustomerView({ products }: Props) {
                     </div>
                 );
             },
-        [itemsPerRow, pagedProducts, gridView, favorites, toggleFavorite, handleProductClick],
+        [itemsPerRow, products.data, gridView, favorites, toggleFavorite, handleProductClick],
     );
 
     return (
@@ -457,8 +428,8 @@ export default function CustomerView({ products }: Props) {
                                             rowCount={rowCount}
                                             rowHeight={rowHeight}
                                             width={width}
-                                            itemData={pagedProducts} // Pass only the products for the current page
-                                            key={currentPage} // Add key based on current page
+                                            itemData={products.data} // Pass only the products for the current page
+                                            key={products.current_page} // Add key based on current page
                                         >
                                             {Cell}
                                         </Grid>
@@ -474,11 +445,8 @@ export default function CustomerView({ products }: Props) {
                                 <div className="order-2 flex items-center space-x-4 sm:order-1">
                                     <Button
                                         variant="outline"
-                                        onClick={() => {
-                                            setCurrentPage(currentPage - 1);
-                                            productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                        }}
-                                        disabled={currentPage === 1}
+                                        onClick={() => products.prev_page_url && handlePageChange(products.prev_page_url)}
+                                        disabled={!products.prev_page_url || isLoading}
                                         className="font-milk px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         <ChevronLeft className="mr-1 h-4 w-4" />
@@ -493,93 +461,49 @@ export default function CustomerView({ products }: Props) {
                                                 className="font-milk min-w-[120px] gap-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 <span>
-                                                    Page {currentPage} of {totalPages}
+                                                    Page {products.current_page} of {products.last_page}
                                                 </span>
                                                 <ChevronDown className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="max-h-60 overflow-y-auto dark:border-[#2d2d35] dark:bg-[#23232a]">
-                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                                <DropdownMenuItem
-                                                    key={page}
-                                                    onClick={() => {
-                                                        setCurrentPage(page);
-                                                        productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                                    }}
-                                                    className={
-                                                        currentPage === page
-                                                            ? 'font-milk bg-gray-100 font-medium uppercase dark:bg-[#2d2d35]'
-                                                            : 'dark:text-[#e0e0e5]'
-                                                    }
-                                                >
-                                                    Page {page}
-                                                </DropdownMenuItem>
-                                            ))}
+                                            {products.links
+                                                .filter((link) => link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;')
+                                                .map((link, index) => (
+                                                    <DropdownMenuItem
+                                                        key={index}
+                                                        onClick={() => {
+                                                            link.url && handlePageChange(link.url);
+                                                        }}
+                                                        className={
+                                                            link.active
+                                                                ? 'font-milk bg-gray-100 font-medium uppercase dark:bg-[#2d2d35]'
+                                                                : 'dark:text-[#e0e0e5]'
+                                                        }
+                                                    >
+                                                        {link.label}
+                                                    </DropdownMenuItem>
+                                                ))}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
 
                                 {/* Center - Page numbers */}
                                 <div className="order-1 flex space-x-1 sm:order-2">
-                                    {/* First page */}
-                                    {currentPage > 3 && (
-                                        <>
+                                    {products.links.map((link, index) =>
+                                        link.url === null ? null : link.label === '&laquo; Previous' || link.label === 'Next &raquo;' ? null : ( // Don't render disabled links // Don't render prev/next here, they are separate buttons
                                             <Button
-                                                variant={1 === currentPage ? 'default' : 'outline'}
+                                                key={index}
+                                                variant={link.active ? 'default' : 'outline'}
                                                 onClick={() => {
-                                                    setCurrentPage(1);
-                                                    productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                                    link.url && handlePageChange(link.url);
                                                 }}
+                                                disabled={!link.url}
                                                 className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
-                                                1
+                                                {link.label}
                                             </Button>
-                                            {currentPage > 4 && totalPages > 5 && (
-                                                <span className="font-milk px-2 py-2 text-gray-600 uppercase dark:text-[#b8b8c0]">...</span>
-                                            )}
-                                        </>
-                                    )}
-
-                                    {/* Pages around current page */}
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                        .filter((page) => {
-                                            // Show pages around the current page, ensuring at least 5 page numbers are visible if possible
-                                            if (totalPages <= 5) return true;
-                                            if (currentPage <= 3) return page <= 5;
-                                            if (currentPage >= totalPages - 2) return page >= totalPages - 4;
-                                            return page >= currentPage - 2 && page <= currentPage + 2;
-                                        })
-                                        .map((page) => (
-                                            <Button
-                                                key={page}
-                                                variant={page === currentPage ? 'default' : 'outline'}
-                                                onClick={() => {
-                                                    setCurrentPage(page);
-                                                    productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                                }}
-                                                className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                            >
-                                                {page}
-                                            </Button>
-                                        ))}
-
-                                    {/* Last page */}
-                                    {currentPage < totalPages - 2 && (
-                                        <>
-                                            {currentPage < totalPages - 3 && totalPages > 5 && (
-                                                <span className="font-milk px-2 py-2 text-gray-600 uppercase dark:text-[#b8b8c0]">...</span>
-                                            )}
-                                            <Button
-                                                variant={totalPages === currentPage ? 'default' : 'outline'}
-                                                onClick={() => {
-                                                    setCurrentPage(totalPages);
-                                                    productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                                }}
-                                                className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                            >
-                                                {totalPages}
-                                            </Button>
-                                        </>
+                                        ),
                                     )}
                                 </div>
 
@@ -587,11 +511,8 @@ export default function CustomerView({ products }: Props) {
                                 <div className="order-3 flex items-center space-x-4">
                                     <Button
                                         variant="outline"
-                                        onClick={() => {
-                                            setCurrentPage(currentPage + 1);
-                                            productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                        }}
-                                        disabled={currentPage === totalPages}
+                                        onClick={() => products.next_page_url && handlePageChange(products.next_page_url)}
+                                        disabled={!products.next_page_url || isLoading}
                                         className="font-milk px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         Next
@@ -603,14 +524,27 @@ export default function CustomerView({ products }: Props) {
 
                         {/* Results Info */}
                         <div className="mt-4 text-center text-sm text-gray-600 dark:text-[#b8b8c0]">
-                            Showing {sortedProducts.length > 0 ? startIndex + 1 : 0}-
-                            {Math.min(startIndex + pagedProducts.length, sortedProducts.length)} of {sortedProducts.length} products
+                            Showing {products.from || 0}-{products.to || 0} of {products.total} products
                         </div>
                     </div>
                 </div>
             </div>
 
             <ProductDetailsModal product={selectedProduct} isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
+
+            {/* Loading indicator using portal */}
+            {isLoading &&
+                createPortal(
+                    <div className="font-milk fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 uppercase backdrop-blur-sm">
+                        <div className="flex flex-col items-center gap-4 rounded-xl bg-white/90 p-6 shadow-2xl dark:bg-[#23232a]/90">
+                            <div className="relative h-12 w-12">
+                                <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-[#2d2d35]"></div>
+                                <div className="absolute inset-0 animate-[spin_1s_linear_infinite] rounded-full border-4 border-t-blue-600 dark:border-t-blue-500"></div>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body,
+                )}
         </div>
     );
 }
