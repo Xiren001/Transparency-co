@@ -281,51 +281,87 @@ export default function Index({ products }: Props) {
         images: string[];
         type: 'product_images' | 'certificate_images';
         existingImages?: string[];
-    }) => (
-        <div className="mt-2 grid grid-cols-4 gap-2">
-            {images.map((image, index) => (
-                <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
-                    <img src={image} alt={`${type} preview ${index + 1}`} className="h-full w-full object-cover" />
-                    <button
-                        type="button"
-                        onClick={() => removeImage(type, index)}
-                        className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path
-                                fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                    </button>
-                </div>
-            ))}
-        </div>
-    );
+    }) => {
+        const placeholderImage =
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
 
-    const ExistingImagePreview = ({ images, type }: { images: string[]; type: 'product_images' | 'certificate_images' }) => (
-        <div className="grid grid-cols-4 gap-2">
-            {images.map((image, index) => (
-                <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
-                    <img src={`/storage/${image}`} alt={`${type} ${index + 1}`} className="h-full w-full object-cover" />
-                    <button
-                        type="button"
-                        onClick={() => removeImage(type, index, image)}
-                        className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path
-                                fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                    </button>
-                </div>
-            ))}
-        </div>
-    );
+        return (
+            <div className="mt-2 grid grid-cols-4 gap-2">
+                {images.map((image, index) => (
+                    <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
+                        <img
+                            src={image}
+                            alt={`${type} preview ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = placeholderImage;
+                                // Revoke the blob URL if it exists
+                                if (image.startsWith('blob:')) {
+                                    URL.revokeObjectURL(image);
+                                }
+                            }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                // Revoke the blob URL before removing the image
+                                if (image.startsWith('blob:')) {
+                                    URL.revokeObjectURL(image);
+                                }
+                                removeImage(type, index);
+                            }}
+                            className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    fillRule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
+    const ExistingImagePreview = ({ images, type }: { images: string[]; type: 'product_images' | 'certificate_images' }) => {
+        const placeholderImage =
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
+
+        return (
+            <div className="grid grid-cols-4 gap-2">
+                {images.map((image, index) => (
+                    <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
+                        <img
+                            src={image ? `/storage/${image}` : placeholderImage}
+                            alt={`${type} ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = placeholderImage;
+                            }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => removeImage(type, index, image)}
+                            className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    fillRule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     const handleCertificateChange = (certificate: string) => {
         setFormData((prev) => {
@@ -647,54 +683,59 @@ export default function Index({ products }: Props) {
                     </DialogContent>
                 </Dialog>
 
-                <div className="rounded-md border">
+                <div className="bg-card rounded-lg border">
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Certificates</TableHead>
-                                <TableHead>Details</TableHead>
-                                <TableHead>Actions</TableHead>
+                            <TableRow className="hover:bg-muted/50">
+                                <TableHead className="w-[250px]">Name</TableHead>
+                                <TableHead className="w-[100px]">Price</TableHead>
+                                <TableHead className="w-[150px]">Category</TableHead>
+                                <TableHead className="w-[100px]">Status</TableHead>
+                                <TableHead className="w-[200px]">Certificates</TableHead>
+                                <TableHead className="w-[200px]">Details</TableHead>
+                                <TableHead className="w-[150px] text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {products.data.map((product) => (
-                                <TableRow key={product.id}>
-                                    <TableCell>{product.name}</TableCell>
-                                    <TableCell>${product.price}</TableCell>
-                                    <TableCell>{product.category || '-'}</TableCell>
+                                <TableRow key={product.id} className="hover:bg-muted/50">
+                                    <TableCell className="font-medium">{product.name}</TableCell>
+                                    <TableCell>${Number(product.price).toFixed(2)}</TableCell>
+                                    <TableCell>
+                                        <span className="capitalize">{product.category?.replace(/-/g, ' ') || '-'}</span>
+                                    </TableCell>
                                     <TableCell>
                                         {product.is_new ? (
-                                            <Badge className="bg-green-500">New</Badge>
+                                            <Badge className="bg-green-500 hover:bg-green-600">New</Badge>
                                         ) : (
-                                            <Badge className="border-none bg-transparent shadow-none"></Badge>
+                                            <Badge variant="outline" className="border-none bg-transparent shadow-none">
+                                                -
+                                            </Badge>
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex flex-wrap gap-1">
+                                        <div className="flex flex-wrap gap-1.5">
                                             {(product.certificates || []).map((cert) => (
-                                                <Badge key={cert} variant="outline">
+                                                <Badge key={cert} variant="secondary" className="text-xs">
                                                     {cert}
                                                 </Badge>
                                             ))}
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="space-y-1">
+                                        <div className="space-y-1.5">
                                             {(product.product_details || []).map((detail, index) => (
-                                                <div key={index} className="text-sm">
-                                                    <span className="font-medium">{detail.name}:</span> {detail.value}
+                                                <div key={index} className="text-muted-foreground text-sm">
+                                                    <span className="text-foreground font-medium">{detail.name}:</span> {detail.value}
                                                 </div>
                                             ))}
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex space-x-2">
+                                        <div className="flex justify-end space-x-2">
                                             <Button
                                                 variant="outline"
+                                                size="sm"
                                                 onClick={() => {
                                                     setSelectedProduct(product);
                                                     setFormData({
@@ -716,10 +757,11 @@ export default function Index({ products }: Props) {
                                                     });
                                                     setIsEditModalOpen(true);
                                                 }}
+                                                className="h-8 px-3"
                                             >
                                                 Edit
                                             </Button>
-                                            <Button variant="destructive" onClick={() => handleDelete(product)}>
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(product)} className="h-8 px-3">
                                                 Delete
                                             </Button>
                                         </div>

@@ -15,8 +15,8 @@ import CategoriesSection from './body/categories-section';
 import FeaturedSection from './body/featured-section';
 import Footer from './body/footer';
 import HeroSection from './body/hero-section';
-import ProductCatalog from './body/product-catalog';
 import TrendingBrands from './body/trending-brands';
+import ProductCatalog from './Products/product-catalog';
 
 const navigation = [
     { name: 'Home', href: '/' },
@@ -26,7 +26,7 @@ const navigation = [
 ];
 
 export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, products } = usePage<SharedData>().props;
     const [isOpen, setIsOpen] = React.useState(false);
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
@@ -298,7 +298,7 @@ export default function Welcome() {
                         <HeroSection />
                         <CategoriesSection />
                         <FeaturedSection />
-                        <ProductCatalog />
+                        <ProductCatalog products={products ?? { data: [], links: {} }} />
                         <TrendingBrands />
                         <Footer />
                         {/* <Laravel12Default /> */}

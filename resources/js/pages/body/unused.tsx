@@ -153,6 +153,23 @@ const allProducts = [
         certificates: ['PLASTIC FREE', 'BIODEGRADABLE', 'COMPOSTABLE'],
     },
     {
+        id: 10,
+        name: 'Natural Fiber Coasters',
+        price: 3.99,
+        originalPrice: null,
+        image: '/placeholder.svg?height=300&width=300',
+        images: [
+            '/placeholder.svg?height=400&width=400',
+            '/placeholder.svg?height=400&width=400&text=Texture+Detail',
+            '/placeholder.svg?height=400&width=400&text=Color+Variants',
+            '/placeholder.svg?height=400&width=400&text=In+Use',
+        ],
+        rating: 5,
+        isNew: true,
+        category: 'dining',
+        certificates: ['PLASTIC FREE', 'BIODEGRADABLE', 'COMPOSTABLE'],
+    },
+    {
         id: 8,
         name: 'Bamboo Cutting Board',
         price: 39.99,
@@ -577,14 +594,14 @@ export default function ProductCatalog() {
 
                         {/* Pagination */}
                         {totalPages > 1 && (
-                            <div className="mt-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                            <div className="font-milk mt-8 flex flex-col items-center justify-between gap-4 uppercase sm:flex-row">
                                 {/* Left side - Previous button and page info */}
                                 <div className="order-2 flex items-center space-x-4 sm:order-1">
                                     <Button
                                         variant="outline"
                                         onClick={goToPrevious}
                                         disabled={currentPage === 1}
-                                        className="px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                        className="font-milk px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         <ChevronLeft className="mr-1 h-4 w-4" />
                                         Previous
@@ -595,7 +612,7 @@ export default function ProductCatalog() {
                                         <DropdownMenuTrigger asChild>
                                             <Button
                                                 variant="outline"
-                                                className="min-w-[120px] gap-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                                className="font-milk min-w-[120px] gap-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 <span>Page {currentPage}</span>
                                                 <ChevronDown className="h-4 w-4" />
@@ -607,7 +624,9 @@ export default function ProductCatalog() {
                                                     key={page}
                                                     onClick={() => goToPage(page)}
                                                     className={
-                                                        currentPage === page ? 'bg-gray-100 font-medium dark:bg-[#2d2d35]' : 'dark:text-[#e0e0e5]'
+                                                        currentPage === page
+                                                            ? 'font-milk bg-gray-100 font-medium uppercase dark:bg-[#2d2d35]'
+                                                            : 'dark:text-[#e0e0e5]'
                                                     }
                                                 >
                                                     Page {page}
@@ -625,11 +644,13 @@ export default function ProductCatalog() {
                                             <Button
                                                 variant={1 === currentPage ? 'default' : 'outline'}
                                                 onClick={() => goToPage(1)}
-                                                className="min-w-[40px] px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                                className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 1
                                             </Button>
-                                            {currentPage > 4 && <span className="px-2 py-2 text-gray-600 dark:text-[#b8b8c0]">...</span>}
+                                            {currentPage > 4 && (
+                                                <span className="font-milk px-2 py-2 text-gray-600 uppercase dark:text-[#b8b8c0]">...</span>
+                                            )}
                                         </>
                                     )}
 
@@ -643,7 +664,7 @@ export default function ProductCatalog() {
                                                 key={page}
                                                 variant={page === currentPage ? 'default' : 'outline'}
                                                 onClick={() => goToPage(page)}
-                                                className="min-w-[40px] px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                                className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 {page}
                                             </Button>
@@ -652,11 +673,13 @@ export default function ProductCatalog() {
                                     {/* Last page */}
                                     {currentPage < totalPages - 2 && (
                                         <>
-                                            {currentPage < totalPages - 3 && <span className="px-2 py-2 text-gray-600 dark:text-[#b8b8c0]">...</span>}
+                                            {currentPage < totalPages - 3 && (
+                                                <span className="font-milk px-2 py-2 text-gray-600 uppercase dark:text-[#b8b8c0]">...</span>
+                                            )}
                                             <Button
                                                 variant={totalPages === currentPage ? 'default' : 'outline'}
                                                 onClick={() => goToPage(totalPages)}
-                                                className="min-w-[40px] px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                                className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                             >
                                                 {totalPages}
                                             </Button>
@@ -670,7 +693,7 @@ export default function ProductCatalog() {
                                         variant="outline"
                                         onClick={goToNext}
                                         disabled={currentPage === totalPages}
-                                        className="px-3 py-2 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                        className="font-milk px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                     >
                                         Next
                                         <ChevronRight className="ml-1 h-4 w-4" />

@@ -241,4 +241,10 @@ class ProductController extends Controller
             return back()->withErrors(['error' => 'Failed to delete product: ' . $e->getMessage()]);
         }
     }
+
+    public function customerView()
+    {
+        $products = Product::latest()->paginate(12);
+        return Inertia::render('Products/product-catalog', ['products' => $products]);
+    }
 }

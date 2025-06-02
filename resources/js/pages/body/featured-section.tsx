@@ -6,96 +6,27 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ChevronLeft, ChevronRight, Heart, Star } from 'lucide-react';
 import { useState } from 'react';
 
-const featuredProducts = [
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+    originalPrice: number | null;
+    image: string;
+    images: string[];
+    rating: number;
+    isHot: boolean;
+}
+
+const featuredProducts: Product[] = [
     {
         id: 1,
-        name: 'Bamboo Storage Containers',
-        price: 19.0,
+        name: 'Coming Soon',
+        price: 0.0,
         originalPrice: null,
         image: '/placeholder.svg?height=300&width=300',
-        images: [
-            '/placeholder.svg?height=400&width=400',
-            '/placeholder.svg?height=400&width=400&text=Side+View',
-            '/placeholder.svg?height=400&width=400&text=Top+View',
-            '/placeholder.svg?height=400&width=400&text=Detail+View',
-        ],
-        rating: 5,
-        isHot: true,
-    },
-    {
-        id: 2,
-        name: 'Wooden Cutting Board Set',
-        price: 24.99,
-        originalPrice: 40.0,
-        image: '/placeholder.svg?height=300&width=300',
-        images: [
-            '/placeholder.svg?height=400&width=400',
-            '/placeholder.svg?height=400&width=400&text=Set+View',
-            '/placeholder.svg?height=400&width=400&text=Individual+Board',
-            '/placeholder.svg?height=400&width=400&text=Wood+Grain',
-        ],
-        rating: 5,
-        isHot: true,
-    },
-    {
-        id: 3,
-        name: 'Bamboo Kitchen Utensil Set',
-        price: 30.0,
-        originalPrice: null,
-        image: '/placeholder.svg?height=300&width=300',
-        images: [
-            '/placeholder.svg?height=400&width=400',
-            '/placeholder.svg?height=400&width=400&text=Utensils+Spread',
-            '/placeholder.svg?height=400&width=400&text=Handle+Detail',
-            '/placeholder.svg?height=400&width=400&text=In+Use',
-        ],
-        rating: 5,
-        isHot: true,
-    },
-    {
-        id: 4,
-        name: 'Wooden Coaster Collection',
-        price: 209.99,
-        originalPrice: null,
-        image: '/placeholder.svg?height=300&width=300',
-        images: [
-            '/placeholder.svg?height=400&width=400',
-            '/placeholder.svg?height=400&width=400&text=Stack+View',
-            '/placeholder.svg?height=400&width=400&text=Pattern+Detail',
-            '/placeholder.svg?height=400&width=400&text=Set+Layout',
-        ],
-        rating: 5,
-        isHot: true,
-    },
-    {
-        id: 5,
-        name: 'Eco-Friendly Dinnerware',
-        price: 45.0,
-        originalPrice: 60.0,
-        image: '/placeholder.svg?height=300&width=300',
-        images: [
-            '/placeholder.svg?height=400&width=400',
-            '/placeholder.svg?height=400&width=400&text=Place+Setting',
-            '/placeholder.svg?height=400&width=400&text=Bowl+Detail',
-            '/placeholder.svg?height=400&width=400&text=Complete+Set',
-        ],
-        rating: 5,
-        isHot: true,
-    },
-    {
-        id: 6,
-        name: 'Sustainable Kitchen Tools',
-        price: 35.99,
-        originalPrice: null,
-        image: '/placeholder.svg?height=300&width=300',
-        images: [
-            '/placeholder.svg?height=400&width=400',
-            '/placeholder.svg?height=400&width=400&text=Tool+Collection',
-            '/placeholder.svg?height=400&width=400&text=Material+Close-up',
-            '/placeholder.svg?height=400&width=400&text=Kitchen+Setup',
-        ],
-        rating: 5,
-        isHot: true,
+        images: ['/placeholder.svg?height=400&width=400'],
+        rating: 0,
+        isHot: false,
     },
 ];
 
@@ -380,10 +311,7 @@ export default function FeaturedSection() {
                                     {/* Description */}
                                     <div className="space-y-3">
                                         <h3 className="font-semibold text-gray-900 dark:text-[#e0e0e5]">Description</h3>
-                                        <p className="leading-relaxed text-gray-600 dark:text-[#b8b8c0]">
-                                            Premium quality {selectedProduct.name.toLowerCase()} made from sustainable, eco-friendly materials.
-                                            Perfect for modern homes with elegant design and superior craftsmanship.
-                                        </p>
+                                        <p className="leading-relaxed text-gray-600 dark:text-[#b8b8c0]">--</p>
                                     </div>
 
                                     {/* Features */}
@@ -392,15 +320,15 @@ export default function FeaturedSection() {
                                         <ul className="space-y-2 text-gray-600 dark:text-[#b8b8c0]">
                                             <li className="flex items-center space-x-2">
                                                 <div className="bg-primary h-1.5 w-1.5 rounded-full"></div>
-                                                <span>Premium sustainable materials</span>
+                                                <span>--</span>
                                             </li>
                                             <li className="flex items-center space-x-2">
                                                 <div className="bg-primary h-1.5 w-1.5 rounded-full"></div>
-                                                <span>Elegant modern design</span>
+                                                <span>--</span>
                                             </li>
                                             <li className="flex items-center space-x-2">
                                                 <div className="bg-primary h-1.5 w-1.5 rounded-full"></div>
-                                                <span>Easy care and maintenance</span>
+                                                <span>--</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -417,17 +345,16 @@ export default function FeaturedSection() {
                                     {/* Additional Info */}
                                     <div className="space-y-2 border-t border-gray-200 pt-4 text-sm text-gray-600 dark:border-[#2d2d35] dark:text-[#b8b8c0]">
                                         <p>
-                                            <span className="font-medium dark:text-[#e0e0e5]">SKU:</span>{' '}
-                                            {selectedProduct.id.toString().padStart(6, '0')}
+                                            <span className="font-medium dark:text-[#e0e0e5]">SKU:</span> --
                                         </p>
                                         <p>
-                                            <span className="font-medium dark:text-[#e0e0e5]">Category:</span> Kitchen & Home
+                                            <span className="font-medium dark:text-[#e0e0e5]">Category:</span> --
                                         </p>
                                         <p>
-                                            <span className="font-medium dark:text-[#e0e0e5]">Shipping:</span> Free shipping on orders over $50
+                                            <span className="font-medium dark:text-[#e0e0e5]">Shipping:</span> --
                                         </p>
                                         <p>
-                                            <span className="font-medium dark:text-[#e0e0e5]">Return Policy:</span> 30-day return guarantee
+                                            <span className="font-medium dark:text-[#e0e0e5]">Return Policy:</span> --
                                         </p>
                                     </div>
                                 </div>

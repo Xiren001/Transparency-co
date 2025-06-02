@@ -29,6 +29,10 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    products?: {
+        data: Product[];
+        links: any;
+    };
     [key: string]: unknown;
 }
 
@@ -41,4 +45,19 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    original_price: number | null;
+    is_new: boolean;
+    certificates: string[] | null;
+    images: string[];
+    certificates_images: string[];
+    product_link: string | null;
+    category: string | null;
+    product_details: { name: string; value: string }[] | null;
 }
