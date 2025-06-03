@@ -15,11 +15,11 @@ export default function HeroSection() {
                 <nav className="text-muted-foreground mb-8 flex items-center justify-center text-sm">
                     <span className="hover:text-primary cursor-pointer transition-colors dark:text-[#b8b8c0]">HOME</span>
                     <ChevronRight className="mx-2 h-4 w-4" />
-                    <span className="text-primary font-medium">FEATURED</span>
+                    <span className="text-primary font-medium">Products</span>
                 </nav>
 
                 {/* Main Heading */}
-                <h1 className="mb-6 text-3xl font-light tracking-wide text-gray-900 md:text-5xl lg:text-6xl dark:text-[#e0e0e5]">Coming Soon</h1>
+                <h1 className="mb-6 text-3xl font-light tracking-wide text-gray-900 md:text-5xl lg:text-6xl dark:text-[#e0e0e5]">Transparency Co</h1>
 
                 {/* Subheading */}
                 <p className="mx-auto max-w-2xl text-sm font-light tracking-wider text-gray-700 md:text-xl dark:text-[#b8b8c0]">

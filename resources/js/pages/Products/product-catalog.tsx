@@ -53,6 +53,7 @@ interface Props {
         certificates: string[];
         price_range: string;
         sort_by: string;
+        category?: string;
     };
 }
 
@@ -84,7 +85,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
 
     // Effect to handle filter changes
     useEffect(() => {
-        const params = new URLSearchParams();
+        const params = new URLSearchParams(window.location.search);
 
         if (selectedCertificates.length > 0) {
             selectedCertificates.forEach((cert) => params.append('certificates[]', cert));
@@ -100,6 +101,25 @@ export default function CustomerView({ products: initialProducts, filters: initi
 
         fetchFilteredProducts(params);
     }, [selectedCertificates, selectedPriceRange, sortBy, fetchFilteredProducts]);
+
+    // Effect to handle category changes
+    useEffect(() => {
+        const handleCategoryChange = () => {
+            const params = new URLSearchParams(window.location.search);
+            fetchFilteredProducts(params);
+        };
+
+        // Initial load with URL params
+        handleCategoryChange();
+
+        window.addEventListener('popstate', handleCategoryChange);
+        window.addEventListener('categoryChanged', handleCategoryChange);
+
+        return () => {
+            window.removeEventListener('popstate', handleCategoryChange);
+            window.removeEventListener('categoryChanged', handleCategoryChange);
+        };
+    }, [fetchFilteredProducts]);
 
     const toggleCertificate = (cert: string) => {
         if (cert === 'ALL CERTIFICATE') {
@@ -355,7 +375,9 @@ export default function CustomerView({ products: initialProducts, filters: initi
                     <div className="flex-1">
                         {/* Header */}
                         <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                            <h1 className="text-2xl font-light tracking-wider text-gray-900 dark:text-[#e0e0e5]">PLASTIC FREE</h1>
+                            <h1 className="text-2xl font-light tracking-wider text-gray-900 dark:text-[#e0e0e5]">
+                                {initialFilters.category || 'Certified Products'}
+                            </h1>
 
                             <div className="flex w-full flex-col items-start gap-4 sm:w-auto sm:flex-row sm:items-center">
                                 {/* Sort By */}

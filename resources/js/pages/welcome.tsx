@@ -185,18 +185,8 @@ export default function Welcome() {
 
                                         {/* Mobile Actions */}
                                         <div className="border-t pt-4">
-                                            {/* Search Button */}
-                                            <button
-                                                type="button"
-                                                className="font-milk mb-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
-                                                onClick={() => setIsSearchOpen(true)}
-                                            >
-                                                <Search className="h-4 w-4" />
-                                                Search
-                                            </button>
-
                                             {auth.user ? (
-                                                <div className="flex flex-col space-y-3">
+                                                <div className="flex flex-col items-center space-y-3">
                                                     <div className="flex items-center space-x-3 p-2">
                                                         <Avatar className="h-10 w-10">
                                                             <AvatarImage src="/placeholder.svg?height=40&width=40" alt={auth.user.name} />
@@ -246,6 +236,16 @@ export default function Welcome() {
                                                     </a>
                                                 </div>
                                             )}
+
+                                            {/* Search Button */}
+                                            <button
+                                                type="button"
+                                                className="font-milk mt-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                onClick={() => setIsSearchOpen(true)}
+                                            >
+                                                <Search className="h-4 w-4" />
+                                                Search
+                                            </button>
                                         </div>
                                     </div>
                                 </SheetContent>

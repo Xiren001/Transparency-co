@@ -446,7 +446,7 @@ export default function Index({ products }: Props) {
     return (
         <AppLayout>
             <Head title="Products" />
-            <div className="container mx-auto py-10">
+            <div className="container mx-auto px-2 py-10">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Products</h1>
                     <Button onClick={() => setIsCreateModalOpen(true)}>Add Product</Button>

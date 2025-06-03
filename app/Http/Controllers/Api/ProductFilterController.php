@@ -13,6 +13,11 @@ class ProductFilterController extends Controller
     {
         $query = Product::query();
 
+        // Handle category filter
+        if ($request->has('category') && $request->category) {
+            $query->where('category', $request->category);
+        }
+
         // Handle certificate filters
         if ($request->has('certificates') && !empty($request->certificates)) {
             $certificates = $request->certificates;
@@ -70,7 +75,8 @@ class ProductFilterController extends Controller
             'filters' => [
                 'certificates' => $request->certificates ?? [],
                 'price_range' => $request->price_range ?? 'all',
-                'sort_by' => $request->sort_by ?? 'Featured'
+                'sort_by' => $request->sort_by ?? 'Featured',
+                'category' => $request->category
             ]
         ]);
     }

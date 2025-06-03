@@ -36,5 +36,15 @@ Route::get('/products/customer-view', [ProductController::class, 'customerView']
 
 Route::get('/api/products/filter', [App\Http\Controllers\Api\ProductFilterController::class, 'filter'])->name('api.products.filter');
 
+Route::post('/newsletter/subscribe', [App\Http\Controllers\NewsletterSubscriberController::class, 'store'])->name('newsletter.subscribe');
+Route::get('/newsletter/verify/{token}', [App\Http\Controllers\NewsletterSubscriberController::class, 'verify'])->name('newsletter.verify');
+Route::get('/newsletter/unsubscribe/{token}', [App\Http\Controllers\NewsletterSubscriberController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
+// Admin routes for newsletter management
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/admin/newsletter', [App\Http\Controllers\NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
+    Route::get('/admin/newsletter/export', [App\Http\Controllers\NewsletterSubscriberController::class, 'export'])->name('newsletter.export');
+});
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

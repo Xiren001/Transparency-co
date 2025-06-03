@@ -1,42 +1,77 @@
 'use client';
 
-import type React from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { Facebook, Instagram } from 'lucide-react';
+import React, { useState } from 'react';
 
-import { Facebook, Instagram, Twitter } from 'lucide-react';
-import { useState } from 'react';
+interface SocialLink {
+    name: string;
+    icon: LucideIcon | React.ComponentType<{ className?: string }>;
+    href: string;
+}
 
 export default function Footer() {
     const [email, setEmail] = useState('');
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email) return;
 
         setIsLoading(true);
+        setError(null);
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        try {
+            const response = await fetch(route('newsletter.subscribe'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+                body: JSON.stringify({ email }),
+                credentials: 'same-origin',
+            });
 
-        setIsSubscribed(true);
-        setIsLoading(false);
-        setEmail('');
+            const data = await response.json();
 
-        // Reset success message after 3 seconds
-        setTimeout(() => setIsSubscribed(false), 3000);
+            if (!response.ok) {
+                if (response.status === 422) {
+                    // Handle validation errors
+                    const errors = data.errors;
+                    if (errors && errors.email) {
+                        const errorMessage = errors.email[0];
+                        setError(errorMessage);
+                        return;
+                    }
+                }
+                // Handle other error responses
+                const errorMessage = data.message || 'Failed to subscribe';
+                setError(errorMessage);
+                return;
+            }
+
+            // Success case
+            setIsSubscribed(true);
+            setEmail('');
+        } catch (error) {
+            console.error('Newsletter subscription error:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Failed to subscribe to newsletter';
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
+            // Reset success message after 5 seconds
+            setTimeout(() => {
+                setIsSubscribed(false);
+                setError(null);
+            }, 5000);
+        }
     };
 
-    const navigationLinks = [
-        { name: 'CERTIFIED PRODUCTS', href: '/certified' },
-        { name: 'HOME', href: '/' },
-        { name: 'FEATURED', href: '/featured' },
-        { name: 'PRODUCT', href: '/products' },
-        { name: 'BLOG', href: '/blog' },
-        { name: 'CONTACT US', href: '/contact' },
-    ];
-
-    const socialLinks = [
+    const socialLinks: SocialLink[] = [
+        { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/topshelf.america' },
         { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/topshelf.america/' },
         {
             name: 'TikTok',
@@ -46,6 +81,24 @@ export default function Footer() {
                 </svg>
             ),
             href: 'https://www.tiktok.com/@topshelf.america',
+        },
+        {
+            name: 'Email',
+            icon: () => (
+                <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                </svg>
+            ),
+            href: 'mailto:michael@topshelf.life',
         },
     ];
 
@@ -60,21 +113,39 @@ export default function Footer() {
                 {/* Newsletter Section */}
                 <div className="mx-auto max-w-2xl text-center">
                     <h2 className="mb-4 text-3xl font-light tracking-wide text-gray-900 md:text-4xl dark:text-[#e0e0e5]">Join Our Newsletter</h2>
-                    <p className="mb-8 text-sm text-gray-600 dark:text-[#b8b8c0]">
-                        Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
-                    </p>
+                    <p className="mb-8 text-sm text-gray-600 dark:text-[#b8b8c0]">Subscribe for deals, new products and promotions</p>
 
                     {/* Email Input */}
-                    <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="font-milk focus:border-primary focus:ring-primary flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm uppercase focus:ring-1 focus:outline-none dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:placeholder-[#6b6b75]"
-                        />
-                        <button className="font-milk rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white uppercase transition-colors duration-200 hover:bg-gray-800 dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]">
-                            Subscribe
+                    <form onSubmit={handleSubscribe} className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                        <div className="flex-1">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    setError(null);
+                                }}
+                                placeholder="Enter your email"
+                                className={`font-milk focus:border-primary focus:ring-primary w-full rounded-lg border px-4 py-3 text-sm uppercase focus:ring-1 focus:outline-none dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:placeholder-[#6b6b75] ${
+                                    error ? 'border-red-500 dark:border-red-500' : 'border-gray-300'
+                                }`}
+                                required
+                            />
+                            {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="font-milk rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white uppercase transition-colors duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                        >
+                            {isLoading ? 'Subscribing...' : 'Subscribe'}
                         </button>
-                    </div>
+                    </form>
+                    {isSubscribed && (
+                        <p className="mt-4 text-sm text-green-600 dark:text-green-400">
+                            Thank you for subscribing! Please check your email to verify your subscription.
+                        </p>
+                    )}
                 </div>
 
                 {/* Footer Links */}
@@ -149,15 +220,20 @@ export default function Footer() {
                     <div>
                         <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">Follow Us</h3>
                         <div className="flex space-x-4">
-                            <a href="#" className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]">
-                                <Facebook className="h-5 w-5" />
-                            </a>
-                            <a href="#" className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]">
-                                <Twitter className="h-5 w-5" />
-                            </a>
-                            <a href="#" className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]">
-                                <Instagram className="h-5 w-5" />
-                            </a>
+                            {socialLinks.map((link) => {
+                                const Icon = link.icon;
+                                return (
+                                    <a
+                                        key={link.name}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-primary text-gray-600 transition-colors dark:text-[#b8b8c0]"
+                                    >
+                                        <Icon className="h-5 w-5" />
+                                    </a>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
