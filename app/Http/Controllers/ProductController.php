@@ -25,8 +25,6 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            Log::info('Product creation request received', $request->all());
-
             // Convert string 'true'/'false' to boolean
             if ($request->has('is_new')) {
                 $request->merge(['is_new' => filter_var($request->is_new, FILTER_VALIDATE_BOOLEAN)]);
@@ -40,6 +38,7 @@ class ProductController extends Controller
                 }
             }
 
+            // Optimize validation rules
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -48,8 +47,8 @@ class ProductController extends Controller
                 'is_new' => 'boolean',
                 'certificates' => 'nullable|array',
                 'certificates.*' => 'string|in:ALL CERTIFICATE,PLASTIC FREE,USDA ORGANIC,NON-GMO,FRAGRANCE FREE,PALM OIL FREE,BIODEGRADABLE,FAIR TRADE,REUSABLE,COMPOSTABLE',
-                'product_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
-                'certificate_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+                'product_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+                'certificate_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
                 'product_link' => 'nullable|url|max:255',
                 'category' => 'nullable|string|max:255',
                 'product_details' => 'nullable|array',
@@ -57,34 +56,44 @@ class ProductController extends Controller
                 'product_details.*.value' => 'required|string|max:255',
             ]);
 
-            Log::info('Validation passed', $validated);
-
             $data = $request->except(['product_images', 'certificate_images']);
 
-            // Process product images
+            // Handle product images
             if ($request->hasFile('product_images')) {
                 $productImages = [];
                 foreach ($request->file('product_images') as $image) {
-                    $path = $image->store('product_image', 'public');
-                    $productImages[] = $path;
+                    // Generate unique filename with timestamp
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+
+                    // Store in public disk
+                    $path = $image->storeAs('public/product_image', $filename);
+
+                    // Get the public URL path
+                    $publicPath = str_replace('public/', '', $path);
+                    $productImages[] = $publicPath;
                 }
                 $data['images'] = $productImages;
-                Log::info('Product images processed', ['images' => $productImages]);
             }
 
-            // Process certificate images
+            // Handle certificate images
             if ($request->hasFile('certificate_images')) {
                 $certificateImages = [];
                 foreach ($request->file('certificate_images') as $image) {
-                    $path = $image->store('certificate_image', 'public');
-                    $certificateImages[] = $path;
+                    // Generate unique filename with timestamp
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+
+                    // Store in public disk
+                    $path = $image->storeAs('public/certificate_image', $filename);
+
+                    // Get the public URL path
+                    $publicPath = str_replace('public/', '', $path);
+                    $certificateImages[] = $publicPath;
                 }
                 $data['certificates_images'] = $certificateImages;
-                Log::info('Certificate images processed', ['images' => $certificateImages]);
             }
 
+            // Create product
             $product = Product::create($data);
-            Log::info('Product created successfully', ['product' => $product]);
 
             return redirect()->route('products.index')->with('success', 'Product created successfully.');
         } catch (ValidationException $e) {
@@ -96,10 +105,8 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             Log::error('Error creating product', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'input' => $request->all()
+                'trace' => $e->getTraceAsString()
             ]);
-
             return back()->withErrors(['error' => 'Failed to create product: ' . $e->getMessage()]);
         }
     }
@@ -117,8 +124,6 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         try {
-            Log::info('Product update request received', $request->all());
-
             // Convert string 'true'/'false' to boolean
             if ($request->has('is_new')) {
                 $request->merge(['is_new' => filter_var($request->is_new, FILTER_VALIDATE_BOOLEAN)]);
@@ -132,6 +137,7 @@ class ProductController extends Controller
                 }
             }
 
+            // Optimize validation rules
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -140,8 +146,8 @@ class ProductController extends Controller
                 'is_new' => 'boolean',
                 'certificates' => 'nullable|array',
                 'certificates.*' => 'string|in:ALL CERTIFICATE,PLASTIC FREE,USDA ORGANIC,NON-GMO,FRAGRANCE FREE,PALM OIL FREE,BIODEGRADABLE,FAIR TRADE,REUSABLE,COMPOSTABLE',
-                'product_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
-                'certificate_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+                'product_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+                'certificate_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
                 'remove_product_images' => 'nullable|array',
                 'remove_certificate_images' => 'nullable|array',
                 'product_link' => 'nullable|url|max:255',
@@ -151,8 +157,6 @@ class ProductController extends Controller
                 'product_details.*.value' => 'required|string|max:255',
             ]);
 
-            Log::info('Validation passed', $validated);
-
             $data = $request->except([
                 'product_images',
                 'certificate_images',
@@ -160,50 +164,58 @@ class ProductController extends Controller
                 'remove_certificate_images'
             ]);
 
-            // Remove selected product images
+            // Handle image removal
             if ($request->has('remove_product_images')) {
                 foreach ($request->remove_product_images as $image) {
-                    Storage::disk('public')->delete($image);
+                    Storage::disk('public')->delete('product_image/' . basename($image));
                 }
                 $currentImages = array_diff($product->images ?? [], $request->remove_product_images);
                 $data['images'] = array_values($currentImages);
-                Log::info('Product images removed', ['removed' => $request->remove_product_images]);
             }
 
-            // Remove selected certificate images
             if ($request->has('remove_certificate_images')) {
                 foreach ($request->remove_certificate_images as $image) {
-                    Storage::disk('public')->delete($image);
+                    Storage::disk('public')->delete('certificate_image/' . basename($image));
                 }
                 $currentCertificates = array_diff($product->certificates_images ?? [], $request->remove_certificate_images);
                 $data['certificates_images'] = array_values($currentCertificates);
-                Log::info('Certificate images removed', ['removed' => $request->remove_certificate_images]);
             }
 
-            // Add new product images
+            // Handle new product images
             if ($request->hasFile('product_images')) {
                 $newImages = $data['images'] ?? $product->images ?? [];
                 foreach ($request->file('product_images') as $image) {
-                    $path = $image->store('product_image', 'public');
-                    $newImages[] = $path;
+                    // Generate unique filename with timestamp
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+
+                    // Store in public disk
+                    $path = $image->storeAs('public/product_image', $filename);
+
+                    // Get the public URL path
+                    $publicPath = str_replace('public/', '', $path);
+                    $newImages[] = $publicPath;
                 }
                 $data['images'] = $newImages;
-                Log::info('New product images added', ['images' => $newImages]);
             }
 
-            // Add new certificate images
+            // Handle new certificate images
             if ($request->hasFile('certificate_images')) {
                 $newCertificates = $data['certificates_images'] ?? $product->certificates_images ?? [];
                 foreach ($request->file('certificate_images') as $image) {
-                    $path = $image->store('certificate_image', 'public');
-                    $newCertificates[] = $path;
+                    // Generate unique filename with timestamp
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+
+                    // Store in public disk
+                    $path = $image->storeAs('public/certificate_image', $filename);
+
+                    // Get the public URL path
+                    $publicPath = str_replace('public/', '', $path);
+                    $newCertificates[] = $publicPath;
                 }
                 $data['certificates_images'] = $newCertificates;
-                Log::info('New certificate images added', ['images' => $newCertificates]);
             }
 
             $product->update($data);
-            Log::info('Product updated successfully', ['product' => $product]);
 
             return redirect()->route('products.index')->with('success', 'Product updated successfully.');
         } catch (\Exception $e) {
@@ -211,7 +223,6 @@ class ProductController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
             return back()->withErrors(['error' => 'Failed to update product: ' . $e->getMessage()]);
         }
     }

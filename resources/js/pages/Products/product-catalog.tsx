@@ -8,10 +8,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { type Product } from '@/types';
 import axios from 'axios';
 import { ChevronDown, ChevronLeft, ChevronRight, Filter, Grid2X2, Grid3X3, Heart, List, Star } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { toast } from 'react-hot-toast';
 
 const certificates = [
     'ALL CERTIFICATE',
@@ -70,6 +69,14 @@ export default function CustomerView({ products: initialProducts, filters: initi
     const [isLoading, setIsLoading] = useState(false);
     const gridRef = useRef<any>(null);
     const productGridWrapperRef = useRef<HTMLDivElement>(null);
+    const [formData, setFormData] = useState<{
+        product_images?: File[];
+        certificate_images?: File[];
+    }>({});
+    const [imagePreviews, setImagePreviews] = useState<{
+        product_images?: string[];
+        certificate_images?: string[];
+    }>({});
 
     const fetchFilteredProducts = useCallback(async (params: URLSearchParams) => {
         try {
@@ -160,157 +167,153 @@ export default function CustomerView({ products: initialProducts, filters: initi
     const itemsPerRow = gridView === '2-col' ? 2 : gridView === '3-col' ? 3 : 1;
     const rowCount = Math.ceil(products.data.length / itemsPerRow);
     const totalPages = products.last_page;
-    const rowHeight = gridView === 'list' ? 180 : gridView === '2-col' ? 550 : 400;
 
-    // Update the Cell component to use products.data directly
-    const Cell = useMemo(
-        () =>
-            ({ columnIndex, rowIndex, style }: any) => {
-                const index = rowIndex * itemsPerRow + columnIndex;
-                const product = products.data[index];
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'product_images' | 'certificate_images') => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            const maxFiles = type === 'product_images' ? 4 : 5;
+            const maxSize = 2 * 1024 * 1024; // 2MB
 
-                if (!product) {
-                    return null;
-                }
+            if (files.length > maxFiles) {
+                toast.error(`Maximum ${maxFiles} ${type === 'product_images' ? 'product' : 'certificate'} images allowed`);
+                return;
+            }
 
-                return (
-                    <div
-                        style={{
-                            ...style,
-                            padding: '8px', // Add 8px padding around each cell (half of gap-4)
-                            boxSizing: 'border-box', // Ensure padding is included in the element's total width and height
-                        }}
-                    >
-                        <div
-                            key={product.id}
-                            className={`group h-full cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${gridView === 'list' ? 'flex' : ''}`}
-                            onClick={() => handleProductClick(product)}
+            // Check file sizes and types
+            const invalidFiles = files.filter((file) => {
+                const isValidType = ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type);
+                const isValidSize = file.size <= maxSize;
+                return !isValidType || !isValidSize;
+            });
+
+            if (invalidFiles.length > 0) {
+                toast.error('Invalid files detected. Please ensure all images are JPEG/PNG and under 2MB.');
+                return;
+            }
+
+            // Create preview URLs for the selected files
+            const previews = files.map((file) => URL.createObjectURL(file));
+
+            setFormData((prev) => ({
+                ...prev,
+                [type]: files,
+            }));
+
+            setImagePreviews((prev) => ({
+                ...prev,
+                [type]: previews,
+            }));
+        }
+    };
+
+    const removeImage = (type: 'product_images' | 'certificate_images', index: number, existingImage?: string) => {
+        setFormData((prev) => {
+            const newFiles = [...(prev[type] || [])];
+            newFiles.splice(index, 1);
+            return { ...prev, [type]: newFiles };
+        });
+
+        setImagePreviews((prev) => {
+            const newPreviews = [...(prev[type] || [])];
+            if (newPreviews[index]?.startsWith('blob:')) {
+                URL.revokeObjectURL(newPreviews[index]);
+            }
+            newPreviews.splice(index, 1);
+            return { ...prev, [type]: newPreviews };
+        });
+    };
+
+    // Optimize image preview component
+    const ImagePreview = ({
+        images,
+        type,
+        existingImages = [],
+    }: {
+        images: string[];
+        type: 'product_images' | 'certificate_images';
+        existingImages?: string[];
+    }) => {
+        const placeholderImage =
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
+
+        return (
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {images.map((image, index) => (
+                    <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
+                        <img
+                            src={image}
+                            alt={`${type} preview ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = placeholderImage;
+                                if (image.startsWith('blob:')) {
+                                    URL.revokeObjectURL(image);
+                                }
+                            }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (image.startsWith('blob:')) {
+                                    URL.revokeObjectURL(image);
+                                }
+                                removeImage(type, index);
+                            }}
+                            className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
                         >
-                            {/* Product Image */}
-                            <div
-                                className={`relative flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#2d2d35] ${gridView === 'list' ? 'h-16 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'}`}
-                            >
-                                <img
-                                    src={product.images[0] ? `/storage/${product.images[0]}` : '/placeholder.svg'}
-                                    alt={product.name}
-                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    fillRule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clipRule="evenodd"
                                 />
-
-                                {/* New Badge */}
-                                {product.is_new && (
-                                    <Badge
-                                        className={`absolute overflow-hidden bg-green-500 text-white hover:bg-green-600 ${gridView === 'list' ? 'top-1 left-1 h-4 px-1 py-0 text-[10px]' : 'top-2 left-2 text-xs'}`}
-                                    >
-                                        NEW
-                                    </Badge>
-                                )}
-
-                                {/* See More Button - Hover Only - Hide in mobile list view */}
-                                {gridView !== 'list' && (
-                                    <div className="absolute right-0 bottom-0 left-0 bg-black/80 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
-                                        <button className="w-full px-3 py-2 text-xs font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black/90">
-                                            SEE MORE
-                                        </button>
-                                    </div>
-                                )}
-
-                                {/* Favorite Button */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleFavorite(product.id);
-                                    }}
-                                    className={`absolute rounded-full bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a] ${gridView === 'list' ? 'top-1 right-1 p-1' : 'top-2 right-2 p-1.5'}`}
-                                >
-                                    <Heart
-                                        className={`${gridView === 'list' ? 'h-3 w-3' : 'h-3.5 w-3.5'} ${
-                                            favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400 dark:text-[#6b6b75]'
-                                        }`}
-                                    />
-                                </button>
-                            </div>
-
-                            {/* Product Info */}
-                            <div className={`${gridView === 'list' ? 'flex flex-1 flex-col justify-between p-2' : 'p-3'}`}>
-                                <div>
-                                    {/* Rating */}
-                                    <div className="mb-1.5 flex items-center">
-                                        {Array.from({ length: 5 }).map((_, index) => (
-                                            <Star
-                                                key={index}
-                                                className={`${gridView === 'list' ? 'h-2.5 w-2.5' : 'h-3 w-3'} ${
-                                                    index < 5 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-[#6b6b75]'
-                                                }`}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    {/* Product Name */}
-                                    <h3
-                                        className={`mb-1.5 font-medium text-gray-900 dark:text-[#e0e0e5] ${gridView === 'list' ? 'line-clamp-1 text-xs sm:line-clamp-2 sm:text-base' : 'line-clamp-2 text-sm'}`}
-                                    >
-                                        {product.name}
-                                    </h3>
-
-                                    {/* Description for list view - Hidden on mobile */}
-                                    {gridView === 'list' && (
-                                        <p className="mb-3 line-clamp-2 hidden text-sm text-gray-600 sm:block dark:text-[#b8b8c0]">
-                                            {product.description}
-                                        </p>
-                                    )}
-
-                                    {/* Certificates for list view - Hidden on mobile */}
-                                    {gridView === 'list' && product.certificates && (
-                                        <div className="mb-3 hidden flex-wrap gap-1 sm:flex">
-                                            {product.certificates.slice(0, 3).map((cert) => (
-                                                <Badge key={cert} variant="outline" className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]">
-                                                    {cert}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center justify-between">
-                                    {/* Price */}
-                                    <div className="flex items-center space-x-1.5">
-                                        <span
-                                            className={`font-semibold text-gray-900 dark:text-[#e0e0e5] ${gridView === 'list' ? 'text-sm sm:text-lg' : 'text-base'}`}
-                                        >
-                                            ${Number(product.price).toFixed(2)}
-                                        </span>
-                                        {product.original_price && (
-                                            <span
-                                                className={`text-gray-500 line-through dark:text-[#b8b8c0] ${gridView === 'list' ? 'text-xs' : 'text-xs'}`}
-                                            >
-                                                ${Number(product.original_price).toFixed(2)}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Buy Now button for list view - Hidden on mobile */}
-                                    {gridView === 'list' && product.product_link && (
-                                        <Button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (product.product_link) {
-                                                    window.open(product.product_link, '_blank');
-                                                }
-                                            }}
-                                            size="sm"
-                                            className="ml-3 hidden uppercase sm:block dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
-                                        >
-                                            Buy Now
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                            </svg>
+                        </button>
                     </div>
-                );
-            },
-        [itemsPerRow, products.data, gridView, favorites, toggleFavorite, handleProductClick],
-    );
+                ))}
+            </div>
+        );
+    };
+
+    // Optimize existing image preview component
+    const ExistingImagePreview = ({ images, type }: { images: string[]; type: 'product_images' | 'certificate_images' }) => {
+        const placeholderImage =
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
+
+        return (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {images.map((image, index) => (
+                    <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
+                        <img
+                            src={image ? `/storage/${image}` : placeholderImage}
+                            alt={`${type} ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = placeholderImage;
+                            }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => removeImage(type, index, image)}
+                            className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    fillRule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div className="min-h-screen rounded-lg bg-gray-50 dark:bg-[#1a1a1f]">
@@ -435,29 +438,166 @@ export default function CustomerView({ products: initialProducts, filters: initi
                         </div>
 
                         {/* Products Grid */}
-                        <div className={`mb-8`} ref={productGridWrapperRef}>
-                            <AutoSizer disableHeight>
-                                {({ width }) => {
-                                    const columnCount = itemsPerRow;
-                                    const columnWidth = width / columnCount;
-
-                                    return (
-                                        <Grid
-                                            ref={gridRef}
-                                            columnCount={columnCount}
-                                            columnWidth={columnWidth}
-                                            height={rowHeight * rowCount} // Grid height based on rows on the current page
-                                            rowCount={rowCount}
-                                            rowHeight={rowHeight}
-                                            width={width}
-                                            itemData={products.data} // Pass only the products for the current page
-                                            key={products.current_page} // Add key based on current page
+                        <div className="mb-8" ref={productGridWrapperRef}>
+                            <div
+                                className={`grid gap-4 ${
+                                    gridView === 'list'
+                                        ? 'grid-cols-1'
+                                        : gridView === '2-col'
+                                          ? 'grid-cols-1 sm:grid-cols-2'
+                                          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                                }`}
+                            >
+                                {products.data.map((product) => (
+                                    <div
+                                        key={product.id}
+                                        className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                            gridView === 'list' ? 'flex' : ''
+                                        }`}
+                                        onClick={() => handleProductClick(product)}
+                                    >
+                                        {/* Product Image */}
+                                        <div
+                                            className={`relative flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#2d2d35] ${
+                                                gridView === 'list' ? 'h-16 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'
+                                            }`}
                                         >
-                                            {Cell}
-                                        </Grid>
-                                    );
-                                }}
-                            </AutoSizer>
+                                            <img
+                                                src={product.images[0] ? `/storage/${product.images[0]}` : '/placeholder.svg'}
+                                                alt={product.name}
+                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+
+                                            {/* New Badge */}
+                                            {product.is_new && (
+                                                <Badge
+                                                    className={`absolute overflow-hidden bg-green-500 text-white hover:bg-green-600 ${
+                                                        gridView === 'list' ? 'top-1 left-1 h-4 px-1 py-0 text-[10px]' : 'top-2 left-2 text-xs'
+                                                    }`}
+                                                >
+                                                    NEW
+                                                </Badge>
+                                            )}
+
+                                            {/* See More Button - Hover Only */}
+                                            {gridView !== 'list' && (
+                                                <div className="absolute right-0 bottom-0 left-0 bg-black/80 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+                                                    <button className="w-full px-3 py-2 text-xs font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black/90">
+                                                        SEE MORE
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* Favorite Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleFavorite(product.id);
+                                                }}
+                                                className={`absolute rounded-full bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a] ${
+                                                    gridView === 'list' ? 'top-1 right-1 p-1' : 'top-2 right-2 p-1.5'
+                                                }`}
+                                            >
+                                                <Heart
+                                                    className={`${gridView === 'list' ? 'h-3 w-3' : 'h-3.5 w-3.5'} ${
+                                                        favorites.includes(product.id)
+                                                            ? 'fill-red-500 text-red-500'
+                                                            : 'text-gray-400 dark:text-[#6b6b75]'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+
+                                        {/* Product Info */}
+                                        <div className={`${gridView === 'list' ? 'flex flex-1 flex-col justify-between p-2' : 'p-3'}`}>
+                                            <div>
+                                                {/* Rating */}
+                                                <div className="mb-1.5 flex items-center">
+                                                    {Array.from({ length: 5 }).map((_, index) => (
+                                                        <Star
+                                                            key={index}
+                                                            className={`${gridView === 'list' ? 'h-2.5 w-2.5' : 'h-3 w-3'} ${
+                                                                index < 5 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-[#6b6b75]'
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                </div>
+
+                                                {/* Product Name */}
+                                                <h3
+                                                    className={`mb-1.5 font-medium text-gray-900 dark:text-[#e0e0e5] ${
+                                                        gridView === 'list'
+                                                            ? 'line-clamp-1 text-xs sm:line-clamp-2 sm:text-base'
+                                                            : 'line-clamp-2 text-sm'
+                                                    }`}
+                                                >
+                                                    {product.name}
+                                                </h3>
+
+                                                {/* Description for list view - Hidden on mobile */}
+                                                {gridView === 'list' && (
+                                                    <p className="mb-3 line-clamp-2 hidden text-sm text-gray-600 sm:block dark:text-[#b8b8c0]">
+                                                        {product.description}
+                                                    </p>
+                                                )}
+
+                                                {/* Certificates for list view - Hidden on mobile */}
+                                                {gridView === 'list' && product.certificates && (
+                                                    <div className="mb-3 hidden flex-wrap gap-1 sm:flex">
+                                                        {product.certificates.slice(0, 3).map((cert) => (
+                                                            <Badge
+                                                                key={cert}
+                                                                variant="outline"
+                                                                className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                            >
+                                                                {cert}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center justify-between">
+                                                {/* Price */}
+                                                <div className="flex items-center space-x-1.5">
+                                                    <span
+                                                        className={`font-semibold text-gray-900 dark:text-[#e0e0e5] ${
+                                                            gridView === 'list' ? 'text-sm sm:text-lg' : 'text-base'
+                                                        }`}
+                                                    >
+                                                        ${Number(product.price).toFixed(2)}
+                                                    </span>
+                                                    {product.original_price && (
+                                                        <span
+                                                            className={`text-gray-500 line-through dark:text-[#b8b8c0] ${
+                                                                gridView === 'list' ? 'text-xs' : 'text-xs'
+                                                            }`}
+                                                        >
+                                                            ${Number(product.original_price).toFixed(2)}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* Buy Now button for list view - Hidden on mobile */}
+                                                {gridView === 'list' && product.product_link && (
+                                                    <Button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (product.product_link) {
+                                                                window.open(product.product_link, '_blank');
+                                                            }
+                                                        }}
+                                                        size="sm"
+                                                        className="ml-3 hidden uppercase sm:block dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
+                                                    >
+                                                        Buy Now
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Pagination */}

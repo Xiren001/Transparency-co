@@ -145,7 +145,7 @@ export default function ProductDetailsModal({ product, isOpen, onOpenChange }: P
                                         <h3 className="text-muted-foreground font-semibold dark:text-[#e0e0e5]">Additional Details</h3>
                                         <div className="space-y-1">
                                             {product.product_details.map((detail, index) => (
-                                                <div key={index} className="flex justify-between text-sm">
+                                                <div key={index} className="flex justify-start gap-2 text-sm">
                                                     <span className="text-muted-foreground">{detail.name}:</span>
                                                     <span className="text-muted-foreground">{detail.value}</span>
                                                 </div>
