@@ -14,16 +14,18 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->json('images')->nullable();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->decimal('original_price', 10, 2)->nullable();
             $table->boolean('is_new')->default(false);
-            $table->string('certificates')->nullable();
-            $table->json('certificates_images')->nullable();
+            $table->json('certificates')->nullable();
+            $table->json('product_details')->nullable();
             $table->string('product_link')->nullable();
             $table->string('category')->nullable();
-            $table->json('product_details')->nullable();
+            $table->string('sub_category')->nullable();
+            $table->string('item')->nullable();
+            $table->json('images')->nullable();
+            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->timestamps();
         });
     }

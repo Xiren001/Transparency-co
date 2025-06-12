@@ -2,10 +2,7 @@ import { ChevronRight } from 'lucide-react';
 
 export default function HeroSection() {
     return (
-        <section
-            className="relative min-h-[500px] w-full rounded-lg bg-cover bg-center bg-no-repeat"
-            style={{ backgroundColor: '#FFDCDC', backgroundImage: "url('/images/hero-bg.png')" }}
-        >
+        <section className="relative min-h-[300px] w-full rounded-lg bg-cover bg-center bg-no-repeat" style={{ backgroundColor: '#EDBFB7' }}>
             {/* Overlay for better text readability */}
             <div className="absolute inset-0 rounded-lg bg-black/10 dark:bg-black/30"></div>
 
@@ -19,10 +16,10 @@ export default function HeroSection() {
                 </nav>
 
                 {/* Main Heading */}
-                <h1 className="mb-6 text-3xl font-light tracking-wide text-gray-900 md:text-5xl lg:text-6xl dark:text-[#e0e0e5]">Transparency Co</h1>
+                <h1 className="mb-6 text-3xl font-light tracking-wide text-gray-200 md:text-5xl lg:text-6xl dark:text-[#F7F4F3]">Transparency Co</h1>
 
                 {/* Subheading */}
-                <p className="mx-auto max-w-2xl text-sm font-light tracking-wider text-gray-700 md:text-xl dark:text-[#b8b8c0]">
+                <p className="mx-auto max-w-2xl text-sm font-light tracking-wider text-gray-200 md:text-xl dark:text-[#F7F4F3]">
                     Let's Elevate the Standards You Always Expected.
                 </p>
             </div>

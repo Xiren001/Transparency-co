@@ -24,6 +24,11 @@ const mainNavItems: NavItem[] = [
         icon: Package,
     },
     {
+        title: 'Companies',
+        href: '/companies',
+        icon: Folder,
+    },
+    {
         title: 'Newsletter',
         href: '/admin/newsletter',
         icon: Mail,

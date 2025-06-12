@@ -8,23 +8,31 @@ class Product extends Model
 {
     protected $fillable = [
         'name',
-        'images',
         'description',
         'price',
         'original_price',
         'is_new',
         'certificates',
-        'certificates_images',
         'product_link',
         'category',
+        'sub_category',
+        'item',
         'product_details',
+        'images',
+        'company_id',
     ];
 
     protected $casts = [
-        'images' => 'array',
-        'certificates' => 'array',
-        'certificates_images' => 'array',
         'is_new' => 'boolean',
+        'images' => 'array',
         'product_details' => 'array',
+        'certificates' => 'array',
+        'price' => 'decimal:2',
+        'original_price' => 'decimal:2',
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

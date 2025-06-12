@@ -12,7 +12,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 import CategoriesSection from './body/categories-section';
-import FeaturedSection from './body/featured-section';
 import Footer from './body/footer';
 import HeroSection from './body/hero-section';
 import TrendingBrands from './body/trending-brands';
@@ -57,7 +56,7 @@ export default function Welcome() {
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
             <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 tracking-tighter text-[#1b1b18] uppercase sm:px-8 lg:justify-center dark:bg-[#0a0a0a]">
-                <header className="sticky top-0 z-50 w-full max-w-[1000px] rounded-b-sm border-b bg-white py-6 text-sm not-has-[nav]:hidden lg:max-w-[2000px] dark:bg-[#0a0a0a]">
+                <header className="sticky top-0 z-50 w-full max-w-[1000px] border-b bg-white py-6 text-sm not-has-[nav]:hidden lg:max-w-[2000px] dark:bg-[#0a0a0a]">
                     <nav className="flex items-center justify-center gap-4">
                         <div className="flex flex-1 items-center justify-between">
                             {/* Logo */}
@@ -85,7 +84,7 @@ export default function Welcome() {
                             <div className="hidden items-center space-x-4 md:flex">
                                 {/* Search Icon */}
                                 <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
-                                    <Search className="h-5 w-5" />
+                                    <Search className="h-5 w-5 dark:text-white" />
                                     <span className="sr-only">Search</span>
                                 </Button>
 
@@ -101,7 +100,7 @@ export default function Welcome() {
                                                     </>
                                                 ) : (
                                                     <AvatarFallback>
-                                                        <User className="h-4 w-4" />
+                                                        <User className="h-4 w-4 dark:text-white" />
                                                     </AvatarFallback>
                                                 )}
                                             </Avatar>
@@ -140,7 +139,7 @@ export default function Welcome() {
                                                         href={route('login')}
                                                         className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                                     >
-                                                        <User className="h-4 w-4" />
+                                                        <User className="h-4 w-4 fill-current dark:text-white" />
                                                         Log in
                                                     </a>
                                                 </DropdownMenuItem>
@@ -149,7 +148,7 @@ export default function Welcome() {
                                                         href={route('register')}
                                                         className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                                     >
-                                                        <User className="h-4 w-4" />
+                                                        <User className="h-4 w-4 fill-current dark:text-white" />
                                                         Sign up
                                                     </a>
                                                 </DropdownMenuItem>
@@ -163,7 +162,7 @@ export default function Welcome() {
                             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                                 <SheetTrigger asChild className="md:hidden">
                                     <Button variant="ghost" size="icon">
-                                        <Menu className="h-5 w-5" />
+                                        <Menu className="h-5 w-5 fill-current dark:text-white" />
                                         <span className="sr-only">Toggle menu</span>
                                     </Button>
                                 </SheetTrigger>
@@ -175,7 +174,7 @@ export default function Welcome() {
                                                 <a
                                                     key={item.name}
                                                     href={item.href}
-                                                    className="font-milk mb-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                    className="font-milk mb-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-400 text-gray-700 uppercase hover:bg-gray-100 dark:text-white"
                                                     onClick={() => setIsOpen(false)}
                                                 >
                                                     {item.name}
@@ -222,16 +221,16 @@ export default function Welcome() {
                                                 <div className="flex flex-col space-y-3">
                                                     <a
                                                         href={route('login')}
-                                                        className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                        className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100 dark:text-white"
                                                     >
-                                                        <User className="h-4 w-4" />
+                                                        <User className="h-4 w-4 fill-current dark:text-white" />
                                                         Log in
                                                     </a>
                                                     <a
                                                         href={route('register')}
-                                                        className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                        className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100 dark:text-white"
                                                     >
-                                                        <User className="h-4 w-4" />
+                                                        <User className="h-4 w-4 fill-current dark:text-white" />
                                                         Sign up
                                                     </a>
                                                 </div>
@@ -240,10 +239,10 @@ export default function Welcome() {
                                             {/* Search Button */}
                                             <button
                                                 type="button"
-                                                className="font-milk mt-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                className="font-milk mt-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100 dark:text-gray-200"
                                                 onClick={() => setIsSearchOpen(true)}
                                             >
-                                                <Search className="h-4 w-4" />
+                                                <Search className="h-4 w-4 fill-current dark:text-white" />
                                                 Search
                                             </button>
                                         </div>
@@ -296,28 +295,30 @@ export default function Welcome() {
                 <div className="flex w-full items-start justify-center opacity-100 transition-opacity duration-750 starting:opacity-0">
                     <main className="flex w-full max-w-[1000px] flex-col gap-4 lg:max-w-[2000px] lg:flex-col">
                         <HeroSection />
+                        {/* <FeaturedSection /> */}
                         <CategoriesSection />
-                        <FeaturedSection />
-                        <ProductCatalog
-                            products={
-                                products ?? {
-                                    data: [],
-                                    links: [],
-                                    current_page: 1,
-                                    last_page: 1,
-                                    from: null,
-                                    to: null,
-                                    total: 0,
-                                    prev_page_url: null,
-                                    next_page_url: null,
+                        <div className="product-catalog-section">
+                            <ProductCatalog
+                                products={
+                                    products ?? {
+                                        data: [],
+                                        links: [],
+                                        current_page: 1,
+                                        last_page: 1,
+                                        from: null,
+                                        to: null,
+                                        total: 0,
+                                        prev_page_url: null,
+                                        next_page_url: null,
+                                    }
                                 }
-                            }
-                            filters={{
-                                certificates: [],
-                                price_range: '',
-                                sort_by: '',
-                            }}
-                        />
+                                filters={{
+                                    certificates: [],
+                                    price_range: '',
+                                    sort_by: '',
+                                }}
+                            />
+                        </div>
                         <TrendingBrands />
                         <Footer />
                         {/* <Laravel12Default /> */}

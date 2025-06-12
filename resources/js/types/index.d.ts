@@ -57,6 +57,7 @@ export interface User {
 export interface Product {
     id: number;
     name: string;
+    company_name: string;
     description: string;
     price: number;
     original_price: number | null;
@@ -66,5 +67,14 @@ export interface Product {
     certificates_images: string[];
     product_link: string | null;
     category: string | null;
+    sub_category: string | null;
+    item: string | null;
     product_details: { name: string; value: string }[] | null;
+    company?: {
+        id: number;
+        name: string;
+        description?: string;
+        website?: string;
+        logo?: string;
+    };
 }

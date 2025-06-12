@@ -4,34 +4,38 @@ import ProductDetailsModal from '@/components/product-details-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { categories } from '@/constants/categories';
 import { type Product } from '@/types';
-import axios from 'axios';
-import { ChevronDown, ChevronLeft, ChevronRight, Filter, Grid2X2, Grid3X3, Heart, List, Star } from 'lucide-react';
+import axios, { CancelTokenSource } from 'axios';
+import { ChevronDown, Filter, Grid2X2, Grid3X3, Heart, List, Star } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { toast } from 'react-hot-toast';
 
-const certificates = [
-    'ALL CERTIFICATE',
-    'PLASTIC FREE',
-    'USDA ORGANIC',
-    'NON-GMO',
-    'FRAGRANCE FREE',
-    'PALM OIL FREE',
-    'BIODEGRADABLE',
-    'FAIR TRADE',
-    'REUSABLE',
-    'COMPOSTABLE',
-];
+const certificatesByCategory = {
+    'food-beverage': ['USDA ORGANIC', 'NON-GMO', 'FAIR TRADE', 'ORGANIC CERTIFIED', 'KOSHER', 'HALAL', 'VEGAN', 'GLUTEN-FREE'],
+    'health-wellness': ['USDA ORGANIC', 'NON-GMO', 'ORGANIC CERTIFIED', 'VEGAN', 'GLUTEN-FREE', 'GMP CERTIFIED', 'FDA REGISTERED'],
+    'personal-care': ['CRUELTY-FREE', 'VEGAN', 'NATURAL', 'ORGANIC CERTIFIED', 'FRAGRANCE FREE', 'DERMATOLOGIST TESTED', 'HYPOALLERGENIC'],
+    'home-cleaning': ['ECO CERTIFIED', 'BIODEGRADABLE', 'PLASTIC FREE', 'NON-TOXIC', 'VEGAN', 'CRUELTY-FREE'],
+    'kitchen-essentials': ['BPA FREE', 'FOOD GRADE', 'FDA APPROVED', 'ECO CERTIFIED', 'SUSTAINABLE'],
+    'baby-kids': ['BPA FREE', 'PHTHALATE FREE', 'ORGANIC CERTIFIED', 'CRUELTY-FREE', 'HYPOALLERGENIC', 'DERMATOLOGIST TESTED'],
+    clothing: ['GOTS ORGANIC', 'FAIR TRADE', 'PETA APPROVED', 'CRUELTY-FREE', 'SUSTAINABLE', 'RECYCLED MATERIALS'],
+    'sustainable-living': ['ECO CERTIFIED', 'CARBON NEUTRAL', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'PLASTIC FREE'],
+    'pet-care': ['NATURAL', 'ORGANIC CERTIFIED', 'CRUELTY-FREE', 'VETERINARIAN APPROVED', 'MADE IN USA'],
+    'home-textiles': ['GOTS ORGANIC', 'FAIR TRADE', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'ECO CERTIFIED'],
+    electronics: ['ENERGY STAR', 'ROHS COMPLIANT', 'EPEAT GOLD', 'CARBON NEUTRAL', 'RECYCLED MATERIALS'],
+    'office-supplies': ['FSC CERTIFIED', 'RECYCLED MATERIALS', 'CARBON NEUTRAL', 'SUSTAINABLE', 'ECO CERTIFIED'],
+    'sports-outdoors': ['FAIR TRADE', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'ECO CERTIFIED', 'CARBON NEUTRAL'],
+    'beauty-cosmetics': ['CRUELTY-FREE', 'VEGAN', 'NATURAL', 'ORGANIC CERTIFIED', 'FRAGRANCE FREE', 'DERMATOLOGIST TESTED'],
+};
 
 const priceRanges = [
     { label: 'ALL PRICE', value: 'all' },
-    { label: '$0.00 - $9.99', value: '0-9.99' },
-    { label: '$100.00 - $199.99', value: '100-199.99' },
-    { label: '$200.00 - $299.99', value: '200-299.99' },
-    { label: '$300.00 - $399.99', value: '300-399.99' },
-    { label: '$400.00+', value: '400+' },
+    { label: '$0 - $25', value: '0-25' },
+    { label: '$25 - $50', value: '25-50' },
+    { label: '$50 - $100', value: '50-100' },
+    { label: '$100+', value: '100+' },
 ];
 
 const sortOptions = ['Featured', 'Price: Low to High', 'Price: High to Low', 'Newest', 'Best Selling', 'Customer Rating'];
@@ -56,7 +60,44 @@ interface Props {
     };
 }
 
+const DEBOUNCE_DELAY = 300; // 300ms delay
+
+// Shimmer Card Component
+const ShimmerCard = ({ gridView }: { gridView: string }) => (
+    <div
+        className={`group animate-pulse cursor-pointer rounded-lg bg-gray-200 shadow-sm transition-shadow duration-300 duration-2000 ease-in-out dark:bg-[#2d2d35]/50 ${gridView === 'list' ? 'flex flex-row' : ''}`}
+    >
+        <div
+            className={`relative flex-shrink-0 overflow-hidden bg-gray-300 dark:bg-[#3d3d45] ${gridView === 'list' ? 'h-24 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'}`}
+        >
+            {/* Shimmer for image */}
+        </div>
+        <div className={`flex flex-1 flex-col justify-between ${gridView === 'list' ? 'p-2 sm:p-4' : 'p-3'}`}>
+            <div className="flex flex-col">
+                <div className="mb-1 flex items-center">
+                    {/* Shimmer for stars */}
+                    {Array.from({ length: 5 }).map((_, index) => (
+                        <div key={index} className="mr-1 h-3 w-3 rounded-full bg-gray-300 dark:bg-[#3d3d45]"></div>
+                    ))}
+                </div>
+                {/* Shimmer for title */}
+                <div className="mb-1 h-4 w-3/4 rounded bg-gray-300 dark:bg-[#3d3d45]"></div>
+                <div className="h-4 w-1/2 rounded bg-gray-300 dark:bg-[#3d3d45]"></div>
+            </div>
+            {/* Shimmer for price and button */}
+            <div className="mt-2 flex items-center justify-between">
+                <div className="h-4 w-1/4 rounded bg-gray-300 dark:bg-[#3d3d45]"></div>
+                <div className="h-7 w-20 rounded bg-gray-300 dark:bg-[#3d3d45]"></div>
+            </div>
+        </div>
+    </div>
+);
+
 export default function CustomerView({ products: initialProducts, filters: initialFilters }: Props) {
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 9;
     const [products, setProducts] = useState(initialProducts);
     const [selectedCertificates, setSelectedCertificates] = useState<string[]>(initialFilters.certificates);
     const [selectedPriceRange, setSelectedPriceRange] = useState(initialFilters.price_range);
@@ -67,6 +108,9 @@ export default function CustomerView({ products: initialProducts, filters: initi
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(initialFilters.category || null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+    const [selectedItem, setSelectedItem] = useState<string | null>(null);
     const gridRef = useRef<any>(null);
     const productGridWrapperRef = useRef<HTMLDivElement>(null);
     const [formData, setFormData] = useState<{
@@ -77,48 +121,116 @@ export default function CustomerView({ products: initialProducts, filters: initi
         product_images?: string[];
         certificate_images?: string[];
     }>({});
+    const cancelTokenRef = useRef<CancelTokenSource | null>(null);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    const fetchFilteredProducts = useCallback(async (params: URLSearchParams) => {
+    // Initialize all products
+    useEffect(() => {
+        setAllProducts(products.data);
+        setDisplayedProducts(products.data.slice(0, productsPerPage));
+    }, [products.data]);
+
+    const handlePageChange = () => {
+        const nextPage = currentPage + 1;
+        const startIndex = 0;
+        const endIndex = nextPage * productsPerPage;
+
+        // Get the next batch of products
+        const nextBatch = allProducts.slice(startIndex, endIndex);
+
+        // Only update if we have more products to show
+        if (nextBatch.length > displayedProducts.length) {
+            setDisplayedProducts(nextBatch);
+            setCurrentPage(nextPage);
+        }
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    };
+
+    const fetchFilteredProducts = useCallback(async (params: URLSearchParams, silent: boolean = false) => {
         try {
-            setIsLoading(true);
-            const response = await axios.get(route('api.products.filter'), { params });
-            setProducts(response.data.products);
+            if (cancelTokenRef.current) {
+                cancelTokenRef.current.cancel('New request started');
+            }
+
+            cancelTokenRef.current = axios.CancelToken.source();
+
+            if (!silent) {
+                setIsLoading(true);
+            }
+
+            // Remove pagination from params to get all products
+            params.delete('page');
+            params.set('per_page', '1000'); // Set a high number to get all products
+
+            const response = await axios.get(route('api.products.filter'), {
+                params,
+                cancelToken: cancelTokenRef.current.token,
+            });
+
+            // Set all products
+            setAllProducts(response.data.products.data);
+            // Set initial displayed products
+            setDisplayedProducts(response.data.products.data.slice(0, productsPerPage));
+            setCurrentPage(1);
+
+            // Update the products state with the full data
+            setProducts({
+                ...response.data.products,
+                data: response.data.products.data,
+            });
         } catch (error) {
-            console.error('Error fetching filtered products:', error);
+            if (!axios.isCancel(error)) {
+                console.error('Error fetching filtered products:', error);
+            }
         } finally {
-            setIsLoading(false);
+            if (!silent) {
+                setIsLoading(false);
+            }
         }
     }, []);
 
-    // Effect to handle filter changes
-    useEffect(() => {
+    const handleCategoryChange = useCallback(() => {
         const params = new URLSearchParams(window.location.search);
+        const categoryFromUrl = params.get('category');
+        const subCategoryFromUrl = params.get('sub_category');
+        const itemFromUrl = params.get('item');
 
-        if (selectedCertificates.length > 0) {
-            selectedCertificates.forEach((cert) => params.append('certificates[]', cert));
+        // Only update state if values have changed
+        if (categoryFromUrl !== selectedCategory) {
+            setSelectedCategory(categoryFromUrl);
+            setSelectedSubCategory(null);
+            setSelectedItem(null);
+        } else if (subCategoryFromUrl !== selectedSubCategory) {
+            setSelectedSubCategory(subCategoryFromUrl);
+            setSelectedItem(null);
+        } else if (itemFromUrl !== selectedItem) {
+            setSelectedItem(itemFromUrl);
         }
 
-        if (selectedPriceRange !== 'all') {
-            params.append('price_range', selectedPriceRange);
+        // Clear any existing timer
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
         }
 
-        if (sortBy !== 'Featured') {
-            params.append('sort_by', sortBy);
-        }
-
-        fetchFilteredProducts(params);
-    }, [selectedCertificates, selectedPriceRange, sortBy, fetchFilteredProducts]);
-
-    // Effect to handle category changes
-    useEffect(() => {
-        const handleCategoryChange = () => {
-            const params = new URLSearchParams(window.location.search);
+        // Set new timer for debouncing
+        debounceTimerRef.current = setTimeout(() => {
+            // Ensure isLoading is set to true when a fetch is triggered by category change
+            setIsLoading(true);
             fetchFilteredProducts(params);
-        };
+        }, DEBOUNCE_DELAY);
+    }, [selectedCategory, selectedSubCategory, selectedItem, fetchFilteredProducts]);
 
+    useEffect(() => {
         // Initial load with URL params
         handleCategoryChange();
 
+        // Listen for category changes
         window.addEventListener('popstate', handleCategoryChange);
         window.addEventListener('categoryChanged', handleCategoryChange);
 
@@ -126,7 +238,47 @@ export default function CustomerView({ products: initialProducts, filters: initi
             window.removeEventListener('popstate', handleCategoryChange);
             window.removeEventListener('categoryChanged', handleCategoryChange);
         };
-    }, [fetchFilteredProducts]);
+    }, [handleCategoryChange]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        // Only update URL if filters have changed
+        if (selectedCertificates.length > 0) {
+            params.set('certificates', selectedCertificates.join(','));
+        } else {
+            params.delete('certificates');
+        }
+
+        if (selectedPriceRange !== 'all') {
+            params.set('price_range', selectedPriceRange);
+        } else {
+            params.delete('price_range');
+        }
+
+        if (sortBy !== 'Featured') {
+            params.set('sort_by', sortBy);
+        } else {
+            params.delete('sort_by');
+        }
+
+        // Update URL without triggering a page reload
+        window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+
+        // Fetch filtered products
+        fetchFilteredProducts(params);
+    }, [selectedCertificates, selectedPriceRange, sortBy, fetchFilteredProducts]);
+
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+            if (cancelTokenRef.current) {
+                cancelTokenRef.current.cancel('Component unmounted');
+            }
+        };
+    }, []);
 
     const toggleCertificate = (cert: string) => {
         if (cert === 'ALL CERTIFICATE') {
@@ -150,23 +302,6 @@ export default function CustomerView({ products: initialProducts, filters: initi
     const handleImageSelect = (index: number) => {
         setSelectedImageIndex(index);
     };
-
-    const handlePageChange = async (url: string) => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get(url);
-            setProducts(response.data.products);
-            productGridWrapperRef.current?.scrollIntoView({ behavior: 'smooth' });
-        } catch (error) {
-            console.error('Error fetching page:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const itemsPerRow = gridView === '2-col' ? 2 : gridView === '3-col' ? 3 : 1;
-    const rowCount = Math.ceil(products.data.length / itemsPerRow);
-    const totalPages = products.last_page;
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'product_images' | 'certificate_images') => {
         if (e.target.files) {
@@ -223,7 +358,6 @@ export default function CustomerView({ products: initialProducts, filters: initi
         });
     };
 
-    // Optimize image preview component
     const ImagePreview = ({
         images,
         type,
@@ -277,7 +411,6 @@ export default function CustomerView({ products: initialProducts, filters: initi
         );
     };
 
-    // Optimize existing image preview component
     const ExistingImagePreview = ({ images, type }: { images: string[]; type: 'product_images' | 'certificate_images' }) => {
         const placeholderImage =
             'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
@@ -287,7 +420,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                 {images.map((image, index) => (
                     <div key={index} className="group relative aspect-square w-full overflow-hidden rounded-lg border">
                         <img
-                            src={image ? `/storage/${image}` : placeholderImage}
+                            src={image ? `/images/${image.replace(/\\/g, '/')}` : placeholderImage}
                             alt={`${type} ${index + 1}`}
                             className="h-full w-full object-cover"
                             loading="lazy"
@@ -315,54 +448,121 @@ export default function CustomerView({ products: initialProducts, filters: initi
         );
     };
 
+    const currentCategorySubCategories = selectedCategory ? categories.find((cat) => cat.id === selectedCategory)?.subCategories || [] : [];
+
     return (
-        <div className="min-h-screen rounded-lg bg-gray-50 dark:bg-[#1a1a1f]">
+        <div className="h-auto rounded-lg bg-gray-50 sm:min-h-screen dark:bg-[#1a1a1f]">
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col gap-8 lg:flex-row">
-                    {/* Sidebar Filters */}
-                    <div className="w-full flex-shrink-0 lg:w-64">
+                    <div className="w-full lg:hidden">
+                        <Collapsible className="w-full">
+                            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-white p-4 shadow-sm dark:bg-[#23232a]">
+                                <div className="flex items-center gap-2">
+                                    <Filter className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
+                                    <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">FILTERS</span>
+                                </div>
+                                <ChevronDown className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-2 rounded-lg bg-white p-4 shadow-sm dark:bg-[#23232a]">
+                                <div className="mb-8">
+                                    <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
+                                    <div className="space-y-3">
+                                        {selectedCategory ? (
+                                            certificatesByCategory[selectedCategory as keyof typeof certificatesByCategory]?.map((cert) => (
+                                                <div key={cert} className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id={cert}
+                                                        checked={selectedCertificates.includes(cert)}
+                                                        onCheckedChange={() => toggleCertificate(cert)}
+                                                        className="dark:border-gray-50"
+                                                    />
+                                                    <label
+                                                        htmlFor={cert}
+                                                        className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                                    >
+                                                        {cert}
+                                                    </label>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-gray-500 dark:text-[#b8b8c0]">
+                                                Select a category to view available certificates
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">PRICE</h3>
+                                    <div className="space-y-3">
+                                        {priceRanges.map((range) => (
+                                            <div key={range.value} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={range.value}
+                                                    checked={selectedPriceRange === range.value}
+                                                    onCheckedChange={() => setSelectedPriceRange(range.value)}
+                                                    className="dark:border-gray-50"
+                                                />
+                                                <label
+                                                    htmlFor={range.value}
+                                                    className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                                >
+                                                    {range.label}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </CollapsibleContent>
+                        </Collapsible>
+                    </div>
+
+                    <div className="hidden w-64 flex-shrink-0 lg:block">
                         <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-[#23232a]">
-                            {/* Filter Header */}
                             <div className="mb-6 flex items-center gap-2">
                                 <Filter className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
                                 <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">FILTER</span>
                             </div>
 
-                            {/* Certificates */}
                             <div className="mb-8">
                                 <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
                                 <div className="space-y-3">
-                                    {certificates.map((cert) => (
-                                        <div key={cert} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={cert}
-                                                checked={selectedCertificates.includes(cert)}
-                                                onCheckedChange={() => toggleCertificate(cert)}
-                                            />
-                                            <label
-                                                htmlFor={cert}
-                                                className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
-                                            >
-                                                {cert}
-                                            </label>
-                                        </div>
-                                    ))}
+                                    {selectedCategory ? (
+                                        certificatesByCategory[selectedCategory as keyof typeof certificatesByCategory]?.map((cert) => (
+                                            <div key={cert} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`desktop-${cert}`}
+                                                    checked={selectedCertificates.includes(cert)}
+                                                    onCheckedChange={() => toggleCertificate(cert)}
+                                                    className="dark:border-gray-50"
+                                                />
+                                                <label
+                                                    htmlFor={`desktop-${cert}`}
+                                                    className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                                >
+                                                    {cert}
+                                                </label>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-gray-500 dark:text-[#b8b8c0]">Select a category to view available certificates</p>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Price */}
                             <div>
                                 <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">PRICE</h3>
                                 <div className="space-y-3">
                                     {priceRanges.map((range) => (
                                         <div key={range.value} className="flex items-center space-x-2">
                                             <Checkbox
-                                                id={range.value}
+                                                id={`desktop-${range.value}`}
                                                 checked={selectedPriceRange === range.value}
                                                 onCheckedChange={() => setSelectedPriceRange(range.value)}
+                                                className="dark:border-gray-50"
                                             />
                                             <label
-                                                htmlFor={range.value}
+                                                htmlFor={`desktop-${range.value}`}
                                                 className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
                                             >
                                                 {range.label}
@@ -374,16 +574,14 @@ export default function CustomerView({ products: initialProducts, filters: initi
                         </div>
                     </div>
 
-                    {/* Main Content */}
                     <div className="flex-1">
-                        {/* Header */}
                         <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                             <h1 className="text-2xl font-light tracking-wider text-gray-900 dark:text-[#e0e0e5]">
-                                {initialFilters.category || 'Certified Products'}
+                                {selectedCategory ? categories.find((cat) => cat.id === selectedCategory)?.name : 'Certified Products'}
+                                {selectedSubCategory && ` - ${selectedSubCategory}`}
                             </h1>
 
                             <div className="flex w-full flex-col items-start gap-4 sm:w-auto sm:flex-row sm:items-center">
-                                {/* Sort By */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button
@@ -407,7 +605,6 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
-                                {/* Grid View Options */}
                                 <div className="flex gap-1">
                                     <Button
                                         variant={gridView === '2-col' ? 'default' : 'outline'}
@@ -437,276 +634,291 @@ export default function CustomerView({ products: initialProducts, filters: initi
                             </div>
                         </div>
 
-                        {/* Products Grid */}
                         <div className="mb-8" ref={productGridWrapperRef}>
+                            <div className="flex overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
+                                <div className="flex gap-4">
+                                    {isLoading
+                                        ? Array.from({ length: 5 }).map((_, index) => <ShimmerCard key={index} gridView="2-col" />)
+                                        : displayedProducts.map((product) => (
+                                              <div
+                                                  key={product.id}
+                                                  className="w-[280px] flex-shrink-0 cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
+                                                  onClick={() => handleProductClick(product)}
+                                              >
+                                                  <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
+                                                      <img
+                                                          src={
+                                                              product.images[0]
+                                                                  ? `/images/${product.images[0].replace(/\\/g, '/')}`
+                                                                  : '/placeholder.svg'
+                                                          }
+                                                          alt={product.name}
+                                                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                      />
+                                                      {product.is_new && (
+                                                          <Badge className="absolute top-2 left-2 overflow-hidden bg-green-500 text-xs text-white hover:bg-green-600">
+                                                              NEW
+                                                          </Badge>
+                                                      )}
+                                                      <button
+                                                          onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              toggleFavorite(product.id);
+                                                          }}
+                                                          className="absolute top-2 right-2 rounded-full bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a]"
+                                                      >
+                                                          <Heart
+                                                              className={`h-4 w-4 ${
+                                                                  favorites.includes(product.id)
+                                                                      ? 'fill-red-500 text-red-500'
+                                                                      : 'text-gray-400 dark:text-[#6b6b75]'
+                                                              }`}
+                                                          />
+                                                      </button>
+                                                  </div>
+                                                  <div className="p-3">
+                                                      <div className="mb-1 flex items-center">
+                                                          {Array.from({ length: 5 }).map((_, index) => (
+                                                              <Star
+                                                                  key={index}
+                                                                  className={`h-2.5 w-2.5 ${
+                                                                      index < 5
+                                                                          ? 'fill-yellow-400 text-yellow-400'
+                                                                          : 'text-gray-300 dark:text-[#6b6b75]'
+                                                                  }`}
+                                                              />
+                                                          ))}
+                                                      </div>
+                                                      <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
+                                                          {product.name}
+                                                      </h3>
+                                                      <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
+                                                          {product.description}
+                                                      </p>
+                                                      {product.certificates && product.certificates.length > 0 && (
+                                                          <div className="mb-2 flex flex-wrap gap-1">
+                                                              {product.certificates.slice(0, 2).map((cert) => (
+                                                                  <Badge
+                                                                      key={cert}
+                                                                      variant="outline"
+                                                                      className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                                  >
+                                                                      {cert}
+                                                                  </Badge>
+                                                              ))}
+                                                              {product.certificates.length > 2 && (
+                                                                  <Badge
+                                                                      variant="outline"
+                                                                      className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                                  >
+                                                                      +{product.certificates.length - 2} more
+                                                                  </Badge>
+                                                              )}
+                                                          </div>
+                                                      )}
+                                                      <div className="mt-2 flex items-center justify-between">
+                                                          <div className="flex flex-col">
+                                                              <div className="flex items-center space-x-1">
+                                                                  <span className="text-base font-semibold text-gray-900 dark:text-[#e0e0e5]">
+                                                                      ${Number(product.price).toFixed(2)}
+                                                                  </span>
+                                                              </div>
+                                                          </div>
+                                                          {product.product_link && (
+                                                              <Button
+                                                                  onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      if (product.product_link) {
+                                                                          window.open(product.product_link, '_blank');
+                                                                      }
+                                                                  }}
+                                                                  size="sm"
+                                                                  className="font-milk h-7 px-2 text-xs uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
+                                                              >
+                                                                  Buy Now
+                                                              </Button>
+                                                          )}
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          ))}
+                                </div>
+                            </div>
+
                             <div
-                                className={`grid gap-4 ${
+                                className={`hidden sm:grid ${
                                     gridView === 'list'
                                         ? 'grid-cols-1'
                                         : gridView === '2-col'
                                           ? 'grid-cols-1 sm:grid-cols-2'
                                           : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                                }`}
+                                } gap-4`}
                             >
-                                {products.data.map((product) => (
-                                    <div
-                                        key={product.id}
-                                        className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
-                                            gridView === 'list' ? 'flex' : ''
-                                        }`}
-                                        onClick={() => handleProductClick(product)}
-                                    >
-                                        {/* Product Image */}
-                                        <div
-                                            className={`relative flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#2d2d35] ${
-                                                gridView === 'list' ? 'h-16 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'
-                                            }`}
-                                        >
-                                            <img
-                                                src={product.images[0] ? `/storage/${product.images[0]}` : '/placeholder.svg'}
-                                                alt={product.name}
-                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                            />
-
-                                            {/* New Badge */}
-                                            {product.is_new && (
-                                                <Badge
-                                                    className={`absolute overflow-hidden bg-green-500 text-white hover:bg-green-600 ${
-                                                        gridView === 'list' ? 'top-1 left-1 h-4 px-1 py-0 text-[10px]' : 'top-2 left-2 text-xs'
-                                                    }`}
-                                                >
-                                                    NEW
-                                                </Badge>
-                                            )}
-
-                                            {/* See More Button - Hover Only */}
-                                            {gridView !== 'list' && (
-                                                <div className="absolute right-0 bottom-0 left-0 bg-black/80 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
-                                                    <button className="w-full px-3 py-2 text-xs font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black/90">
-                                                        SEE MORE
-                                                    </button>
-                                                </div>
-                                            )}
-
-                                            {/* Favorite Button */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleFavorite(product.id);
-                                                }}
-                                                className={`absolute rounded-full bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a] ${
-                                                    gridView === 'list' ? 'top-1 right-1 p-1' : 'top-2 right-2 p-1.5'
-                                                }`}
-                                            >
-                                                <Heart
-                                                    className={`${gridView === 'list' ? 'h-3 w-3' : 'h-3.5 w-3.5'} ${
-                                                        favorites.includes(product.id)
-                                                            ? 'fill-red-500 text-red-500'
-                                                            : 'text-gray-400 dark:text-[#6b6b75]'
-                                                    }`}
-                                                />
-                                            </button>
-                                        </div>
-
-                                        {/* Product Info */}
-                                        <div className={`${gridView === 'list' ? 'flex flex-1 flex-col justify-between p-2' : 'p-3'}`}>
-                                            <div>
-                                                {/* Rating */}
-                                                <div className="mb-1.5 flex items-center">
-                                                    {Array.from({ length: 5 }).map((_, index) => (
-                                                        <Star
-                                                            key={index}
-                                                            className={`${gridView === 'list' ? 'h-2.5 w-2.5' : 'h-3 w-3'} ${
-                                                                index < 5 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-[#6b6b75]'
-                                                            }`}
-                                                        />
-                                                    ))}
-                                                </div>
-
-                                                {/* Product Name */}
-                                                <h3
-                                                    className={`mb-1.5 font-medium text-gray-900 dark:text-[#e0e0e5] ${
-                                                        gridView === 'list'
-                                                            ? 'line-clamp-1 text-xs sm:line-clamp-2 sm:text-base'
-                                                            : 'line-clamp-2 text-sm'
-                                                    }`}
-                                                >
-                                                    {product.name}
-                                                </h3>
-
-                                                {/* Description for list view - Hidden on mobile */}
-                                                {gridView === 'list' && (
-                                                    <p className="mb-3 line-clamp-2 hidden text-sm text-gray-600 sm:block dark:text-[#b8b8c0]">
-                                                        {product.description}
-                                                    </p>
-                                                )}
-
-                                                {/* Certificates for list view - Hidden on mobile */}
-                                                {gridView === 'list' && product.certificates && (
-                                                    <div className="mb-3 hidden flex-wrap gap-1 sm:flex">
-                                                        {product.certificates.slice(0, 3).map((cert) => (
-                                                            <Badge
-                                                                key={cert}
-                                                                variant="outline"
-                                                                className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
-                                                            >
-                                                                {cert}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="flex items-center justify-between">
-                                                {/* Price */}
-                                                <div className="flex items-center space-x-1.5">
-                                                    <span
-                                                        className={`font-semibold text-gray-900 dark:text-[#e0e0e5] ${
-                                                            gridView === 'list' ? 'text-sm sm:text-lg' : 'text-base'
-                                                        }`}
-                                                    >
-                                                        ${Number(product.price).toFixed(2)}
-                                                    </span>
-                                                    {product.original_price && (
-                                                        <span
-                                                            className={`text-gray-500 line-through dark:text-[#b8b8c0] ${
-                                                                gridView === 'list' ? 'text-xs' : 'text-xs'
-                                                            }`}
-                                                        >
-                                                            ${Number(product.original_price).toFixed(2)}
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {/* Buy Now button for list view - Hidden on mobile */}
-                                                {gridView === 'list' && product.product_link && (
-                                                    <Button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (product.product_link) {
-                                                                window.open(product.product_link, '_blank');
-                                                            }
-                                                        }}
-                                                        size="sm"
-                                                        className="ml-3 hidden uppercase sm:block dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
-                                                    >
-                                                        Buy Now
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                {isLoading
+                                    ? Array.from({ length: 9 }).map((_, index) => <ShimmerCard key={index} gridView={gridView} />)
+                                    : displayedProducts.map((product, index) => (
+                                          <div
+                                              key={`${product.id}-${Math.floor(index / 9)}`}
+                                              className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                                  gridView === 'list' ? 'flex flex-row' : ''
+                                              }`}
+                                              style={{
+                                                  animation: `fadeIn 0.5s ease-in-out ${Math.floor(index / 9) * 0.1}s`,
+                                                  opacity: 0,
+                                                  animationFillMode: 'forwards',
+                                              }}
+                                              onClick={() => handleProductClick(product)}
+                                          >
+                                              <div
+                                                  className={`relative flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-[#2d2d35] ${
+                                                      gridView === 'list' ? 'h-24 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'
+                                                  }`}
+                                              >
+                                                  <img
+                                                      src={
+                                                          product.images[0] ? `/images/${product.images[0].replace(/\\/g, '/')}` : '/placeholder.svg'
+                                                      }
+                                                      alt={product.name}
+                                                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                  />
+                                                  {product.is_new && gridView !== 'list' && (
+                                                      <Badge className="absolute top-2 left-2 overflow-hidden bg-green-500 text-xs text-white hover:bg-green-600">
+                                                          NEW
+                                                      </Badge>
+                                                  )}
+                                                  {gridView !== 'list' && (
+                                                      <button
+                                                          onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              toggleFavorite(product.id);
+                                                          }}
+                                                          className="absolute top-2 right-2 rounded-full bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a]"
+                                                      >
+                                                          <Heart
+                                                              className={`h-4 w-4 ${
+                                                                  favorites.includes(product.id)
+                                                                      ? 'fill-red-500 text-red-500'
+                                                                      : 'text-gray-400 dark:text-[#6b6b75]'
+                                                              }`}
+                                                          />
+                                                      </button>
+                                                  )}
+                                              </div>
+                                              <div
+                                                  className={`flex flex-1 flex-col justify-between ${gridView === 'list' ? 'min-w-0 p-2 sm:p-4' : 'p-3'}`}
+                                              >
+                                                  <div className="flex min-w-0 flex-col">
+                                                      <div className="mb-1 flex items-center">
+                                                          {Array.from({ length: 5 }).map((_, index) => (
+                                                              <Star
+                                                                  key={index}
+                                                                  className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${
+                                                                      index < 5
+                                                                          ? 'fill-yellow-400 text-yellow-400'
+                                                                          : 'text-gray-300 dark:text-[#6b6b75]'
+                                                                  }`}
+                                                              />
+                                                          ))}
+                                                      </div>
+                                                      <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
+                                                          {product.name}
+                                                      </h3>
+                                                      <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
+                                                          {product.description}
+                                                      </p>
+                                                      {product.certificates && product.certificates.length > 0 && (
+                                                          <div className="mb-2 flex flex-wrap gap-1">
+                                                              {product.certificates.slice(0, 2).map((cert) => (
+                                                                  <Badge
+                                                                      key={cert}
+                                                                      variant="outline"
+                                                                      className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                                  >
+                                                                      {cert}
+                                                                  </Badge>
+                                                              ))}
+                                                              {product.certificates.length > 2 && (
+                                                                  <Badge
+                                                                      variant="outline"
+                                                                      className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                                  >
+                                                                      +{product.certificates.length - 2} more
+                                                                  </Badge>
+                                                              )}
+                                                          </div>
+                                                      )}
+                                                  </div>
+                                                  <div className="mt-2 flex items-center justify-between">
+                                                      <div className="flex flex-col">
+                                                          <div className="flex items-center space-x-1">
+                                                              <span className="text-base font-semibold text-gray-900 dark:text-[#e0e0e5]">
+                                                                  ${Number(product.price).toFixed(2)}
+                                                              </span>
+                                                          </div>
+                                                      </div>
+                                                      {product.product_link && (
+                                                          <Button
+                                                              onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                  if (product.product_link) {
+                                                                      window.open(product.product_link, '_blank');
+                                                                  }
+                                                              }}
+                                                              size="sm"
+                                                              className="font-milk h-7 px-2 text-xs uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
+                                                          >
+                                                              Buy Now
+                                                          </Button>
+                                                      )}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      ))}
                             </div>
                         </div>
 
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                            <div className="font-milk mt-8 flex flex-col items-center justify-between gap-4 uppercase sm:flex-row">
-                                {/* Left side - Previous button and page info */}
-                                <div className="order-2 flex items-center space-x-4 sm:order-1">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => products.prev_page_url && handlePageChange(products.prev_page_url)}
-                                        disabled={!products.prev_page_url || isLoading}
-                                        className="font-milk px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                    >
-                                        <ChevronLeft className="mr-1 h-4 w-4" />
-                                        Previous
-                                    </Button>
+                        {/* Back to Top Button */}
+                        <button
+                            onClick={scrollToTop}
+                            className="fixed right-8 bottom-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 hover:bg-gray-100 dark:bg-[#23232a] dark:hover:bg-[#2d2d35]"
+                            aria-label="Back to top"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-gray-600 dark:text-[#e0e0e5]"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                        </button>
 
-                                    {/* Page selector dropdown */}
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className="font-milk min-w-[120px] gap-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                            >
-                                                <span>
-                                                    Page {products.current_page} of {products.last_page}
-                                                </span>
-                                                <ChevronDown className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="max-h-60 overflow-y-auto dark:border-[#2d2d35] dark:bg-[#23232a]">
-                                            {products.links
-                                                .filter((link) => link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;')
-                                                .map((link, index) => (
-                                                    <DropdownMenuItem
-                                                        key={index}
-                                                        onClick={() => {
-                                                            link.url && handlePageChange(link.url);
-                                                        }}
-                                                        className={
-                                                            link.active
-                                                                ? 'font-milk bg-gray-100 font-medium uppercase dark:bg-[#2d2d35]'
-                                                                : 'dark:text-[#e0e0e5]'
-                                                        }
-                                                    >
-                                                        {link.label}
-                                                    </DropdownMenuItem>
-                                                ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-
-                                {/* Center - Page numbers */}
-                                <div className="order-1 flex space-x-1 sm:order-2">
-                                    {products.links.map((link, index) =>
-                                        link.url === null ? null : link.label === '&laquo; Previous' || link.label === 'Next &raquo;' ? null : ( // Don't render disabled links // Don't render prev/next here, they are separate buttons
-                                            <Button
-                                                key={index}
-                                                variant={link.active ? 'default' : 'outline'}
-                                                onClick={() => {
-                                                    link.url && handlePageChange(link.url);
-                                                }}
-                                                disabled={!link.url}
-                                                className="font-milk min-w-[40px] px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                            >
-                                                {link.label}
-                                            </Button>
-                                        ),
+                        {/* Load More Button */}
+                        {displayedProducts.length < allProducts.length && (
+                            <div className="mt-8 flex justify-center">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    onClick={handlePageChange}
+                                    disabled={isLoading}
+                                    className="font-milk w-full max-w-xs uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                >
+                                    {isLoading ? (
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 dark:border-[#3d3d45] dark:border-t-[#e0e0e5]"></div>
+                                            <span>Loading...</span>
+                                        </div>
+                                    ) : (
+                                        `Load More (${allProducts.length - displayedProducts.length} remaining)`
                                     )}
-                                </div>
-
-                                {/* Right side - Next button */}
-                                <div className="order-3 flex items-center space-x-4">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => products.next_page_url && handlePageChange(products.next_page_url)}
-                                        disabled={!products.next_page_url || isLoading}
-                                        className="font-milk px-3 py-2 uppercase dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                    >
-                                        Next
-                                        <ChevronRight className="ml-1 h-4 w-4" />
-                                    </Button>
-                                </div>
+                                </Button>
                             </div>
                         )}
-
-                        {/* Results Info */}
-                        <div className="mt-4 text-center text-sm text-gray-600 dark:text-[#b8b8c0]">
-                            Showing {products.from || 0}-{products.to || 0} of {products.total} products
-                        </div>
                     </div>
                 </div>
             </div>
-
             <ProductDetailsModal product={selectedProduct} isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
-
-            {/* Loading indicator using portal */}
-            {isLoading &&
-                createPortal(
-                    <div className="font-milk fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 uppercase backdrop-blur-sm">
-                        <div className="flex flex-col items-center gap-4 rounded-xl bg-white/90 p-6 shadow-2xl dark:bg-[#23232a]/90">
-                            <div className="relative h-12 w-12">
-                                <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-[#2d2d35]"></div>
-                                <div className="absolute inset-0 animate-[spin_1s_linear_infinite] rounded-full border-4 border-t-blue-600 dark:border-t-blue-500"></div>
-                            </div>
-                        </div>
-                    </div>,
-                    document.body,
-                )}
         </div>
     );
 }

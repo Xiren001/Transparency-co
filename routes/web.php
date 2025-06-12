@@ -5,6 +5,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\CompanyController;
 
 Route::get('/', function (Request $request) {
     $products = Product::latest()->paginate(12);
@@ -28,7 +30,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
     Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
     Route::post('products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('pro                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ducts/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    // Company routes
+    Route::get('companies', [CompanyController::class, 'index'])->name('companies.index');
+    Route::post('companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::post('companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 });
 
 Route::get('/productst', [ProductController::class, 'customerView'])->name('products.customer');
@@ -45,6 +53,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/admin/newsletter', [App\Http\Controllers\NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
     Route::get('/admin/newsletter/export', [App\Http\Controllers\NewsletterSubscriberController::class, 'export'])->name('newsletter.export');
 });
+
+Route::get('/images/{type}/{filename}', [ImageController::class, 'serve'])->name('images.serve');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

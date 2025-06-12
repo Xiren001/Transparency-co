@@ -105,7 +105,7 @@ export default function Footer() {
     return (
         <footer className="relative rounded-lg bg-white py-16 dark:bg-[#1a1a1f]">
             {/* Background Image with Overlay */}
-            <div className="absolute inset-0 rounded-lg bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/footer-bg.png')" }}>
+            <div className="absolute inset-0 rounded-lg bg-cover bg-center bg-no-repeat" style={{ backgroundColor: '#EDBFB7' }}>
                 <div className="absolute inset-0 rounded-lg bg-black/20 dark:bg-black/40"></div>
             </div>
 
@@ -126,7 +126,7 @@ export default function Footer() {
                                     setError(null);
                                 }}
                                 placeholder="Enter your email"
-                                className={`font-milk focus:border-primary focus:ring-primary w-full rounded-lg border px-4 py-3 text-sm uppercase focus:ring-1 focus:outline-none dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:placeholder-[#6b6b75] ${
+                                className={`font-milk focus:border-primary focus:ring-primary w-full rounded-lg border bg-[#e0e0e5] px-4 py-3 text-sm uppercase focus:ring-1 focus:outline-none dark:border-[#e0e0e5] dark:bg-[#e0e0e5] dark:text-[#e0e0e5] dark:placeholder-[#6b6b75] ${
                                     error ? 'border-red-500 dark:border-red-500' : 'border-gray-300'
                                 }`}
                                 required

@@ -73,21 +73,21 @@ export default function FeaturedSection() {
     const canScrollLeft = currentIndex > 0;
 
     return (
-        <section className="rounded-lg bg-white py-16 dark:bg-[#1a1a1f]">
+        <section className="rounded-lg bg-white py-4 dark:bg-[#1a1a1f]">
             <div className="container mx-auto px-4">
                 {/* Header */}
-                <div className="mb-8 flex items-center justify-between">
-                    <h2 className="text-3xl font-light text-gray-900 md:text-4xl dark:text-[#e0e0e5]">Featured</h2>
+                <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-2xl font-light text-gray-900 md:text-3xl dark:text-[#e0e0e5]">Featured</h2>
 
                     {/* Navigation Controls */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
                         {/* Pagination Dots */}
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1">
                             {Array.from({ length: Math.ceil(featuredProducts.length / 4) }).map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setCurrentIndex(index * 4)}
-                                    className={`h-2 w-2 rounded-full transition-colors ${
+                                    className={`h-1.5 w-1.5 rounded-full transition-colors ${
                                         Math.floor(currentIndex / 4) === index ? 'bg-gray-800 dark:bg-[#e0e0e5]' : 'bg-gray-300 dark:bg-[#6b6b75]'
                                     }`}
                                 />
@@ -95,24 +95,24 @@ export default function FeaturedSection() {
                         </div>
 
                         {/* Arrow Controls */}
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1">
                             <Button
                                 variant="outline"
                                 size="icon"
                                 onClick={scrollLeft}
                                 disabled={!canScrollLeft}
-                                className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                className="h-6 w-6 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                             >
-                                <ChevronLeft className="h-4 w-4" />
+                                <ChevronLeft className="h-3 w-3" />
                             </Button>
                             <Button
                                 variant="outline"
                                 size="icon"
                                 onClick={scrollRight}
                                 disabled={!canScrollRight}
-                                className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                className="h-6 w-6 dark:border-[#2d2d35] dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                             >
-                                <ChevronRight className="h-4 w-4" />
+                                <ChevronRight className="h-3 w-3" />
                             </Button>
                         </div>
                     </div>
@@ -143,14 +143,14 @@ export default function FeaturedSection() {
 
                                         {/* Hot Badge */}
                                         {product.isHot && (
-                                            <Badge className="absolute top-2 left-2 bg-red-500 px-1 py-0 text-[10px] text-white hover:bg-red-600 sm:top-3 sm:left-3 sm:px-2 sm:py-1 sm:text-xs">
+                                            <Badge className="absolute top-1.5 left-1.5 bg-red-500 px-1 py-0 text-[10px] text-white hover:bg-red-600 sm:top-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-xs">
                                                 HOT
                                             </Badge>
                                         )}
 
                                         {/* See More Button - Full Width - Hover Only */}
                                         <div className="absolute right-0 bottom-0 left-0 bg-black/80 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
-                                            <button className="w-full px-3 py-2 text-xs font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black/90 sm:px-4 sm:py-3 sm:text-sm">
+                                            <button className="w-full px-2 py-1.5 text-xs font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black/90 sm:px-3 sm:py-2 sm:text-sm">
                                                 SEE MORE
                                             </button>
                                         </div>
@@ -161,10 +161,10 @@ export default function FeaturedSection() {
                                                 e.stopPropagation();
                                                 toggleFavorite(product.id);
                                             }}
-                                            className="absolute top-2 right-2 rounded-full bg-white p-1 shadow-sm transition-all duration-200 hover:shadow-md sm:top-3 sm:right-3 sm:p-2 dark:bg-[#23232a]"
+                                            className="absolute top-1.5 right-1.5 rounded-full bg-white p-1 shadow-sm transition-all duration-200 hover:shadow-md sm:top-2 sm:right-2 sm:p-1.5 dark:bg-[#23232a]"
                                         >
                                             <Heart
-                                                className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                                                className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
                                                     favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400 dark:text-[#6b6b75]'
                                                 }`}
                                             />
@@ -172,13 +172,13 @@ export default function FeaturedSection() {
                                     </div>
 
                                     {/* Product Info */}
-                                    <div className="p-2 sm:p-4">
+                                    <div className="p-2 sm:p-3">
                                         {/* Rating */}
-                                        <div className="mb-1 flex items-center sm:mb-2">
+                                        <div className="mb-1 flex items-center">
                                             {Array.from({ length: 5 }).map((_, index) => (
                                                 <Star
                                                     key={index}
-                                                    className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                                                    className={`h-3 w-3 ${
                                                         index < product.rating
                                                             ? 'fill-yellow-400 text-yellow-400'
                                                             : 'text-gray-300 dark:text-[#6b6b75]'
@@ -188,17 +188,15 @@ export default function FeaturedSection() {
                                         </div>
 
                                         {/* Product Name */}
-                                        <h3 className="mb-1 line-clamp-2 text-sm font-medium text-gray-900 sm:mb-2 sm:text-base dark:text-[#e0e0e5]">
-                                            {product.name}
-                                        </h3>
+                                        <h3 className="mb-1 line-clamp-2 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">{product.name}</h3>
 
                                         {/* Price */}
-                                        <div className="flex items-center space-x-1 sm:space-x-2">
-                                            <span className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">
+                                        <div className="flex items-center space-x-1">
+                                            <span className="text-sm font-semibold text-gray-900 dark:text-[#e0e0e5]">
                                                 ${product.price.toFixed(2)}
                                             </span>
                                             {product.originalPrice && (
-                                                <span className="text-xs text-gray-500 line-through sm:text-sm dark:text-[#b8b8c0]">
+                                                <span className="text-xs text-gray-500 line-through dark:text-[#b8b8c0]">
                                                     ${product.originalPrice.toFixed(2)}
                                                 </span>
                                             )}
@@ -211,7 +209,7 @@ export default function FeaturedSection() {
                 </div>
 
                 {/* Mobile Scroll Indicator */}
-                <div className="mt-4 text-center text-sm text-gray-500 md:hidden dark:text-[#b8b8c0]">Swipe to see more products</div>
+                <div className="mt-2 text-center text-xs text-gray-500 md:hidden dark:text-[#b8b8c0]">Swipe to see more products</div>
             </div>
 
             {/* Product Detail Modal */}
