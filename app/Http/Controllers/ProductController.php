@@ -15,17 +15,41 @@ class ProductController extends Controller
     {
         $query = Product::query();
 
-        // Search
+        // Enhanced Search - Search through everything related to products
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
+                // Product basic fields
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('category', 'like', "%{$search}%")
                     ->orWhere('sub_category', 'like', "%{$search}%")
                     ->orWhere('item', 'like', "%{$search}%")
-                    ->orWhereHas('company', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
+                    ->orWhere('product_link', 'like', "%{$search}%")
+
+                    // Search in product details (JSON field)
+                    ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].name')", ["%{$search}%"])
+                    ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].value')", ["%{$search}%"])
+
+                    // Search in certificates (JSON field)
+                    ->orWhereRaw("JSON_SEARCH(LOWER(certificates), 'one', ?, null, '$[*]')", ["%{$search}%"])
+
+                    // Search in company information
+                    ->orWhereHas('company', function ($companyQuery) use ($search) {
+                        $companyQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%")
+                            ->orWhere('link', 'like', "%{$search}%");
+                    })
+
+                    // Search price as text (for price-related searches)
+                    ->orWhereRaw("CAST(price AS CHAR) LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("CAST(original_price AS CHAR) LIKE ?", ["%{$search}%"])
+
+                    // Search for "new" products
+                    ->orWhere(function ($newQuery) use ($search) {
+                        if (stripos($search, 'new') !== false) {
+                            $newQuery->where('is_new', true);
+                        }
                     });
             });
         }
@@ -253,88 +277,6 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to delete product: ' . $e->getMessage());
-        }
-    }
-
-    public function bulkStore(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'products' => 'required|array',
-            'products.*.name' => 'required|string|max:255',
-            'products.*.company_name' => 'required|string|max:255',
-            'products.*.description' => 'nullable|string',
-            'products.*.price' => 'required|numeric|min:0',
-            'products.*.original_price' => 'nullable|numeric|min:0',
-            'products.*.is_new' => 'boolean',
-            'products.*.certificates' => 'array',
-            'products.*.certificates.*' => 'string',
-            'products.*.product_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'products.*.product_link' => 'nullable|url',
-            'products.*.category' => 'required|string',
-            'products.*.sub_category' => 'required|string',
-            'products.*.product_details' => 'array',
-            'products.*.product_details.*.name' => 'required|string',
-            'products.*.product_details.*.value' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-
-        try {
-            $createdProducts = [];
-            foreach ($request->products as $productData) {
-                $product = new Product();
-                $product->fill($productData);
-
-                // Handle product images
-                if (isset($productData['product_images'])) {
-                    $productImages = [];
-                    foreach ($productData['product_images'] as $image) {
-                        $path = $image->store('products', 'public');
-                        $productImages[] = $path;
-                    }
-                    $product->images = $productImages;
-                }
-
-                $product->save();
-                $createdProducts[] = $product;
-            }
-
-            return redirect()->route('products.index')->with('success', count($createdProducts) . ' products created successfully.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to create products: ' . $e->getMessage())->withInput();
-        }
-    }
-
-    public function bulkDestroy(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'product_ids' => 'required|array',
-            'product_ids.*' => 'exists:products,id',
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator);
-        }
-
-        try {
-            $products = Product::whereIn('id', $request->product_ids)->get();
-
-            foreach ($products as $product) {
-                // Delete product images
-                if ($product->images) {
-                    foreach ($product->images as $image) {
-                        Storage::disk('public')->delete($image);
-                    }
-                }
-
-                $product->delete();
-            }
-
-            return redirect()->route('products.index')->with('success', count($products) . ' products deleted successfully.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to delete products: ' . $e->getMessage());
         }
     }
 

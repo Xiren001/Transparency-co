@@ -17,4 +17,9 @@ class Company extends Model
     protected $casts = [
         'certification_images' => 'array',
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

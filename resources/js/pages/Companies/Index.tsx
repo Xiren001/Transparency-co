@@ -250,6 +250,7 @@ export default function Index({ companies }: Props) {
             'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
 
         const getImageUrl = (image: string) => {
+            if (!image) return placeholderImage;
             if (image.startsWith('blob:')) {
                 return image;
             }
@@ -340,6 +341,18 @@ export default function Index({ companies }: Props) {
         );
     };
 
+    // Defensive fallback for images
+    const getCompanyImage = (image: any) => {
+        if (typeof image === 'string' && image.trim()) {
+            return image.startsWith('http') ? image : `/storage/${image}`;
+        }
+        return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
+    };
+    const getCompanyImages = (images: any) => (Array.isArray(images) ? images : []);
+    const getCompanyName = (name: any) => (typeof name === 'string' && name.trim() ? name : 'Unnamed Company');
+    const getCompanyDescription = (desc: any) => (typeof desc === 'string' && desc.trim() ? desc : 'No description available');
+    const getCompanyLink = (link: any) => (typeof link === 'string' && link.trim() ? link : undefined);
+
     return (
         <AppLayout>
             <Head title="Companies" />
@@ -409,14 +422,14 @@ export default function Index({ companies }: Props) {
                         <TableBody>
                             {companies.data.map((company) => (
                                 <TableRow key={company.id} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">{company.name}</TableCell>
-                                    <TableCell className="max-w-md truncate">{company.description}</TableCell>
+                                    <TableCell className="font-medium">{getCompanyName(company.name)}</TableCell>
+                                    <TableCell className="max-w-md truncate">{getCompanyDescription(company.description)}</TableCell>
                                     <TableCell>
                                         {company.logo && (
                                             <div className="relative h-10 w-10 overflow-hidden rounded-full border">
                                                 <img
-                                                    src={`/storage/${company.logo}`}
-                                                    alt={`${company.name} logo`}
+                                                    src={getCompanyImage(company.logo)}
+                                                    alt={`${getCompanyName(company.name)} logo`}
                                                     className="h-full w-full object-cover"
                                                 />
                                             </div>
@@ -424,26 +437,28 @@ export default function Index({ companies }: Props) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex -space-x-2">
-                                            {company.certification_images?.slice(0, 3).map((image, index) => (
-                                                <div key={index} className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-white">
-                                                    <img
-                                                        src={`/storage/${image}`}
-                                                        alt={`Certification ${index + 1}`}
-                                                        className="h-full w-full object-cover"
-                                                    />
-                                                </div>
-                                            ))}
-                                            {company.certification_images?.length > 3 && (
+                                            {getCompanyImages(company.certification_images)
+                                                .slice(0, 3)
+                                                .map((image, index) => (
+                                                    <div key={index} className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-white">
+                                                        <img
+                                                            src={getCompanyImage(image)}
+                                                            alt={`Certification ${index + 1}`}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            {getCompanyImages(company.certification_images).length > 3 && (
                                                 <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-xs">
-                                                    +{company.certification_images.length - 3}
+                                                    +{getCompanyImages(company.certification_images).length - 3}
                                                 </div>
                                             )}
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        {company.link && (
+                                        {getCompanyLink(company.link) && (
                                             <a
-                                                href={company.link}
+                                                href={getCompanyLink(company.link) || undefined}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 hover:underline"
@@ -647,7 +662,7 @@ export default function Index({ companies }: Props) {
                                             {imagePreviews.logo && (
                                                 <div className="mt-2">
                                                     <p className="mb-2 text-sm font-medium">Logo Preview:</p>
-                                                    <ImagePreview images={[imagePreviews.logo]} type="logo" />
+                                                    <ImagePreview images={imagePreviews.logo ? [imagePreviews.logo] : []} type="logo" />
                                                 </div>
                                             )}
                                         </div>
@@ -669,7 +684,14 @@ export default function Index({ companies }: Props) {
                                             {imagePreviews.certification_images.length > 0 && (
                                                 <div className="mt-2">
                                                     <p className="mb-2 text-sm font-medium">New Images:</p>
-                                                    <ImagePreview images={imagePreviews.certification_images} type="certification_images" />
+                                                    <ImagePreview
+                                                        images={
+                                                            imagePreviews.certification_images?.filter(
+                                                                (img): img is string => typeof img === 'string',
+                                                            ) || []
+                                                        }
+                                                        type="certification_images"
+                                                    />
                                                 </div>
                                             )}
                                         </div>
@@ -797,13 +819,13 @@ export default function Index({ companies }: Props) {
                                             {selectedCompany && (
                                                 <div className="mt-2">
                                                     <p className="mb-2 text-sm font-medium">Current Logo:</p>
-                                                    <ImagePreview images={[selectedCompany.logo]} type="logo" />
+                                                    <ImagePreview images={selectedCompany.logo ? [selectedCompany.logo] : []} type="logo" />
                                                 </div>
                                             )}
                                             {imagePreviews.logo && (
                                                 <div className="mt-2">
                                                     <p className="mb-2 text-sm font-medium">New Logo:</p>
-                                                    <ImagePreview images={[imagePreviews.logo]} type="logo" />
+                                                    <ImagePreview images={imagePreviews.logo ? [imagePreviews.logo] : []} type="logo" />
                                                 </div>
                                             )}
                                         </div>
@@ -826,9 +848,9 @@ export default function Index({ companies }: Props) {
                                                 <div className="mt-2">
                                                     <p className="mb-2 text-sm font-medium">Current Images:</p>
                                                     <ImagePreview
-                                                        images={(selectedCompany?.certification_images || []).filter(
-                                                            (img) => !removedImages.certification_images.includes(img),
-                                                        )}
+                                                        images={(selectedCompany?.certification_images || [])
+                                                            .filter((img) => !removedImages.certification_images.includes(img))
+                                                            .filter((img): img is string => typeof img === 'string')}
                                                         type="certification_images"
                                                     />
                                                 </div>
@@ -836,7 +858,14 @@ export default function Index({ companies }: Props) {
                                             {imagePreviews.certification_images.length > 0 && (
                                                 <div className="mt-2">
                                                     <p className="mb-2 text-sm font-medium">New Images:</p>
-                                                    <ImagePreview images={imagePreviews.certification_images} type="certification_images" />
+                                                    <ImagePreview
+                                                        images={
+                                                            imagePreviews.certification_images?.filter(
+                                                                (img): img is string => typeof img === 'string',
+                                                            ) || []
+                                                        }
+                                                        type="certification_images"
+                                                    />
                                                 </div>
                                             )}
                                         </div>

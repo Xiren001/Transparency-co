@@ -3,13 +3,57 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CompanyController;
+use App\Models\Company;
 
 Route::get('/', function (Request $request) {
-    $products = Product::latest()->paginate(12);
+    $query = Product::query();
+
+    // Enhanced Search - Search through everything related to products
+    if ($request->has('search')) {
+        $search = $request->input('search');
+        $query->where(function ($q) use ($search) {
+            // Product basic fields
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhere('category', 'like', "%{$search}%")
+                ->orWhere('sub_category', 'like', "%{$search}%")
+                ->orWhere('item', 'like', "%{$search}%")
+                ->orWhere('product_link', 'like', "%{$search}%")
+
+                // Search in product details (JSON field)
+                ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].name')", ["%{$search}%"])
+                ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].value')", ["%{$search}%"])
+
+                // Search in certificates (JSON field)
+                ->orWhereRaw("JSON_SEARCH(LOWER(certificates), 'one', ?, null, '$[*]')", ["%{$search}%"])
+
+                // Search in company information
+                ->orWhereHas('company', function ($companyQuery) use ($search) {
+                    $companyQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('link', 'like', "%{$search}%");
+                })
+
+                // Search price as text (for price-related searches)
+                ->orWhereRaw("CAST(price AS CHAR) LIKE ?", ["%{$search}%"])
+                ->orWhereRaw("CAST(original_price AS CHAR) LIKE ?", ["%{$search}%"])
+
+                // Search for "new" products
+                ->orWhere(function ($newQuery) use ($search) {
+                    if (stripos($search, 'new') !== false) {
+                        $newQuery->where('is_new', true);
+                    }
+                });
+        });
+    }
+
+    $products = $query->with('company')->latest()->paginate(12);
+
     return Inertia::render('welcome', [
         'auth' => [
             'user' => $request->user(),
@@ -21,9 +65,7 @@ Route::get('/', function (Request $request) {
 
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Product routes
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
@@ -44,6 +86,9 @@ Route::get('/products/customer-view', [ProductController::class, 'customerView']
 
 Route::get('/api/products/filter', [App\Http\Controllers\Api\ProductFilterController::class, 'filter'])->name('api.products.filter');
 
+// Product click tracking
+Route::post('/api/products/{product}/click', [App\Http\Controllers\Api\ProductClickController::class, 'track'])->name('api.products.click');
+
 Route::post('/newsletter/subscribe', [App\Http\Controllers\NewsletterSubscriberController::class, 'store'])->name('newsletter.subscribe');
 Route::get('/newsletter/verify/{token}', [App\Http\Controllers\NewsletterSubscriberController::class, 'verify'])->name('newsletter.verify');
 Route::get('/newsletter/unsubscribe/{token}', [App\Http\Controllers\NewsletterSubscriberController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
@@ -55,6 +100,42 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 });
 
 Route::get('/images/{type}/{filename}', [ImageController::class, 'serve'])->name('images.serve');
+
+// Instant search suggestions endpoint
+Route::get('/api/search-suggestions', function (\Illuminate\Http\Request $request) {
+    $query = $request->input('q', '');
+    if (!$query) {
+        return response()->json([
+            'products' => [],
+            'companies' => [],
+            'categories' => [],
+        ]);
+    }
+
+    $products = \App\Models\Product::where('name', 'like', "%{$query}%")
+        ->orWhere('description', 'like', "%{$query}%")
+        ->orWhere('category', 'like', "%{$query}%")
+        ->orWhere('sub_category', 'like', "%{$query}%")
+        ->orWhere('item', 'like', "%{$query}%")
+        ->limit(5)
+        ->get(['id', 'name', 'category']);
+
+    $companies = Company::where('name', 'like', "%{$query}%")
+        ->orWhere('description', 'like', "%{$query}%")
+        ->limit(5)
+        ->get(['id', 'name']);
+
+    $categories = \App\Models\Product::where('category', 'like', "%{$query}%")
+        ->distinct()
+        ->limit(5)
+        ->pluck('category');
+
+    return response()->json([
+        'products' => $products,
+        'companies' => $companies,
+        'categories' => $categories,
+    ]);
+});
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

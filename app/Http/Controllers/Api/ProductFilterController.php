@@ -13,6 +13,45 @@ class ProductFilterController extends Controller
     {
         $query = Product::query();
 
+        // Enhanced Search - Search through everything related to products
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                // Product basic fields
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%")
+                    ->orWhere('sub_category', 'like', "%{$search}%")
+                    ->orWhere('item', 'like', "%{$search}%")
+                    ->orWhere('product_link', 'like', "%{$search}%")
+
+                    // Search in product details (JSON field)
+                    ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].name')", ["%{$search}%"])
+                    ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].value')", ["%{$search}%"])
+
+                    // Search in certificates (JSON field)
+                    ->orWhereRaw("JSON_SEARCH(LOWER(certificates), 'one', ?, null, '$[*]')", ["%{$search}%"])
+
+                    // Search in company information
+                    ->orWhereHas('company', function ($companyQuery) use ($search) {
+                        $companyQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%")
+                            ->orWhere('link', 'like', "%{$search}%");
+                    })
+
+                    // Search price as text (for price-related searches)
+                    ->orWhereRaw("CAST(price AS CHAR) LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("CAST(original_price AS CHAR) LIKE ?", ["%{$search}%"])
+
+                    // Search for "new" products
+                    ->orWhere(function ($newQuery) use ($search) {
+                        if (stripos($search, 'new') !== false) {
+                            $newQuery->where('is_new', true);
+                        }
+                    });
+            });
+        }
+
         // Apply filters
         if ($request->has('category')) {
             $query->where('category', $request->category);
@@ -70,7 +109,7 @@ class ProductFilterController extends Controller
         }
 
         // Get all products without pagination
-        $products = $query->get();
+        $products = $query->with('company')->get();
 
         // Get sub-category counts if a category is selected
         $subCategoryCounts = [];

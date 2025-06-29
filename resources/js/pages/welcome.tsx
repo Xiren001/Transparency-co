@@ -2,15 +2,15 @@ import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 import { Link } from '@inertiajs/react';
-import { LogOut, Menu, Search, User } from 'lucide-react';
+import { Bell, Calendar, Home, LogOut, Mail, Menu, MessageSquare, Search, Settings, User } from 'lucide-react';
 import * as React from 'react';
 
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-
 import CategoriesSection from './body/categories-section';
 import Footer from './body/footer';
 import HeroSection from './body/hero-section';
@@ -23,6 +23,16 @@ const navigation = [
     { name: 'Services', href: '/services' },
     { name: 'Contact', href: '/contact' },
 ];
+
+const navIconMap: Record<string, any> = {
+    Home: Home,
+    'My Profile': User,
+    'My Vacancy': Calendar,
+    Message: MessageSquare,
+    Subscription: Mail,
+    Notification: Bell,
+    Setting: Settings,
+};
 
 export default function Welcome() {
     const { auth, products } = usePage<SharedData>().props;
@@ -73,7 +83,8 @@ export default function Welcome() {
                                     <a
                                         key={item.name}
                                         href={item.href}
-                                        className="hover:text-primary cursor-pointer text-sm font-medium transition-colors dark:text-gray-200"
+                                        className="font-milk text-foreground hover:bg-muted/40 rounded-lg px-3 py-2 text-base uppercase transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                        onClick={() => setIsOpen(false)}
                                     >
                                         {item.name}
                                     </a>
@@ -87,6 +98,9 @@ export default function Welcome() {
                                     <Search className="h-5 w-5 dark:text-white" />
                                     <span className="sr-only">Search</span>
                                 </Button>
+
+                                {/* Dark Mode Toggle */}
+                                <AppearanceToggleDropdown />
 
                                 {/* Profile Menu */}
                                 <DropdownMenu>
@@ -166,85 +180,93 @@ export default function Welcome() {
                                         <span className="sr-only">Toggle menu</span>
                                     </Button>
                                 </SheetTrigger>
-                                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                                    <div className="mt-6 mb-6 flex h-full flex-col justify-between space-y-4">
-                                        {/* Mobile Navigation Links */}
-                                        <div className="flex flex-col space-y-3">
+                                <SheetContent
+                                    side="left"
+                                    hideDefaultClose={true}
+                                    className="bg-background text-foreground flex h-full w-[270px] max-w-[90vw] flex-col rounded-r-2xl p-0 shadow-xl dark:bg-[#1a1a1f] dark:text-[#e0e0e5]"
+                                >
+                                    {/* Top Bar: Dark Mode Toggle & Close Button */}
+                                    <div className="flex items-center justify-between px-4 pt-4 pb-2 uppercase">
+                                        <AppearanceToggleDropdown />
+                                        <SheetTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="ml-auto">
+                                                <span className="sr-only">Close menu</span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-6 w-6"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </Button>
+                                        </SheetTrigger>
+                                    </div>
+                                    {/* Profile Section */}
+                                    <div className="border-border/20 flex flex-col items-center border-b px-4 py-4 uppercase dark:border-white/10">
+                                        <Avatar className="mb-2 h-16 w-16 ring-4 ring-white/20">
+                                            <AvatarImage src="/placeholder.svg?height=64&width=64" alt={auth.user?.name || 'User'} />
+                                            <AvatarFallback>{auth.user?.name ? auth.user.name[0].toUpperCase() : 'U'}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="font-milk text-lg font-semibold">{auth.user?.name || 'Guest'}</div>
+                                        <div className="text-xs text-white/70">{auth.user?.email || ''}</div>
+                                    </div>
+                                    {/* Navigation Links & Actions */}
+                                    <div className="flex flex-1 flex-col justify-between uppercase">
+                                        <div className="flex flex-col space-y-3 px-4 py-6">
                                             {navigation.map((item) => (
                                                 <a
                                                     key={item.name}
                                                     href={item.href}
-                                                    className="font-milk mb-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-400 text-gray-700 uppercase hover:bg-gray-100 dark:text-white"
+                                                    className="font-milk text-foreground hover:bg-muted/40 rounded-lg px-3 py-2 text-base uppercase transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                     onClick={() => setIsOpen(false)}
                                                 >
                                                     {item.name}
                                                 </a>
                                             ))}
                                         </div>
-
-                                        {/* Mobile Actions */}
-                                        <div className="border-t pt-4">
+                                        <div className="flex flex-col space-y-3 px-4 pb-6">
                                             {auth.user ? (
-                                                <div className="flex flex-col items-center space-y-3">
-                                                    <div className="flex items-center space-x-3 p-2">
-                                                        <Avatar className="h-10 w-10">
-                                                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt={auth.user.name} />
-                                                            <AvatarFallback>{auth.user.name ? auth.user.name[0].toUpperCase() : 'U'}</AvatarFallback>
-                                                        </Avatar>
-                                                        <div>
-                                                            <p className="font-milk text-sm font-medium uppercase">{auth.user.name}</p>
-                                                            <p className="font-milk text-muted-foreground text-xs uppercase">{auth.user.email}</p>
-                                                        </div>
-                                                    </div>
-
+                                                <>
                                                     {auth.isAdmin && (
                                                         <a
                                                             href={route('dashboard')}
-                                                            className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                            onClick={() => setIsOpen(false)}
                                                         >
-                                                            <User className="h-4 w-4" />
                                                             Dashboard
                                                         </a>
                                                     )}
-
                                                     <Link
                                                         href={route('logout')}
                                                         method="post"
                                                         as="button"
-                                                        className="font-milk flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100"
+                                                        className="font-milk bg-muted/40 text-foreground hover:bg-muted/60 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-base uppercase dark:bg-white/10 dark:text-[#e0e0e5] dark:hover:bg-white/20"
+                                                        onClick={() => setIsOpen(false)}
                                                     >
-                                                        <LogOut className="h-4 w-4" />
-                                                        Logout
+                                                        <LogOut className="h-5 w-5" />
+                                                        Log Out
                                                     </Link>
-                                                </div>
+                                                </>
                                             ) : (
-                                                <div className="flex flex-col space-y-3">
+                                                <>
                                                     <a
                                                         href={route('login')}
-                                                        className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100 dark:text-white"
+                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                        onClick={() => setIsOpen(false)}
                                                     >
-                                                        <User className="h-4 w-4 fill-current dark:text-white" />
                                                         Log in
                                                     </a>
                                                     <a
                                                         href={route('register')}
-                                                        className="font-milk flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100 dark:text-white"
+                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                        onClick={() => setIsOpen(false)}
                                                     >
-                                                        <User className="h-4 w-4 fill-current dark:text-white" />
                                                         Sign up
                                                     </a>
-                                                </div>
+                                                </>
                                             )}
-
-                                            {/* Search Button */}
-                                            <button
-                                                type="button"
-                                                className="font-milk mt-3 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 uppercase hover:bg-gray-100 dark:text-gray-200"
-                                                onClick={() => setIsSearchOpen(true)}
-                                            >
-                                                <Search className="h-4 w-4 fill-current dark:text-white" />
-                                                Search
-                                            </button>
                                         </div>
                                     </div>
                                 </SheetContent>

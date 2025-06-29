@@ -93,6 +93,52 @@ const ShimmerCard = ({ gridView }: { gridView: string }) => (
     </div>
 );
 
+// Defensive fallback for images
+const getProductImage = (images: any) => {
+    if (Array.isArray(images) && images.length > 0 && images[0]) {
+        return `/images/${String(images[0]).replace(/\\/g, '/')}`;
+    }
+    return '/placeholder.svg';
+};
+
+// Defensive fallback for certificates
+const getCertificates = (certs: any) => (Array.isArray(certs) ? certs : []);
+
+// Defensive fallback for product details
+const getProductDetails = (details: any) => (Array.isArray(details) ? details : []);
+
+// Defensive fallback for price
+const getPrice = (price: any) => {
+    console.log('getPrice input:', price, typeof price);
+    if (typeof price === 'number' && !isNaN(price)) {
+        return price;
+    }
+    if (typeof price === 'string' && price.trim()) {
+        const numPrice = parseFloat(price);
+        if (!isNaN(numPrice)) {
+            return numPrice;
+        }
+    }
+    return 0;
+};
+
+// Defensive fallback for original price
+const getOriginalPrice = (originalPrice: any) => {
+    if (typeof originalPrice === 'number' && !isNaN(originalPrice)) {
+        return originalPrice;
+    }
+    if (typeof originalPrice === 'string' && originalPrice.trim()) {
+        const numPrice = parseFloat(originalPrice);
+        if (!isNaN(numPrice)) {
+            return numPrice;
+        }
+    }
+    return null;
+};
+
+// Defensive fallback for company name
+const getCompanyName = (company: any) => (company && typeof company.name === 'string' ? company.name : 'Unknown Company');
+
 export default function CustomerView({ products: initialProducts, filters: initialFilters }: Props) {
     const [allProducts, setAllProducts] = useState<Product[]>([]);
     const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
@@ -450,6 +496,21 @@ export default function CustomerView({ products: initialProducts, filters: initi
 
     const currentCategorySubCategories = selectedCategory ? categories.find((cat) => cat.id === selectedCategory)?.subCategories || [] : [];
 
+    // Function to track product clicks
+    const trackProductClick = async (productId: number) => {
+        try {
+            await fetch(`/api/products/${productId}/click`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+            });
+        } catch (error) {
+            console.error('Failed to track product click:', error);
+        }
+    };
+
     return (
         <div className="h-auto rounded-lg bg-gray-50 sm:min-h-screen dark:bg-[#1a1a1f]">
             <div className="container mx-auto px-4 py-8">
@@ -581,7 +642,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                 {selectedSubCategory && ` - ${selectedSubCategory}`}
                             </h1>
 
-                            <div className="flex w-full flex-col items-start gap-4 sm:w-auto sm:flex-row sm:items-center">
+                            <div className="hidden w-full flex-col items-start gap-4 sm:flex sm:w-auto sm:flex-row sm:items-center">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button
@@ -647,13 +708,13 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                               >
                                                   <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
                                                       <img
-                                                          src={
-                                                              product.images[0]
-                                                                  ? `/images/${product.images[0].replace(/\\/g, '/')}`
-                                                                  : '/placeholder.svg'
-                                                          }
-                                                          alt={product.name}
+                                                          src={getProductImage(product.images)}
+                                                          alt={product.name || 'Product image'}
                                                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                          onError={(e) => {
+                                                              const target = e.target as HTMLImageElement;
+                                                              target.src = '/placeholder.svg';
+                                                          }}
                                                       />
                                                       {product.is_new && (
                                                           <Badge className="absolute top-2 left-2 overflow-hidden bg-green-500 text-xs text-white hover:bg-green-600">
@@ -677,7 +738,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                       </button>
                                                   </div>
                                                   <div className="p-3">
-                                                      <div className="mb-1 flex items-center">
+                                                      <div className="mb-1 hidden items-center sm:flex">
                                                           {Array.from({ length: 5 }).map((_, index) => (
                                                               <Star
                                                                   key={index}
@@ -690,28 +751,33 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                           ))}
                                                       </div>
                                                       <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
-                                                          {product.name}
+                                                          {product.name || 'Unnamed Product'}
                                                       </h3>
-                                                      <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
-                                                          {product.description}
+                                                      <p className="mb-1 text-xs text-blue-600 dark:text-blue-400">
+                                                          {getCompanyName(product.company)}
                                                       </p>
-                                                      {product.certificates && product.certificates.length > 0 && (
+                                                      <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
+                                                          {product.description || 'No description available'}
+                                                      </p>
+                                                      {getCertificates(product.certificates).length > 0 && (
                                                           <div className="mb-2 flex flex-wrap gap-1">
-                                                              {product.certificates.slice(0, 2).map((cert) => (
+                                                              {getCertificates(product.certificates)
+                                                                  .slice(0, 2)
+                                                                  .map((cert) => (
+                                                                      <Badge
+                                                                          key={cert}
+                                                                          variant="outline"
+                                                                          className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                                      >
+                                                                          {cert}
+                                                                      </Badge>
+                                                                  ))}
+                                                              {getCertificates(product.certificates).length > 2 && (
                                                                   <Badge
-                                                                      key={cert}
                                                                       variant="outline"
                                                                       className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
                                                                   >
-                                                                      {cert}
-                                                                  </Badge>
-                                                              ))}
-                                                              {product.certificates.length > 2 && (
-                                                                  <Badge
-                                                                      variant="outline"
-                                                                      className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
-                                                                  >
-                                                                      +{product.certificates.length - 2} more
+                                                                      +{getCertificates(product.certificates).length - 2} more
                                                                   </Badge>
                                                               )}
                                                           </div>
@@ -720,7 +786,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                           <div className="flex flex-col">
                                                               <div className="flex items-center space-x-1">
                                                                   <span className="text-base font-semibold text-gray-900 dark:text-[#e0e0e5]">
-                                                                      ${Number(product.price).toFixed(2)}
+                                                                      ${getPrice(product.price).toFixed(2)}
                                                                   </span>
                                                               </div>
                                                           </div>
@@ -728,12 +794,12 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                               <Button
                                                                   onClick={(e) => {
                                                                       e.stopPropagation();
+                                                                      trackProductClick(product.id);
                                                                       if (product.product_link) {
                                                                           window.open(product.product_link, '_blank');
                                                                       }
                                                                   }}
-                                                                  size="sm"
-                                                                  className="font-milk h-7 px-2 text-xs uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
+                                                                  className="font-milk h-9 px-4 text-sm font-medium uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
                                                               >
                                                                   Buy Now
                                                               </Button>
@@ -775,11 +841,13 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                   }`}
                                               >
                                                   <img
-                                                      src={
-                                                          product.images[0] ? `/images/${product.images[0].replace(/\\/g, '/')}` : '/placeholder.svg'
-                                                      }
-                                                      alt={product.name}
+                                                      src={getProductImage(product.images)}
+                                                      alt={product.name || 'Product image'}
                                                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                      onError={(e) => {
+                                                          const target = e.target as HTMLImageElement;
+                                                          target.src = '/placeholder.svg';
+                                                      }}
                                                   />
                                                   {product.is_new && gridView !== 'list' && (
                                                       <Badge className="absolute top-2 left-2 overflow-hidden bg-green-500 text-xs text-white hover:bg-green-600">
@@ -808,11 +876,11 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                   className={`flex flex-1 flex-col justify-between ${gridView === 'list' ? 'min-w-0 p-2 sm:p-4' : 'p-3'}`}
                                               >
                                                   <div className="flex min-w-0 flex-col">
-                                                      <div className="mb-1 flex items-center">
+                                                      <div className="mb-1 hidden items-center sm:flex">
                                                           {Array.from({ length: 5 }).map((_, index) => (
                                                               <Star
                                                                   key={index}
-                                                                  className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${
+                                                                  className={`h-2.5 w-2.5 ${
                                                                       index < 5
                                                                           ? 'fill-yellow-400 text-yellow-400'
                                                                           : 'text-gray-300 dark:text-[#6b6b75]'
@@ -821,28 +889,33 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                           ))}
                                                       </div>
                                                       <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
-                                                          {product.name}
+                                                          {product.name || 'Unnamed Product'}
                                                       </h3>
-                                                      <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
-                                                          {product.description}
+                                                      <p className="mb-1 text-xs text-blue-600 dark:text-blue-400">
+                                                          {getCompanyName(product.company)}
                                                       </p>
-                                                      {product.certificates && product.certificates.length > 0 && (
+                                                      <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
+                                                          {product.description || 'No description available'}
+                                                      </p>
+                                                      {getCertificates(product.certificates).length > 0 && (
                                                           <div className="mb-2 flex flex-wrap gap-1">
-                                                              {product.certificates.slice(0, 2).map((cert) => (
+                                                              {getCertificates(product.certificates)
+                                                                  .slice(0, 2)
+                                                                  .map((cert) => (
+                                                                      <Badge
+                                                                          key={cert}
+                                                                          variant="outline"
+                                                                          className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
+                                                                      >
+                                                                          {cert}
+                                                                      </Badge>
+                                                                  ))}
+                                                              {getCertificates(product.certificates).length > 2 && (
                                                                   <Badge
-                                                                      key={cert}
                                                                       variant="outline"
                                                                       className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
                                                                   >
-                                                                      {cert}
-                                                                  </Badge>
-                                                              ))}
-                                                              {product.certificates.length > 2 && (
-                                                                  <Badge
-                                                                      variant="outline"
-                                                                      className="text-[10px] break-words sm:text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]"
-                                                                  >
-                                                                      +{product.certificates.length - 2} more
+                                                                      +{getCertificates(product.certificates).length - 2} more
                                                                   </Badge>
                                                               )}
                                                           </div>
@@ -852,7 +925,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                       <div className="flex flex-col">
                                                           <div className="flex items-center space-x-1">
                                                               <span className="text-base font-semibold text-gray-900 dark:text-[#e0e0e5]">
-                                                                  ${Number(product.price).toFixed(2)}
+                                                                  ${getPrice(product.price).toFixed(2)}
                                                               </span>
                                                           </div>
                                                       </div>
@@ -860,12 +933,12 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                           <Button
                                                               onClick={(e) => {
                                                                   e.stopPropagation();
+                                                                  trackProductClick(product.id);
                                                                   if (product.product_link) {
                                                                       window.open(product.product_link, '_blank');
                                                                   }
                                                               }}
-                                                              size="sm"
-                                                              className="font-milk h-7 px-2 text-xs uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
+                                                              className="font-milk h-9 px-4 text-sm font-medium uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
                                                           >
                                                               Buy Now
                                                           </Button>

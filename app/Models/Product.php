@@ -35,4 +35,9 @@ class Product extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function productClicks()
+    {
+        return $this->hasMany(ProductClick::class);
+    }
 }
