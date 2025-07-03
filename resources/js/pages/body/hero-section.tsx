@@ -57,6 +57,20 @@ export default function HeroSection() {
         }
     };
 
+    // Close suggestions when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
         <section className="relative min-h-[400px] w-full rounded-lg border border-gray-200 bg-gray-50 bg-white shadow-sm sm:min-h-[450px] md:min-h-[500px] dark:border-[#23232a] dark:bg-[#1a1a1f]">
             {/* No background pattern or overlay for a clean, consistent look */}
@@ -88,7 +102,7 @@ export default function HeroSection() {
                             }}
                             onKeyPress={handleKeyPress}
                             onFocus={() => setShowSuggestions(true)}
-                            className="font-milk [&::placeholder]:font-milk h-12 pr-10 pl-10 text-sm uppercase sm:h-14 sm:pr-12 sm:pl-12 sm:text-base md:h-16 md:pr-14 md:pl-16 md:text-lg"
+                            className="font-milk [&::placeholder]:font-milk h-12 pr-10 pl-10 text-sm uppercase sm:h-14 sm:pr-12 sm:pl-12 sm:text-base md:h-16 md:pr-14 md:pl-16 md:text-lg dark:text-white"
                             autoComplete="off"
                         />
                         {searchQuery && (
@@ -116,47 +130,52 @@ export default function HeroSection() {
                         {/* Suggestions Dropdown */}
                         {showSuggestions &&
                             (suggestions.products.length > 0 || suggestions.companies.length > 0 || suggestions.categories.length > 0) && (
-                                <div className="absolute top-full right-0 left-0 z-20 mt-2 rounded-lg border border-gray-200 bg-white py-2 shadow-lg dark:border-[#23232a] dark:bg-[#18181c]">
+                                <div className="absolute top-full right-0 left-0 z-20 mt-2 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg sm:max-h-80 md:max-h-96 dark:border-[#23232a] dark:bg-[#18181c]">
                                     {suggestions.products.length > 0 && (
                                         <div>
-                                            <div className="font-milk px-4 py-1 text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">
+                                            <div className="font-milk px-3 py-1 text-xs font-semibold text-gray-500 uppercase sm:px-4 dark:text-gray-400">
                                                 Products
                                             </div>
                                             {suggestions.products.map((p) => (
                                                 <button
                                                     key={`product-${p.id}`}
-                                                    className="font-milk block w-full px-4 py-2 text-left text-sm uppercase hover:bg-gray-100 dark:hover:bg-[#23232a]"
+                                                    className="font-milk block w-full px-3 py-2.5 text-left text-sm uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 sm:px-4 sm:py-2 dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32]"
                                                     onClick={() => handleSearch(p.name)}
                                                 >
-                                                    {p.name} {p.category && <span className="ml-2 text-xs text-gray-400">({p.category})</span>}
+                                                    <span className="block truncate">{p.name}</span>
+                                                    {p.category && <span className="block truncate text-xs text-gray-400">({p.category})</span>}
                                                 </button>
                                             ))}
                                         </div>
                                     )}
                                     {suggestions.companies.length > 0 && (
                                         <div>
-                                            <div className="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Companies</div>
+                                            <div className="font-milk px-3 py-1 text-xs font-semibold text-gray-500 uppercase sm:px-4 dark:text-gray-400">
+                                                Companies
+                                            </div>
                                             {suggestions.companies.map((c) => (
                                                 <button
                                                     key={`company-${c.id}`}
-                                                    className="font-milk block w-full px-4 py-2 text-left text-sm uppercase hover:bg-gray-100 dark:hover:bg-[#23232a]"
+                                                    className="font-milk block w-full px-3 py-2.5 text-left text-sm uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 sm:px-4 sm:py-2 dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32]"
                                                     onClick={() => handleSearch(c.name)}
                                                 >
-                                                    {c.name}
+                                                    <span className="block truncate">{c.name}</span>
                                                 </button>
                                             ))}
                                         </div>
                                     )}
                                     {suggestions.categories.length > 0 && (
                                         <div>
-                                            <div className="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Categories</div>
+                                            <div className="font-milk px-3 py-1 text-xs font-semibold text-gray-500 uppercase sm:px-4 dark:text-gray-400">
+                                                Categories
+                                            </div>
                                             {suggestions.categories.map((cat, idx) => (
                                                 <button
                                                     key={`cat-${idx}`}
-                                                    className="font-milk block w-full px-4 py-2 text-left text-sm uppercase hover:bg-gray-100 dark:hover:bg-[#23232a]"
+                                                    className="font-milk block w-full px-3 py-2.5 text-left text-sm uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 sm:px-4 sm:py-2 dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32]"
                                                     onClick={() => handleSearch(cat)}
                                                 >
-                                                    {cat}
+                                                    <span className="block truncate">{cat}</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -175,7 +194,7 @@ export default function HeroSection() {
                                         setSearchQuery(term);
                                         handleSearch(term);
                                     }}
-                                    className="font-milk border-gray/20 rounded-full border px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-white/50 hover:text-gray-800 sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 dark:border-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white"
+                                    className="font-milk border-gray/20 rounded-full border px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-white/50 hover:text-gray-800 active:bg-white/70 sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 dark:border-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white dark:active:bg-gray-700/50"
                                 >
                                     {term}
                                 </button>
