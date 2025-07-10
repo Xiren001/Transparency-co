@@ -1,22 +1,7 @@
 'use client';
 
 import { categories } from '@/constants/categories';
-import {
-    Baby,
-    Bath,
-    BedDouble,
-    Briefcase,
-    Droplets,
-    Dumbbell,
-    Heart,
-    Home,
-    Leaf,
-    PawPrint,
-    Shirt,
-    Smartphone,
-    Sparkles,
-    Utensils,
-} from 'lucide-react';
+import { Baby, Bath, BedDouble, Briefcase, Droplets, Heart, Home, PawPrint, Shirt, Smartphone, Sparkles, Utensils } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 // Map of category IDs to their icons
@@ -28,12 +13,11 @@ const categoryIcons: { [key: string]: React.ElementType } = {
     'kitchen-essentials': Home,
     'baby-kids': Baby,
     clothing: Shirt,
-    'sustainable-living': Leaf,
     'pet-care': PawPrint,
     'home-textiles': BedDouble,
-    electronics: Smartphone,
+    'air-purifiers': Smartphone,
+    'water-filters': Droplets,
     'office-supplies': Briefcase,
-    'sports-outdoors': Dumbbell,
     'beauty-cosmetics': Sparkles,
 };
 

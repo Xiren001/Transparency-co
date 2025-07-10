@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CompanyController;
 use App\Models\Company;
+use App\Http\Controllers\Api\SearchSuggestionController;
 
 Route::get('/', function (Request $request) {
     $query = Product::query();
@@ -102,40 +103,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 Route::get('/images/{type}/{filename}', [ImageController::class, 'serve'])->name('images.serve');
 
 // Instant search suggestions endpoint
-Route::get('/api/search-suggestions', function (\Illuminate\Http\Request $request) {
-    $query = $request->input('q', '');
-    if (!$query) {
-        return response()->json([
-            'products' => [],
-            'companies' => [],
-            'categories' => [],
-        ]);
-    }
+Route::get('/api/search-suggestions', [SearchSuggestionController::class, 'suggest']);
+Route::post('/api/search-suggestions/click', [SearchSuggestionController::class, 'logClick']);
+Route::post('/api/search-analytics', [SearchSuggestionController::class, 'logSearch']);
 
-    $products = \App\Models\Product::where('name', 'like', "%{$query}%")
-        ->orWhere('description', 'like', "%{$query}%")
-        ->orWhere('category', 'like', "%{$query}%")
-        ->orWhere('sub_category', 'like', "%{$query}%")
-        ->orWhere('item', 'like', "%{$query}%")
-        ->limit(5)
-        ->get(['id', 'name', 'category']);
-
-    $companies = Company::where('name', 'like', "%{$query}%")
-        ->orWhere('description', 'like', "%{$query}%")
-        ->limit(5)
-        ->get(['id', 'name']);
-
-    $categories = \App\Models\Product::where('category', 'like', "%{$query}%")
-        ->distinct()
-        ->limit(5)
-        ->pluck('category');
-
-    return response()->json([
-        'products' => $products,
-        'companies' => $companies,
-        'categories' => $categories,
-    ]);
-});
+Route::get('/api/products/top-clicked', [ProductController::class, 'topClicked']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

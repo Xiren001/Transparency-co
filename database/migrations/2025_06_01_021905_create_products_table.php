@@ -27,6 +27,8 @@ return new class extends Migration
             $table->json('images')->nullable();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->timestamps();
+            $table->index('name');
+            $table->index('category');
         });
     }
 

@@ -39,6 +39,18 @@ export default function Welcome() {
     const [isOpen, setIsOpen] = React.useState(false);
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        // If already loaded (e.g. from bfcache or very fast), hide spinner immediately
+        if (document.readyState === 'complete') {
+            setLoading(false);
+            return;
+        }
+        const handleLoad = () => setLoading(false);
+        window.addEventListener('load', handleLoad);
+        return () => window.removeEventListener('load', handleLoad);
+    }, []);
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -61,6 +73,12 @@ export default function Welcome() {
 
     return (
         <>
+            {/* Global Loading Spinner Overlay */}
+            {loading && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/90 transition-opacity dark:bg-[#0a0a0a]/90">
+                    <div className="border-primary h-12 w-12 animate-spin rounded-full border-4 border-t-transparent" />
+                </div>
+            )}
             <Head title="Home Page">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />

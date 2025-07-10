@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Company;
+use App\Models\ProductClick;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -283,6 +284,24 @@ class ProductController extends Controller
     public function customerView()
     {
         $products = Product::with('company')->latest()->paginate(12);
-        return Inertia::render('Products/product-catalog', ['products' => $products]);
+        // Get top clicked products (3-6)
+        $topClickedProducts = Product::withCount('productClicks')
+            ->orderBy('product_clicks_count', 'desc')
+            ->limit(6)
+            ->get();
+        return Inertia::render('Products/product-catalog', [
+            'products' => $products,
+            'suggestedProducts' => $topClickedProducts,
+        ]);
+    }
+
+    public function topClicked()
+    {
+        $topClickedProducts = Product::with('company')
+            ->withCount('productClicks')
+            ->orderBy('product_clicks_count', 'desc')
+            ->limit(6)
+            ->get();
+        return response()->json($topClickedProducts);
     }
 }

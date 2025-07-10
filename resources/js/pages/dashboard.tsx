@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { Building2, MousePointer, Package, Star, TrendingUp, Users } from 'lucide-react';
+import { Building2, MousePointer, Package, Search as SearchIcon, Star, TrendingUp, Users } from 'lucide-react';
 import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -84,6 +84,49 @@ export default function Dashboard() {
                         change={'+3%'}
                         changeType="up"
                     />
+                </div>
+
+                {/* Search Analytics Section */}
+                <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+                    <StatCard
+                        title="Total Searches"
+                        value={analytics.search.totalQueries}
+                        icon={<SearchIcon className="h-5 w-5 text-blue-500" />}
+                        sub="Last 30 days"
+                    />
+                    <StatCard
+                        title="Total Suggestion Clicks"
+                        value={analytics.search.totalClicks}
+                        icon={<MousePointer className="h-5 w-5 text-cyan-500" />}
+                        sub="Last 30 days"
+                    />
+                    <div className="col-span-1 flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm md:col-span-2 dark:bg-[#18181c]">
+                        <div className="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Top Search Queries</div>
+                        <ul className="text-sm text-gray-800 dark:text-gray-100">
+                            {analytics.search.topQueries.length === 0 && <li className="text-gray-400">No data</li>}
+                            {analytics.search.topQueries.map((q: any) => (
+                                <li key={q.query} className="flex justify-between border-b border-gray-100 py-1 dark:border-[#23232a]">
+                                    <span>{q.query}</span>
+                                    <span className="text-xs text-gray-400">{q.count}x</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="mt-4 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Top Clicked Suggestions</div>
+                        <ul className="text-sm text-gray-800 dark:text-gray-100">
+                            {analytics.search.topClickedSuggestions.length === 0 && <li className="text-gray-400">No data</li>}
+                            {analytics.search.topClickedSuggestions.map((c: any, i: number) => (
+                                <li
+                                    key={c.suggestion_value + '-' + i}
+                                    className="flex justify-between border-b border-gray-100 py-1 dark:border-[#23232a]"
+                                >
+                                    <span>
+                                        {c.suggestion_value} <span className="text-xs text-gray-400">({c.suggestion_type})</span>
+                                    </span>
+                                    <span className="text-xs text-gray-400">{c.count}x</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
 
                 {/* Main Chart and Side Panel */}

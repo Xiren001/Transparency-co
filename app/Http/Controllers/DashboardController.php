@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Company;
 use App\Models\ProductClick;
+use App\Models\SearchAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -97,6 +98,28 @@ class DashboardController extends Controller
             ];
         });
 
+        // Search Analytics (last 30 days)
+        $searchQueriesCount = SearchAnalytics::where('type', 'query')
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->count();
+        $searchClicksCount = SearchAnalytics::where('type', 'click')
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->count();
+        $topQueries = SearchAnalytics::where('type', 'query')
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->select('query', DB::raw('COUNT(*) as count'))
+            ->groupBy('query')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+        $topClickedSuggestions = SearchAnalytics::where('type', 'click')
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->select('suggestion_value', 'suggestion_type', DB::raw('COUNT(*) as count'))
+            ->groupBy('suggestion_value', 'suggestion_type')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
         return Inertia::render('dashboard', [
             'analytics' => [
                 'users' => [
@@ -118,7 +141,13 @@ class DashboardController extends Controller
                     'newThisMonth' => $newCompaniesThisMonth,
                     'topByProductCount' => $topCompaniesByProductCount,
                     'activity' => $companyActivity
-                ]
+                ],
+                'search' => [
+                    'totalQueries' => $searchQueriesCount,
+                    'totalClicks' => $searchClicksCount,
+                    'topQueries' => $topQueries,
+                    'topClickedSuggestions' => $topClickedSuggestions,
+                ],
             ]
         ]);
     }

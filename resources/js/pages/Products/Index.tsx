@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { categories } from '@/constants/categories';
 import AppLayout from '@/layouts/app-layout';
+import { getCertificatesForCategory } from '@/lib/utils';
 import { Head, router as inertiaRouter } from '@inertiajs/react';
 import { ChevronDown, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -27,20 +28,22 @@ import { toast } from 'sonner';
 
 // Update the certificates constant to be organized by category
 const certificatesByCategory = {
-    'food-beverage': ['USDA ORGANIC', 'NON-GMO', 'FAIR TRADE', 'ORGANIC CERTIFIED', 'KOSHER', 'HALAL', 'VEGAN', 'GLUTEN-FREE'],
-    'health-wellness': ['USDA ORGANIC', 'NON-GMO', 'ORGANIC CERTIFIED', 'VEGAN', 'GLUTEN-FREE', 'GMP CERTIFIED', 'FDA REGISTERED'],
-    'personal-care': ['CRUELTY-FREE', 'VEGAN', 'NATURAL', 'ORGANIC CERTIFIED', 'FRAGRANCE FREE', 'DERMATOLOGIST TESTED', 'HYPOALLERGENIC'],
-    'home-cleaning': ['ECO CERTIFIED', 'BIODEGRADABLE', 'PLASTIC FREE', 'NON-TOXIC', 'VEGAN', 'CRUELTY-FREE'],
-    'kitchen-essentials': ['BPA FREE', 'FOOD GRADE', 'FDA APPROVED', 'ECO CERTIFIED', 'SUSTAINABLE'],
-    'baby-kids': ['BPA FREE', 'PHTHALATE FREE', 'ORGANIC CERTIFIED', 'CRUELTY-FREE', 'HYPOALLERGENIC', 'DERMATOLOGIST TESTED'],
-    clothing: ['GOTS ORGANIC', 'FAIR TRADE', 'PETA APPROVED', 'CRUELTY-FREE', 'SUSTAINABLE', 'RECYCLED MATERIALS'],
-    'sustainable-living': ['ECO CERTIFIED', 'CARBON NEUTRAL', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'PLASTIC FREE'],
-    'pet-care': ['NATURAL', 'ORGANIC CERTIFIED', 'CRUELTY-FREE', 'VETERINARIAN APPROVED', 'MADE IN USA'],
-    'home-textiles': ['GOTS ORGANIC', 'FAIR TRADE', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'ECO CERTIFIED'],
-    electronics: ['ENERGY STAR', 'ROHS COMPLIANT', 'EPEAT GOLD', 'CARBON NEUTRAL', 'RECYCLED MATERIALS'],
-    'office-supplies': ['FSC CERTIFIED', 'RECYCLED MATERIALS', 'CARBON NEUTRAL', 'SUSTAINABLE', 'ECO CERTIFIED'],
-    'sports-outdoors': ['FAIR TRADE', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'ECO CERTIFIED', 'CARBON NEUTRAL'],
-    'beauty-cosmetics': ['CRUELTY-FREE', 'VEGAN', 'NATURAL', 'ORGANIC CERTIFIED', 'FRAGRANCE FREE', 'DERMATOLOGIST TESTED'],
+    'food-beverage': ['USDA ORGANIC', 'NON-GMO', 'PLASTIC FREE', 'HEAVY METAL FREE', 'KOSHER', 'HALAL', 'VEGAN', 'GLUTEN-FREE'],
+    'health-wellness': ['USDA ORGANIC', 'NON-GMO', 'PLASTIC FREE', 'HEAVY METAL FREE', 'VEGAN', 'GLUTEN-FREE'],
+    'personal-care': ['FRAGRANCE FREE', 'PARABEN FREE', 'PHTHALATE FREE', 'SULFATE FREE', 'PLASTIC FREE', 'VEGAN', 'HYPOALLERGENIC'],
+    'home-cleaning': ['GREEN SEAL CERTIFIED', 'EPA SAFER CHOICE', 'EWG VERIFIED', 'PLASTIC FREE'],
+    'kitchen-essentials': ['PLASTIC FREE', 'PFAS FREE', 'MADE SAFE'],
+    'baby-kids': ['MADE SAFE', 'GOTS ORGANIC', 'OEKO TEX STANDARD 100', 'GREENGUARD GOLD', 'FSC'],
+    clothing: ['GOTS ORGANIC', 'OEKO-TEX STANDARD 100', 'BLUESIGN', 'FAIR TRADE'],
+    'pet-care': ['USDA ORGANIC', 'OEKO-TEX STANDARD 100', 'GOTS ORGANIC', 'BPA FREE', 'PFAS FREE'],
+    'home-textiles': ['GOTS ORGANIC', 'OEKO-TEX STANDARD 100', 'FAIR TRADE'],
+    'air-purifiers': ['TRUE HEPA'],
+    'water-filters': ['NSF 177 CERTIFIED'],
+    'office-supplies': {
+        writing: ['ASTM D-4236', 'FSC', 'CRADLE TO CRADLE CERTIFIED'],
+        paper: ['FSC', 'OEKO TEX 100', 'CRADLE TO CRADLE', 'UL ECOLOGO®'],
+    },
+    'beauty-cosmetics': ['PFAS FREE', 'PHTHALATE FREE', 'PARABEN FREE', 'PLASTIC FREE', 'USDA ORGANIC', 'MADE SAFE', 'EWG CERTIFIED', 'VEGAN'],
 };
 
 interface Product {
@@ -1015,18 +1018,28 @@ export default function Index({ products, companies }: Props) {
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-medium">Certificates</h3>
                                         <div className="mt-2 grid max-h-[200px] grid-cols-1 gap-2 overflow-y-auto rounded-md border p-2">
-                                            {certificatesByCategory[formData.category as keyof typeof certificatesByCategory]?.map((cert) => (
-                                                <div key={cert} className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id={cert}
-                                                        checked={selectedCertificates.includes(cert)}
-                                                        onCheckedChange={() => toggleCertificate(cert)}
-                                                    />
-                                                    <Label htmlFor={cert} className="text-sm font-normal">
-                                                        {cert}
-                                                    </Label>
-                                                </div>
-                                            ))}
+                                            {(() => {
+                                                const certificates = getCertificatesForCategory(
+                                                    certificatesByCategory,
+                                                    formData.category,
+                                                    formData.sub_category,
+                                                );
+                                                if (certificates.length > 0) {
+                                                    return certificates.map((cert) => (
+                                                        <div key={cert} className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id={cert}
+                                                                checked={selectedCertificates.includes(cert)}
+                                                                onCheckedChange={() => toggleCertificate(cert)}
+                                                            />
+                                                            <Label htmlFor={cert} className="text-sm font-normal">
+                                                                {cert}
+                                                            </Label>
+                                                        </div>
+                                                    ));
+                                                }
+                                                return <p className="text-sm text-gray-500">No certificates available for this category</p>;
+                                            })()}
                                         </div>
                                     </div>
 
@@ -1370,18 +1383,28 @@ export default function Index({ products, companies }: Props) {
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-medium">Certificates</h3>
                                         <div className="mt-2 grid max-h-[200px] grid-cols-1 gap-2 overflow-y-auto rounded-md border p-2">
-                                            {certificatesByCategory[formData.category as keyof typeof certificatesByCategory]?.map((cert) => (
-                                                <div key={cert} className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id={cert}
-                                                        checked={selectedCertificates.includes(cert)}
-                                                        onCheckedChange={() => toggleCertificate(cert)}
-                                                    />
-                                                    <Label htmlFor={cert} className="text-sm font-normal">
-                                                        {cert}
-                                                    </Label>
-                                                </div>
-                                            ))}
+                                            {(() => {
+                                                const certificates = getCertificatesForCategory(
+                                                    certificatesByCategory,
+                                                    formData.category,
+                                                    formData.sub_category,
+                                                );
+                                                if (certificates.length > 0) {
+                                                    return certificates.map((cert) => (
+                                                        <div key={cert} className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id={cert}
+                                                                checked={selectedCertificates.includes(cert)}
+                                                                onCheckedChange={() => toggleCertificate(cert)}
+                                                            />
+                                                            <Label htmlFor={cert} className="text-sm font-normal">
+                                                                {cert}
+                                                            </Label>
+                                                        </div>
+                                                    ));
+                                                }
+                                                return <p className="text-sm text-gray-500">No certificates available for this category</p>;
+                                            })()}
                                         </div>
                                     </div>
 

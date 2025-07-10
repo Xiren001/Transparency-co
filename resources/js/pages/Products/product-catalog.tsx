@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { categories } from '@/constants/categories';
+import { getCertificatesForCategory } from '@/lib/utils';
 import { type Product } from '@/types';
 import axios, { CancelTokenSource } from 'axios';
 import { ChevronDown, Filter, Grid2X2, Grid3X3, Heart, List, Star } from 'lucide-react';
@@ -14,20 +15,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 const certificatesByCategory = {
-    'food-beverage': ['USDA ORGANIC', 'NON-GMO', 'FAIR TRADE', 'ORGANIC CERTIFIED', 'KOSHER', 'HALAL', 'VEGAN', 'GLUTEN-FREE'],
-    'health-wellness': ['USDA ORGANIC', 'NON-GMO', 'ORGANIC CERTIFIED', 'VEGAN', 'GLUTEN-FREE', 'GMP CERTIFIED', 'FDA REGISTERED'],
-    'personal-care': ['CRUELTY-FREE', 'VEGAN', 'NATURAL', 'ORGANIC CERTIFIED', 'FRAGRANCE FREE', 'DERMATOLOGIST TESTED', 'HYPOALLERGENIC'],
-    'home-cleaning': ['ECO CERTIFIED', 'BIODEGRADABLE', 'PLASTIC FREE', 'NON-TOXIC', 'VEGAN', 'CRUELTY-FREE'],
-    'kitchen-essentials': ['BPA FREE', 'FOOD GRADE', 'FDA APPROVED', 'ECO CERTIFIED', 'SUSTAINABLE'],
-    'baby-kids': ['BPA FREE', 'PHTHALATE FREE', 'ORGANIC CERTIFIED', 'CRUELTY-FREE', 'HYPOALLERGENIC', 'DERMATOLOGIST TESTED'],
-    clothing: ['GOTS ORGANIC', 'FAIR TRADE', 'PETA APPROVED', 'CRUELTY-FREE', 'SUSTAINABLE', 'RECYCLED MATERIALS'],
-    'sustainable-living': ['ECO CERTIFIED', 'CARBON NEUTRAL', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'PLASTIC FREE'],
-    'pet-care': ['NATURAL', 'ORGANIC CERTIFIED', 'CRUELTY-FREE', 'VETERINARIAN APPROVED', 'MADE IN USA'],
-    'home-textiles': ['GOTS ORGANIC', 'FAIR TRADE', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'ECO CERTIFIED'],
-    electronics: ['ENERGY STAR', 'ROHS COMPLIANT', 'EPEAT GOLD', 'CARBON NEUTRAL', 'RECYCLED MATERIALS'],
-    'office-supplies': ['FSC CERTIFIED', 'RECYCLED MATERIALS', 'CARBON NEUTRAL', 'SUSTAINABLE', 'ECO CERTIFIED'],
-    'sports-outdoors': ['FAIR TRADE', 'SUSTAINABLE', 'RECYCLED MATERIALS', 'ECO CERTIFIED', 'CARBON NEUTRAL'],
-    'beauty-cosmetics': ['CRUELTY-FREE', 'VEGAN', 'NATURAL', 'ORGANIC CERTIFIED', 'FRAGRANCE FREE', 'DERMATOLOGIST TESTED'],
+    'food-beverage': ['USDA ORGANIC', 'NON-GMO', 'PLASTIC FREE', 'HEAVY METAL FREE', 'KOSHER', 'HALAL', 'VEGAN', 'GLUTEN-FREE'],
+    'health-wellness': ['USDA ORGANIC', 'NON-GMO', 'PLASTIC FREE', 'HEAVY METAL FREE', 'VEGAN', 'GLUTEN-FREE'],
+    'personal-care': ['FRAGRANCE FREE', 'PARABEN FREE', 'PHTHALATE FREE', 'SULFATE FREE', 'PLASTIC FREE', 'VEGAN', 'HYPOALLERGENIC'],
+    'home-cleaning': ['GREEN SEAL CERTIFIED', 'EPA SAFER CHOICE', 'EWG VERIFIED', 'PLASTIC FREE'],
+    'kitchen-essentials': ['PLASTIC FREE', 'PFAS FREE', 'MADE SAFE'],
+    'baby-kids': ['MADE SAFE', 'GOTS ORGANIC', 'OEKO TEX STANDARD 100', 'GREENGUARD GOLD', 'FSC'],
+    clothing: ['GOTS ORGANIC', 'OEKO-TEX STANDARD 100', 'BLUESIGN', 'FAIR TRADE'],
+    'pet-care': ['USDA ORGANIC', 'OEKO-TEX STANDARD 100', 'GOTS ORGANIC', 'BPA FREE', 'PFAS FREE'],
+    'home-textiles': ['GOTS ORGANIC', 'OEKO-TEX STANDARD 100', 'FAIR TRADE'],
+    'air-purifiers': ['TRUE HEPA'],
+    'water-filters': ['NSF 177 CERTIFIED'],
+    'office-supplies': {
+        writing: ['ASTM D-4236', 'FSC', 'CRADLE TO CRADLE CERTIFIED'],
+        paper: ['FSC', 'OEKO TEX 100', 'CRADLE TO CRADLE', 'UL ECOLOGO®'],
+    },
+    'beauty-cosmetics': ['PFAS FREE', 'PHTHALATE FREE', 'PARABEN FREE', 'PLASTIC FREE', 'USDA ORGANIC', 'MADE SAFE', 'EWG CERTIFIED', 'VEGAN'],
 };
 
 const priceRanges = [
@@ -169,6 +172,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
     }>({});
     const cancelTokenRef = useRef<CancelTokenSource | null>(null);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
 
     // Initialize all products
     useEffect(() => {
@@ -314,6 +318,15 @@ export default function CustomerView({ products: initialProducts, filters: initi
         // Fetch filtered products
         fetchFilteredProducts(params);
     }, [selectedCertificates, selectedPriceRange, sortBy, fetchFilteredProducts]);
+
+    useEffect(() => {
+        if (!isLoading && displayedProducts.length === 0 && suggestedProducts.length === 0) {
+            fetch('/api/products/top-clicked')
+                .then((res) => res.json())
+                .then((data) => setSuggestedProducts(data.slice(0, 3)))
+                .catch(() => setSuggestedProducts([]));
+        }
+    }, [isLoading, displayedProducts, suggestedProducts.length]);
 
     useEffect(() => {
         return () => {
@@ -529,22 +542,36 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
                                     <div className="space-y-3">
                                         {selectedCategory ? (
-                                            certificatesByCategory[selectedCategory as keyof typeof certificatesByCategory]?.map((cert) => (
-                                                <div key={cert} className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id={cert}
-                                                        checked={selectedCertificates.includes(cert)}
-                                                        onCheckedChange={() => toggleCertificate(cert)}
-                                                        className="dark:border-gray-50"
-                                                    />
-                                                    <label
-                                                        htmlFor={cert}
-                                                        className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
-                                                    >
-                                                        {cert}
-                                                    </label>
-                                                </div>
-                                            ))
+                                            (() => {
+                                                const certificates = getCertificatesForCategory(
+                                                    certificatesByCategory,
+                                                    selectedCategory,
+                                                    selectedSubCategory || undefined,
+                                                );
+                                                if (certificates.length > 0) {
+                                                    return certificates.map((cert) => (
+                                                        <div key={cert} className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id={cert}
+                                                                checked={selectedCertificates.includes(cert)}
+                                                                onCheckedChange={() => toggleCertificate(cert)}
+                                                                className="dark:border-gray-50"
+                                                            />
+                                                            <label
+                                                                htmlFor={cert}
+                                                                className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                                            >
+                                                                {cert}
+                                                            </label>
+                                                        </div>
+                                                    ));
+                                                }
+                                                return (
+                                                    <p className="text-sm text-gray-500 dark:text-[#b8b8c0]">
+                                                        No certificates available for this category
+                                                    </p>
+                                                );
+                                            })()
                                         ) : (
                                             <p className="text-sm text-gray-500 dark:text-[#b8b8c0]">
                                                 Select a category to view available certificates
@@ -589,22 +616,36 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                 <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
                                 <div className="space-y-3">
                                     {selectedCategory ? (
-                                        certificatesByCategory[selectedCategory as keyof typeof certificatesByCategory]?.map((cert) => (
-                                            <div key={cert} className="flex items-center space-x-2">
-                                                <Checkbox
-                                                    id={`desktop-${cert}`}
-                                                    checked={selectedCertificates.includes(cert)}
-                                                    onCheckedChange={() => toggleCertificate(cert)}
-                                                    className="dark:border-gray-50"
-                                                />
-                                                <label
-                                                    htmlFor={`desktop-${cert}`}
-                                                    className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
-                                                >
-                                                    {cert}
-                                                </label>
-                                            </div>
-                                        ))
+                                        (() => {
+                                            const certificates = getCertificatesForCategory(
+                                                certificatesByCategory,
+                                                selectedCategory,
+                                                selectedSubCategory || undefined,
+                                            );
+                                            if (certificates.length > 0) {
+                                                return certificates.map((cert) => (
+                                                    <div key={cert} className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            id={`desktop-${cert}`}
+                                                            checked={selectedCertificates.includes(cert)}
+                                                            onCheckedChange={() => toggleCertificate(cert)}
+                                                            className="dark:border-gray-50"
+                                                        />
+                                                        <label
+                                                            htmlFor={`desktop-${cert}`}
+                                                            className="cursor-pointer text-sm text-gray-700 hover:text-gray-900 dark:text-[#b8b8c0] dark:hover:text-[#e0e0e5]"
+                                                        >
+                                                            {cert}
+                                                        </label>
+                                                    </div>
+                                                ));
+                                            }
+                                            return (
+                                                <p className="text-sm text-gray-500 dark:text-[#b8b8c0]">
+                                                    No certificates available for this category
+                                                </p>
+                                            );
+                                        })()
                                     ) : (
                                         <p className="text-sm text-gray-500 dark:text-[#b8b8c0]">Select a category to view available certificates</p>
                                     )}
@@ -696,6 +737,84 @@ export default function CustomerView({ products: initialProducts, filters: initi
                         </div>
 
                         <div className="mb-8" ref={productGridWrapperRef}>
+                            {/* No products after search/filter or at all */}
+                            {!isLoading && displayedProducts.length === 0 && (
+                                <>
+                                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                                        <span className="mb-2 text-2xl font-semibold text-gray-400 dark:text-gray-500">
+                                            No products match your search
+                                        </span>
+                                        <span className="text-sm text-gray-400 dark:text-gray-500">Try adjusting your search or filters.</span>
+                                    </div>
+                                    {suggestedProducts.length > 0 && (
+                                        <div className="mt-8">
+                                            <h2 className="mb-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                                Suggested Products
+                                            </h2>
+                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                                {suggestedProducts.map((product) => (
+                                                    <div
+                                                        key={product.id}
+                                                        className="group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
+                                                        onClick={() => handleProductClick(product)}
+                                                    >
+                                                        <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
+                                                            <img
+                                                                src={getProductImage(product.images)}
+                                                                alt={product.name || 'Product image'}
+                                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.src = '/placeholder.svg';
+                                                                }}
+                                                            />
+                                                            {product.is_new && (
+                                                                <Badge className="absolute top-2 left-2 overflow-hidden bg-green-500 text-xs text-white hover:bg-green-600">
+                                                                    NEW
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                        <div className="p-3">
+                                                            <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
+                                                                {product.name || 'Unnamed Product'}
+                                                            </h3>
+                                                            <p className="mb-1 text-xs text-blue-600 dark:text-blue-400">
+                                                                {getCompanyName(product.company)}
+                                                            </p>
+                                                            <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
+                                                                {product.description || 'No description available'}
+                                                            </p>
+                                                            <div className="mt-2 flex items-center justify-between">
+                                                                <div className="flex flex-col">
+                                                                    <div className="flex items-center space-x-1">
+                                                                        <span className="text-base font-semibold text-gray-900 dark:text-[#e0e0e5]">
+                                                                            ${getPrice(product.price).toFixed(2)}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                {product.product_link && (
+                                                                    <Button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            trackProductClick(product.id);
+                                                                            if (product.product_link) {
+                                                                                window.open(product.product_link, '_blank');
+                                                                            }
+                                                                        }}
+                                                                        className="font-milk h-9 px-4 text-sm font-medium uppercase dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:hover:bg-[#3d3d45]"
+                                                                    >
+                                                                        Buy Now
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                             <div className="flex overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
                                 <div className="flex gap-4">
                                     {isLoading
