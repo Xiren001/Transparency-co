@@ -147,6 +147,7 @@ export default function Index({ products, companies }: Props) {
         setSelectedCertificates([]);
         setRemovedImages([]);
         setImagePreviews([]);
+        setSelectedProduct(null);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -198,6 +199,7 @@ export default function Index({ products, companies }: Props) {
                 toast.success(`Product ${selectedProduct ? 'updated' : 'created'} successfully`);
                 setIsCreateModalOpen(false);
                 setIsEditModalOpen(false);
+                setSelectedProduct(null);
                 resetForm();
             },
             onError: (errors) => {
@@ -493,6 +495,7 @@ export default function Index({ products, companies }: Props) {
         });
         setImagePreviews([]);
         setSelectedCertificates(product.certificates || []);
+        setRemovedImages([]);
         setIsEditModalOpen(true);
     };
 
@@ -502,7 +505,15 @@ export default function Index({ products, companies }: Props) {
             <div className="container mx-auto px-2 py-10">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Products</h1>
-                    <Button onClick={() => setIsCreateModalOpen(true)}>Add Product</Button>
+                    <Button
+                        onClick={() => {
+                            setSelectedProduct(null);
+                            resetForm();
+                            setIsCreateModalOpen(true);
+                        }}
+                    >
+                        Add Product
+                    </Button>
                 </div>
 
                 {/* Replace the search and filter section with this simplified version */}
@@ -786,9 +797,11 @@ export default function Index({ products, companies }: Props) {
                 <Dialog
                     open={isCreateModalOpen}
                     onOpenChange={(open) => {
-                        if (!open && !isSubmitting) {
+                        if (!open) {
                             setIsCreateModalOpen(false);
-                            resetForm();
+                            if (!isSubmitting) {
+                                resetForm();
+                            }
                         }
                     }}
                 >
@@ -1152,8 +1165,12 @@ export default function Index({ products, companies }: Props) {
                 <Dialog
                     open={isEditModalOpen}
                     onOpenChange={(open) => {
-                        if (!open && !isSubmitting) {
+                        if (!open) {
                             setIsEditModalOpen(false);
+                            if (!isSubmitting) {
+                                setSelectedProduct(null);
+                                resetForm();
+                            }
                         }
                     }}
                 >
@@ -1167,6 +1184,7 @@ export default function Index({ products, companies }: Props) {
                                 <button
                                     onClick={() => {
                                         setIsEditModalOpen(false);
+                                        setSelectedProduct(null);
                                         resetForm();
                                     }}
                                     className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground self-start rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
