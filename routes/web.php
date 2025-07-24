@@ -109,5 +109,9 @@ Route::post('/api/search-analytics', [SearchSuggestionController::class, 'logSea
 
 Route::get('/api/products/top-clicked', [ProductController::class, 'topClicked']);
 
+Route::get('/certifications', function () {
+    return Inertia::render('certifications/Page');
+})->name('certifications');
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

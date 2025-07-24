@@ -1,10 +1,146 @@
 import { Input } from '@/components/ui/input';
 import { router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { route } from 'ziggy-js';
 
 type SuggestionItem = { type: string; value: string; id: string | number; category?: string };
+
+// SuggestionDropdown component
+function SuggestionDropdown({
+    suggestions,
+    loading,
+    error,
+    show,
+    highlightedIndex: controlledHighlightedIndex,
+    setHighlightedIndex: setControlledHighlightedIndex,
+    onSelect,
+    inputRef,
+    searchQuery,
+    suggestionLocked,
+}: {
+    suggestions: SuggestionItem[];
+    loading: boolean;
+    error: string | null;
+    show: boolean;
+    highlightedIndex: number | null;
+    setHighlightedIndex: (idx: number | null) => void;
+    onSelect: (item: SuggestionItem) => void;
+    inputRef: React.RefObject<HTMLInputElement | null>;
+    searchQuery: string;
+    suggestionLocked: boolean;
+}) {
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    // Use local state for keyboard navigation
+    const [localHighlightedIndex, setLocalHighlightedIndex] = useState<number | null>(null);
+    const highlightedIndex = controlledHighlightedIndex !== null ? controlledHighlightedIndex : localHighlightedIndex;
+    const setHighlightedIndex = (idx: number | null) => {
+        setLocalHighlightedIndex(idx);
+        setControlledHighlightedIndex(idx);
+    };
+    // Keyboard navigation for dropdown
+    useEffect(() => {
+        if (!show || suggestions.length === 0) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (document.activeElement !== inputRef.current) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setHighlightedIndex(highlightedIndex === null || highlightedIndex === suggestions.length - 1 ? 0 : highlightedIndex + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setHighlightedIndex(highlightedIndex === null || highlightedIndex === 0 ? suggestions.length - 1 : highlightedIndex - 1);
+            } else if (e.key === 'Enter') {
+                if (highlightedIndex !== null && suggestions[highlightedIndex]) {
+                    onSelect(suggestions[highlightedIndex]);
+                }
+            } else if (e.key === 'Escape') {
+                setHighlightedIndex(null);
+                inputRef.current?.blur();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [show, suggestions, highlightedIndex, onSelect, inputRef]);
+
+    // Close on outside click
+    useEffect(() => {
+        if (!show) return;
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node) &&
+                inputRef.current &&
+                !inputRef.current.contains(event.target as Node)
+            ) {
+                setHighlightedIndex(null);
+                inputRef.current.blur();
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [show, setHighlightedIndex, inputRef]);
+
+    if (!show) return null;
+    return (
+        <div
+            ref={dropdownRef}
+            id="hero-search-suggestions"
+            className="absolute top-full right-0 left-0 z-20 mt-2 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg sm:max-h-80 md:max-h-96 dark:border-[#23232a] dark:bg-[#18181c]"
+            role="listbox"
+            aria-label="Search suggestions"
+        >
+            {loading && (
+                <div className="flex items-center justify-center py-4">
+                    <div className="border-muted-foreground h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></div>
+                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Loading...</span>
+                </div>
+            )}
+            {!loading && !error && suggestions.length === 0 && searchQuery.trim() && (
+                <div className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">No results found</div>
+            )}
+            {error && <div className="py-4 text-center text-sm text-red-500 dark:text-red-400">{error}</div>}
+            {suggestions.length > 0 && (
+                <>
+                    {suggestions.map((item, idx) => (
+                        <button
+                            key={`${item.type}-${item.id}`}
+                            id={`hero-suggestion-${idx}`}
+                            className={`font-milk block w-full px-3 py-2.5 text-left text-sm uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 sm:px-4 sm:py-2 dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32] ${highlightedIndex === idx ? 'bg-gray-100 dark:bg-[#23232a]' : ''} ${suggestionLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                            onMouseEnter={() => setHighlightedIndex(idx)}
+                            onMouseLeave={() => setHighlightedIndex(null)}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                onSelect(item);
+                            }}
+                            role="option"
+                            aria-selected={highlightedIndex === idx}
+                            aria-label={item.value}
+                            tabIndex={-1}
+                            disabled={suggestionLocked}
+                        >
+                            <span className="block truncate">{highlightMatch(item.value, searchQuery)}</span>
+                            {item.category && <span className="block truncate text-xs text-gray-400">({item.category})</span>}
+                        </button>
+                    ))}
+                </>
+            )}
+        </div>
+    );
+}
+
+function highlightMatch(text: string, query: string) {
+    if (!query) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig');
+    return text.split(regex).map((part, i) =>
+        regex.test(part) ? (
+            <mark key={i} className="rounded bg-yellow-200 px-0.5 dark:bg-yellow-700">
+                {part}
+            </mark>
+        ) : (
+            part
+        ),
+    );
+}
 
 export default function HeroSection() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +156,8 @@ export default function HeroSection() {
     const [suggestionsLoading, setSuggestionsLoading] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
     const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
+    const [suggestionLocked, setSuggestionLocked] = useState(false);
+    const [searchInProgress, setSearchInProgress] = useState(false);
 
     // On mount, set searchQuery from URL param if present
     useEffect(() => {
@@ -73,6 +211,31 @@ export default function HeroSection() {
         }
     }
 
+    // Custom smooth scroll function
+    function customSmoothScrollTo(element: HTMLElement, duration = 700) {
+        const start = window.scrollY || window.pageYOffset;
+        const end = element.getBoundingClientRect().top + start;
+        const change = end - start;
+        const startTime = performance.now();
+
+        function easeInOutQuad(t: number) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        }
+
+        function animateScroll(currentTime: number) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = easeInOutQuad(progress);
+            window.scrollTo(0, start + change * ease);
+
+            if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+            }
+        }
+
+        requestAnimationFrame(animateScroll);
+    }
+
     // fromSuggestion: true if triggered from a suggestion click, false/undefined for plain search
     const handleSearch = async (query?: string, fromSuggestion?: boolean) => {
         const q = typeof query === 'string' ? query : searchQuery;
@@ -84,7 +247,20 @@ export default function HeroSection() {
         const params: Record<string, string> = {};
         if (q) params.search = q;
         router.get(route('home'), params, {
-            onFinish: () => setIsSearching(false),
+            onFinish: () => {
+                setIsSearching(false);
+                setTimeout(() => {
+                    const catalog = document.getElementById('product-catalog-section');
+                    if (catalog) {
+                        setTimeout(() => {
+                            customSmoothScrollTo(catalog, 700); // 700ms duration
+                            setTimeout(() => setSearchInProgress(false), 700); // unlock after scroll
+                        }, 500); // 1 second pause before scrolling
+                    } else {
+                        setSearchInProgress(false);
+                    }
+                }, 100);
+            },
         });
         setShowSuggestions(false);
     };
@@ -95,28 +271,19 @@ export default function HeroSection() {
         ...suggestions.categories.map((cat, idx) => ({ type: 'category', value: cat, id: idx })),
     ];
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            if (highlightedIndex !== null && showSuggestions && allSuggestions[highlightedIndex]) {
-                handleSearch(allSuggestions[highlightedIndex].value, true); // from suggestion
-            } else {
-                handleSearch(undefined, false); // plain search
-            }
-        } else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && showSuggestions && allSuggestions.length > 0) {
-            e.preventDefault();
-            setHighlightedIndex((prev) => {
-                if (e.key === 'ArrowDown') {
-                    if (prev === null || prev === allSuggestions.length - 1) return 0;
-                    return prev + 1;
-                } else {
-                    if (prev === null || prev === 0) return allSuggestions.length - 1;
-                    return prev - 1;
-                }
-            });
-        } else if (e.key === 'Escape') {
+    // Suggestion select handler
+    const handleSuggestionSelect = useCallback(
+        (item: SuggestionItem) => {
+            if (searchInProgress) return;
+            setSearchInProgress(true);
+            logSuggestionClick(item.type, item.id, item.value);
+            handleSearch(item.value, true); // Trigger search immediately
             setShowSuggestions(false);
-        }
-    };
+            setHighlightedIndex(null);
+            inputRef.current?.blur();
+        },
+        [handleSearch, searchInProgress],
+    );
 
     // Close suggestions when clicking outside
     useEffect(() => {
@@ -131,20 +298,6 @@ export default function HeroSection() {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
-    function highlightMatch(text: string, query: string) {
-        if (!query) return text;
-        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig');
-        return text.split(regex).map((part, i) =>
-            regex.test(part) ? (
-                <mark key={i} className="rounded bg-yellow-200 px-0.5 dark:bg-yellow-700">
-                    {part}
-                </mark>
-            ) : (
-                part
-            ),
-        );
-    }
 
     async function logSuggestionClick(type: string, id: string | number, value: string) {
         try {
@@ -192,14 +345,39 @@ export default function HeroSection() {
                                 setShowSuggestions(true);
                                 setHighlightedIndex(null);
                             }}
-                            onKeyDown={handleKeyDown}
-                            onFocus={() => setShowSuggestions(true)}
+                            onFocus={() => {
+                                if (searchQuery.trim()) setShowSuggestions(true);
+                            }}
+                            onKeyDown={(e) => {
+                                if (searchInProgress) return;
+                                if (e.key === 'Enter') {
+                                    if (highlightedIndex !== null && showSuggestions && allSuggestions[highlightedIndex]) {
+                                        handleSuggestionSelect(allSuggestions[highlightedIndex]);
+                                    } else {
+                                        handleSearch(undefined, false);
+                                    }
+                                } else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && showSuggestions && allSuggestions.length > 0) {
+                                    e.preventDefault();
+                                    setHighlightedIndex((prev) => {
+                                        if (e.key === 'ArrowDown') {
+                                            if (prev === null || prev === allSuggestions.length - 1) return 0;
+                                            return prev + 1;
+                                        } else {
+                                            if (prev === null || prev === 0) return allSuggestions.length - 1;
+                                            return prev - 1;
+                                        }
+                                    });
+                                } else if (e.key === 'Escape') {
+                                    setShowSuggestions(false);
+                                }
+                            }}
                             className="font-milk [&::placeholder]:font-milk h-12 pr-10 pl-10 text-sm uppercase sm:h-14 sm:pr-12 sm:pl-12 sm:text-base md:h-16 md:pr-14 md:pl-16 md:text-lg dark:text-white"
                             autoComplete="off"
                             aria-label="Search for products, companies, or categories"
                             aria-autocomplete="list"
                             aria-controls="hero-search-suggestions"
                             aria-activedescendant={highlightedIndex !== null ? `hero-suggestion-${highlightedIndex}` : undefined}
+                            disabled={searchInProgress}
                         />
                         {searchQuery && (
                             <button
@@ -207,6 +385,8 @@ export default function HeroSection() {
                                 onClick={() => {
                                     setSearchQuery('');
                                     setSuggestions({ products: [], companies: [], categories: [] });
+                                    setShowSuggestions(false);
+                                    setHighlightedIndex(null);
                                     router.get(route('home'));
                                     setTimeout(() => {
                                         inputRef.current?.focus();
@@ -226,51 +406,18 @@ export default function HeroSection() {
                                 <div className="border-muted-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent sm:h-5 sm:w-5"></div>
                             </div>
                         )}
-                        {/* Suggestions Dropdown */}
-                        {showSuggestions &&
-                            (suggestions.products.length > 0 || suggestions.companies.length > 0 || suggestions.categories.length > 0) && (
-                                <div
-                                    id="hero-search-suggestions"
-                                    className="absolute top-full right-0 left-0 z-20 mt-2 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg sm:max-h-80 md:max-h-96 dark:border-[#23232a] dark:bg-[#18181c]"
-                                    role="listbox"
-                                    aria-label="Search suggestions"
-                                >
-                                    {suggestionsLoading && (
-                                        <div className="flex items-center justify-center py-4">
-                                            <div className="border-muted-foreground h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></div>
-                                            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Loading...</span>
-                                        </div>
-                                    )}
-                                    {!suggestionsLoading && !suggestionsError && allSuggestions.length === 0 && searchQuery.trim() && (
-                                        <div className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">No results found</div>
-                                    )}
-                                    {suggestionsError && (
-                                        <div className="py-4 text-center text-sm text-red-500 dark:text-red-400">{suggestionsError}</div>
-                                    )}
-                                    {allSuggestions.length > 0 && (
-                                        <>
-                                            {allSuggestions.map((item, idx) => (
-                                                <button
-                                                    key={`${item.type}-${item.id}`}
-                                                    id={`hero-suggestion-${idx}`}
-                                                    className={`font-milk block w-full px-3 py-2.5 text-left text-sm uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 sm:px-4 sm:py-2 dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32] ${highlightedIndex === idx ? 'bg-gray-100 dark:bg-[#23232a]' : ''}`}
-                                                    onClick={async () => {
-                                                        await logSuggestionClick(item.type, item.id, item.value);
-                                                        handleSearch(item.value, true); // from suggestion
-                                                    }}
-                                                    role="option"
-                                                    aria-selected={highlightedIndex === idx}
-                                                    aria-label={item.value}
-                                                    tabIndex={-1}
-                                                >
-                                                    <span className="block truncate">{highlightMatch(item.value, searchQuery)}</span>
-                                                    {item.category && <span className="block truncate text-xs text-gray-400">({item.category})</span>}
-                                                </button>
-                                            ))}
-                                        </>
-                                    )}
-                                </div>
-                            )}
+                        <SuggestionDropdown
+                            suggestions={allSuggestions}
+                            loading={suggestionsLoading}
+                            error={suggestionsError}
+                            show={showSuggestions && searchQuery.trim().length > 0}
+                            highlightedIndex={highlightedIndex}
+                            setHighlightedIndex={setHighlightedIndex}
+                            onSelect={handleSuggestionSelect}
+                            inputRef={inputRef}
+                            searchQuery={searchQuery}
+                            suggestionLocked={searchInProgress}
+                        />
                     </div>
 
                     {/* Quick Search Suggestions */}
@@ -283,7 +430,8 @@ export default function HeroSection() {
                                         setSearchQuery(term);
                                         handleSearch(term);
                                     }}
-                                    className="font-milk border-gray/20 rounded-full border px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-white/50 hover:text-gray-800 active:bg-white/70 sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 dark:border-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white dark:active:bg-gray-700/50"
+                                    className={`font-milk border-gray/20 rounded-full border px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-white/50 hover:text-gray-800 active:bg-white/70 sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 dark:border-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white dark:active:bg-gray-700/50 ${searchInProgress ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                                    disabled={searchInProgress}
                                 >
                                     {term}
                                 </button>

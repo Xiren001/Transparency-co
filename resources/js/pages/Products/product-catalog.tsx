@@ -525,19 +525,19 @@ export default function CustomerView({ products: initialProducts, filters: initi
     };
 
     return (
-        <div className="h-auto rounded-lg bg-gray-50 sm:min-h-screen dark:bg-[#1a1a1f]">
+        <div className="h-auto rounded-lg bg-white sm:min-h-screen dark:bg-[#1a1a1f]">
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col gap-8 lg:flex-row">
                     <div className="w-full lg:hidden">
                         <Collapsible className="w-full">
-                            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-white p-4 shadow-sm dark:bg-[#23232a]">
+                            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-white p-4 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#23232a]">
                                 <div className="flex items-center gap-2">
                                     <Filter className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
                                     <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">FILTERS</span>
                                 </div>
                                 <ChevronDown className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2 rounded-lg bg-white p-4 shadow-sm dark:bg-[#23232a]">
+                            <CollapsibleContent className="mt-2 rounded-lg bg-white p-4 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#23232a]">
                                 <div className="mb-8">
                                     <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
                                     <div className="space-y-3">
@@ -555,7 +555,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                                 id={cert}
                                                                 checked={selectedCertificates.includes(cert)}
                                                                 onCheckedChange={() => toggleCertificate(cert)}
-                                                                className="dark:border-gray-50"
+                                                                className="dark:border-[#2d2d35]"
                                                             />
                                                             <label
                                                                 htmlFor={cert}
@@ -589,7 +589,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                     id={range.value}
                                                     checked={selectedPriceRange === range.value}
                                                     onCheckedChange={() => setSelectedPriceRange(range.value)}
-                                                    className="dark:border-gray-50"
+                                                    className="dark:border-[#2d2d35]"
                                                 />
                                                 <label
                                                     htmlFor={range.value}
@@ -606,7 +606,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                     </div>
 
                     <div className="hidden w-64 flex-shrink-0 lg:block">
-                        <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-[#23232a]">
+                        <div className="rounded-lg bg-white p-6 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#23232a]">
                             <div className="mb-6 flex items-center gap-2">
                                 <Filter className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
                                 <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">FILTER</span>
@@ -629,7 +629,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                             id={`desktop-${cert}`}
                                                             checked={selectedCertificates.includes(cert)}
                                                             onCheckedChange={() => toggleCertificate(cert)}
-                                                            className="dark:border-gray-50"
+                                                            className="dark:border-[#2d2d35]"
                                                         />
                                                         <label
                                                             htmlFor={`desktop-${cert}`}
@@ -661,7 +661,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                 id={`desktop-${range.value}`}
                                                 checked={selectedPriceRange === range.value}
                                                 onCheckedChange={() => setSelectedPriceRange(range.value)}
-                                                className="dark:border-gray-50"
+                                                className="dark:border-[#2d2d35]"
                                             />
                                             <label
                                                 htmlFor={`desktop-${range.value}`}
@@ -755,7 +755,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                 {suggestedProducts.map((product) => (
                                                     <div
                                                         key={product.id}
-                                                        className="group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
+                                                        className="group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
                                                         onClick={() => handleProductClick(product)}
                                                     >
                                                         <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
@@ -822,7 +822,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         : displayedProducts.map((product) => (
                                               <div
                                                   key={product.id}
-                                                  className="w-[280px] flex-shrink-0 cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
+                                                  className="w-[280px] flex-shrink-0 cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
                                                   onClick={() => handleProductClick(product)}
                                               >
                                                   <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
@@ -845,7 +845,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                               e.stopPropagation();
                                                               toggleFavorite(product.id);
                                                           }}
-                                                          className="absolute top-2 right-2 rounded-full bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a]"
+                                                          className="absolute top-2 right-2 rounded-full bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#23232a]"
                                                       >
                                                           <Heart
                                                               className={`h-4 w-4 ${
@@ -944,7 +944,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     : displayedProducts.map((product, index) => (
                                           <div
                                               key={`${product.id}-${Math.floor(index / 9)}`}
-                                              className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                              className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
                                                   gridView === 'list' ? 'flex flex-row' : ''
                                               }`}
                                               style={{
@@ -979,7 +979,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                               e.stopPropagation();
                                                               toggleFavorite(product.id);
                                                           }}
-                                                          className="absolute top-2 right-2 rounded-full bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow-md dark:bg-[#23232a]"
+                                                          className="absolute top-2 right-2 rounded-full bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#23232a]"
                                                       >
                                                           <Heart
                                                               className={`h-4 w-4 ${
@@ -1072,7 +1072,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                         {/* Back to Top Button */}
                         <button
                             onClick={scrollToTop}
-                            className="fixed right-8 bottom-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 hover:bg-gray-100 dark:bg-[#23232a] dark:hover:bg-[#2d2d35]"
+                            className="fixed right-8 bottom-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 hover:bg-gray-100 dark:border dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:bg-[#2d2d35]"
                             aria-label="Back to top"
                         >
                             <svg
