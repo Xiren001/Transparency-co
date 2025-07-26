@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Company;
 use App\Models\ProductClick;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -104,9 +105,16 @@ class ProductController extends Controller
         $products = $query->with('company')->paginate(10);
         $companies = Company::all();
 
+        // Get current user with roles and permissions
+        $currentUser = Auth::user();
+        $currentUser->load(['roles', 'permissions']);
+
         return Inertia::render('Products/Index', [
             'products' => $products,
             'companies' => $companies,
+            'auth' => [
+                'user' => $currentUser,
+            ],
         ]);
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -27,8 +28,15 @@ class CompanyController extends Controller
 
         $companies = $query->paginate(10)->withQueryString();
 
+        // Get current user with roles and permissions
+        $currentUser = Auth::user();
+        $currentUser->load(['roles', 'permissions']);
+
         return Inertia::render('Companies/Index', [
             'companies' => $companies,
+            'auth' => [
+                'user' => $currentUser,
+            ],
         ]);
     }
 

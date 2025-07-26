@@ -30,6 +30,7 @@ const navIconMap: Record<string, any> = {
 type AuthUser = {
     name?: string;
     email?: string;
+    roles?: Array<{ name: string }> | string[];
     // add other user fields as needed
 };
 
@@ -47,6 +48,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const [isOpen, setIsOpen] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [loading, setLoading] = React.useState(true);
+
+    // Check if user has admin role (admin, moderator, or content_manager)
+    const hasAdminRole =
+        auth.user &&
+        (auth.user.roles?.some((role: any) => ['admin', 'moderator', 'content_manager'].includes(role.name)) ||
+            auth.user.roles?.some((role: any) => ['admin', 'moderator', 'content_manager'].includes(role)));
+
+    // Check if user is admin (for user management access)
+    const isAdmin =
+        auth.user && (auth.user.roles?.some((role: any) => role.name === 'admin') || auth.user.roles?.some((role: any) => role === 'admin'));
 
     React.useEffect(() => {
         if (document.readyState === 'complete') {
@@ -120,7 +131,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     <DropdownMenuContent className="w-56 dark:border-[#2d2d35] dark:bg-[#23232a]" align="end" forceMount>
                                         {auth.user ? (
                                             <>
-                                                {auth.isAdmin && (
+                                                {hasAdminRole ? (
                                                     <DropdownMenuItem asChild>
                                                         <a
                                                             href={route('dashboard')}
@@ -128,6 +139,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                         >
                                                             <User className="h-4 w-4" />
                                                             Dashboard
+                                                        </a>
+                                                    </DropdownMenuItem>
+                                                ) : (
+                                                    <DropdownMenuItem asChild>
+                                                        <a
+                                                            href={route('profile.edit')}
+                                                            className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                                        >
+                                                            <User className="h-4 w-4" />
+                                                            Profile
                                                         </a>
                                                     </DropdownMenuItem>
                                                 )}
@@ -225,13 +246,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         <div className="flex flex-col space-y-3 px-4 pb-6">
                                             {auth.user ? (
                                                 <>
-                                                    {auth.isAdmin && (
+                                                    {hasAdminRole ? (
                                                         <a
                                                             href={route('dashboard')}
                                                             className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                             onClick={() => setIsOpen(false)}
                                                         >
                                                             Dashboard
+                                                        </a>
+                                                    ) : (
+                                                        <a
+                                                            href={route('profile.edit')}
+                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                            onClick={() => setIsOpen(false)}
+                                                        >
+                                                            Profile
                                                         </a>
                                                     )}
                                                     <Link

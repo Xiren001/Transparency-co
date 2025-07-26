@@ -35,7 +35,8 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
+        // Check if user has admin role (admin, moderator, or content_manager)
+        if ($user->hasRole(['admin', 'moderator', 'content_manager'])) {
             return redirect()->intended(route('dashboard'));
         } else {
             return redirect()->intended(route('home'));

@@ -25,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register route middleware aliases
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'admin.role' => \App\Http\Middleware\AdminRoleMiddleware::class,
+            'role.or' => \App\Http\Middleware\RoleOrMiddleware::class,
         ]);
     })
 

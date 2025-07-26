@@ -65,7 +65,7 @@ Route::get('/', function (Request $request) {
 })->name('home');
 
 
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin.role'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Product routes
@@ -80,6 +80,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('companies', [CompanyController::class, 'store'])->name('companies.store');
     Route::post('companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+
+    // User management routes (admin only)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('admin/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+        Route::post('admin/users/{user}/assign-role', [App\Http\Controllers\Admin\UserController::class, 'assignRole'])->name('admin.users.assign-role');
+        Route::post('admin/users/{user}/assign-permissions', [App\Http\Controllers\Admin\UserController::class, 'assignPermissions'])->name('admin.users.assign-permissions');
+    });
 });
 
 Route::get('/productst', [ProductController::class, 'customerView'])->name('products.customer');
@@ -94,10 +101,12 @@ Route::post('/newsletter/subscribe', [App\Http\Controllers\NewsletterSubscriberC
 Route::get('/newsletter/verify/{token}', [App\Http\Controllers\NewsletterSubscriberController::class, 'verify'])->name('newsletter.verify');
 Route::get('/newsletter/unsubscribe/{token}', [App\Http\Controllers\NewsletterSubscriberController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
-// Admin routes for newsletter management
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    Route::get('/admin/newsletter', [App\Http\Controllers\NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
-    Route::get('/admin/newsletter/export', [App\Http\Controllers\NewsletterSubscriberController::class, 'export'])->name('newsletter.export');
+// Admin routes for newsletter management (admin and moderator only)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware(['role.or:admin,moderator'])->group(function () {
+        Route::get('/admin/newsletter', [App\Http\Controllers\NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
+        Route::get('/admin/newsletter/export', [App\Http\Controllers\NewsletterSubscriberController::class, 'export'])->name('newsletter.export');
+    });
 });
 
 Route::get('/images/{type}/{filename}', [ImageController::class, 'serve'])->name('images.serve');

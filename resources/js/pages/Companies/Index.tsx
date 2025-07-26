@@ -33,9 +33,15 @@ interface Props {
         prev_page_url: string | null;
         next_page_url: string | null;
     };
+    auth: {
+        user?: {
+            roles?: Array<{ name: string }> | string[];
+            permissions?: Array<{ name: string }> | string[];
+        } | null;
+    };
 }
 
-export default function Index({ companies }: Props) {
+export default function Index({ companies, auth }: Props) {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -44,6 +50,31 @@ export default function Index({ companies }: Props) {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('created_at');
     const [sortDirection, setSortDirection] = useState('desc');
+
+    // Helper function to check if current user has a specific permission
+    const hasPermission = (permissionName: string): boolean => {
+        if (!auth.user) return false;
+
+        const userPermissions = auth.user.permissions;
+        if (!userPermissions) return false;
+
+        return userPermissions.some((permission: any) =>
+            typeof permission === 'string' ? permission === permissionName : permission.name === permissionName,
+        );
+    };
+
+    // Helper functions for company permissions
+    const canCreateCompanies = (): boolean => {
+        return hasPermission('create companies');
+    };
+
+    const canEditCompanies = (): boolean => {
+        return hasPermission('edit companies');
+    };
+
+    const canDeleteCompanies = (): boolean => {
+        return hasPermission('delete companies');
+    };
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -359,7 +390,7 @@ export default function Index({ companies }: Props) {
             <div className="container mx-auto px-2 py-10">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Companies</h1>
-                    <Button onClick={() => setIsAddDialogOpen(true)}>
+                    <Button onClick={() => setIsAddDialogOpen(true)} disabled={!canCreateCompanies()}>
                         <Plus className="mr-2 h-4 w-4" />
                         Add Company
                     </Button>
@@ -469,11 +500,23 @@ export default function Index({ companies }: Props) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-end space-x-2">
-                                            <Button variant="outline" size="sm" onClick={() => handleEditCompany(company)} className="h-8 px-3">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleEditCompany(company)}
+                                                className="h-8 px-3"
+                                                disabled={!canEditCompanies()}
+                                            >
                                                 <Pencil className="mr-1 h-4 w-4" />
                                                 Edit
                                             </Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(company)} className="h-8 px-3">
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() => handleDelete(company)}
+                                                className="h-8 px-3"
+                                                disabled={!canDeleteCompanies()}
+                                            >
                                                 <Trash2 className="mr-1 h-4 w-4" />
                                                 Delete
                                             </Button>
@@ -905,7 +948,7 @@ export default function Index({ companies }: Props) {
                             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isSubmitting}>
                                 Cancel
                             </Button>
-                            <Button variant="destructive" onClick={confirmDelete} disabled={isSubmitting}>
+                            <Button variant="destructive" onClick={confirmDelete} disabled={isSubmitting || !canDeleteCompanies()}>
                                 {isSubmitting ? 'Deleting...' : 'Delete'}
                             </Button>
                         </div>
