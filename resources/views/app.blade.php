@@ -35,13 +35,15 @@
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
+        <link rel="preload" href="/fonts/milk-clay-font/Web-Fonts/milkandclay-regular-webfont.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="/fonts/Schoolbell/Schoolbell-Regular.woff" as="font" type="font/woff" crossorigin="anonymous" />
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         @routes
         @viteReactRefresh
+        
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"], null, 'build', ['defer'])
         @inertiaHead
     </head>

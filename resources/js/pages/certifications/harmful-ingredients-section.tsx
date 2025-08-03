@@ -1,140 +1,133 @@
+import ContentRenderer from '@/components/editor/ContentRenderer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import StyledCard from '@/components/ui/styled-card';
+import { categoryBackgrounds } from '@/constants/backgrounds';
+import { Eye } from 'lucide-react';
+import { useState } from 'react';
 
-interface HarmfulItem {
+interface HarmfulContent {
     id: number;
-    name: string;
-    category: string;
-    riskSummary: string;
-    studyLink: string;
-    alternatives: string[];
-    severity: string;
-}
-
-interface Category {
-    id: string;
-    name: string;
+    title: string;
+    content_json: any;
+    content_html?: string;
+    slug: string;
+    is_active: boolean;
+    version: number;
+    created_at: string;
+    updated_at: string;
+    category?: string;
+    image_url?: string;
 }
 
 interface HarmfulIngredientsSectionProps {
-    harmfulItems: HarmfulItem[];
-    categories: Category[];
+    harmfulContents: HarmfulContent[];
 }
 
-export default function HarmfulIngredientsSection({ harmfulItems, categories }: HarmfulIngredientsSectionProps) {
-    const getSeverityColor = (severity: string) => {
-        switch (severity) {
-            case 'high':
-                return 'bg-red-100 text-red-700 border-red-200';
-            case 'moderate':
-                return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-            case 'low':
-                return 'bg-green-100 text-green-700 border-green-200';
-            default:
-                return 'bg-gray-100 text-gray-700 border-gray-200';
-        }
+export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIngredientsSectionProps) {
+    const [viewingContent, setViewingContent] = useState<HarmfulContent | null>(null);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
     };
 
-    const getSeverityIcon = (severity: string) => {
-        switch (severity) {
-            case 'high':
-                return 'text-red-500';
-            case 'moderate':
-                return 'text-yellow-500';
-            case 'low':
-                return 'text-orange-400';
-            default:
-                return 'text-gray-500';
-        }
+    const handleView = (content: HarmfulContent) => {
+        setViewingContent(content);
+        setIsViewModalOpen(true);
     };
 
     return (
         <>
             <div className="container mx-auto mb-6">
-                <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-[#e0e0e5]">What to Watch Out For</h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                    Learn about potentially harmful ingredients and practices, backed by scientific research.
+                <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-[#e0e0e5]">Harmful Ingredients & Practices</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Stay informed about potentially harmful ingredients and practices in everyday products. Our research-backed content helps you make
+                    informed decisions about your health and safety.
                 </p>
             </div>
             <div className="container mx-auto">
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    {harmfulItems.map((item) => (
-                        <Card
-                            key={item.id}
-                            className="group rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
-                        >
-                            <CardHeader className="pb-6">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center space-x-4">
-                                        <AlertTriangle
-                                            className={`h-6 w-6 ${getSeverityIcon(item.severity)} mt-0.5 flex-shrink-0 transition-transform group-hover:scale-110`}
-                                        />
-                                        <div>
-                                            <CardTitle className="text-xl transition-colors group-hover:text-red-600 dark:text-[#e0e0e5] dark:group-hover:text-red-400">
-                                                {item.name}
-                                            </CardTitle>
-                                            <Badge
-                                                variant="outline"
-                                                className="mt-1 border-gray-200 px-2 py-1 text-xs dark:border-[#2d2d35] dark:bg-[#1a1a1f] dark:text-[#e0e0e5]"
-                                            >
-                                                {categories.find((c) => c.id === item.category)?.name}
-                                            </Badge>
-                                        </div>
-                                    </div>
-                                    <Badge
-                                        className={`${getSeverityColor(item.severity)} border px-2 py-1 text-xs font-medium dark:border-[#2d2d35]`}
-                                    >
-                                        {item.severity} risk
-                                    </Badge>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {harmfulContents.map((content, index) => {
+                        // Use category-based background if available, otherwise fallback to rotating backgrounds
+                        let background: 'peach' | 'lavender' | 'green' | 'pink' = 'peach';
+                        let customBackground: string | undefined;
+                        let label = 'IMPORTANT';
+
+                        if (content.category && categoryBackgrounds[content.category as keyof typeof categoryBackgrounds]) {
+                            const categoryBg = categoryBackgrounds[content.category as keyof typeof categoryBackgrounds];
+                            background = categoryBg.background as 'peach' | 'lavender' | 'green' | 'pink';
+                            customBackground = categoryBg.customBackground;
+                            label = categoryBg.label;
+                        } else {
+                            const backgrounds: Array<'peach' | 'lavender' | 'green' | 'pink'> = ['peach', 'lavender', 'green', 'pink'];
+                            background = backgrounds[index % backgrounds.length];
+                        }
+
+                        return (
+                            <StyledCard
+                                key={content.id}
+                                background={background}
+                                customBackground={customBackground}
+                                backgroundImage={content.image_url}
+                                label={label}
+                                title={content.title}
+                                body={`Updated: ${formatDate(content.updated_at)} • Version: ${content.version}`}
+                                linkText="View Details →"
+                                onLinkClick={() => handleView(content)}
+                            >
+                                <div className="mt-4 flex justify-end">
+                                    <Button variant="outline" size="sm" onClick={() => handleView(content)}>
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        View Content
+                                    </Button>
                                 </div>
-                            </CardHeader>
+                            </StyledCard>
+                        );
+                    })}
 
-                            <CardContent className="space-y-6">
-                                <div>
-                                    <h4 className="mb-2 text-sm font-semibold text-gray-800 dark:text-[#e0e0e5]">Risk Summary:</h4>
-                                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{item.riskSummary}</p>
-                                </div>
-
-                                <div>
-                                    <h4 className="mb-2 text-sm font-semibold text-gray-800 dark:text-[#e0e0e5]">Safer Alternatives:</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {item.alternatives.map((alt, index) => (
-                                            <Badge
-                                                key={index}
-                                                variant="secondary"
-                                                className="rounded-md bg-green-100 px-2 py-1 text-xs text-green-700 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30"
-                                            >
-                                                {alt}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="group w-full rounded-md bg-white py-2 transition-colors hover:bg-blue-50 dark:border-[#2d2d35] dark:bg-[#1a1a1f] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
-                                    asChild
-                                >
-                                    <a href={item.studyLink} target="_blank" rel="noopener noreferrer">
-                                        <ExternalLink className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                        View Research
-                                    </a>
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    ))}
-
-                    {harmfulItems.length === 0 && (
-                        <div className="col-span-full py-12 text-center">
-                            <p className="text-lg text-gray-500 dark:text-gray-400">No harmful ingredients found for your search criteria.</p>
-                            <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">Try adjusting your search or category filter.</p>
+                    {harmfulContents.length === 0 && (
+                        <div className="col-span-full">
+                            <Card className="rounded-2xl bg-white shadow-sm dark:bg-[#18181c]">
+                                <CardContent className="py-12 text-center">
+                                    <p className="text-gray-500 dark:text-gray-400">No harmful content available. Check back later for updates.</p>
+                                </CardContent>
+                            </Card>
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* View Modal */}
+            <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+                <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{viewingContent?.title}</DialogTitle>
+                    </DialogHeader>
+
+                    {viewingContent && (
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Badge variant={viewingContent.is_active ? 'default' : 'secondary'}>
+                                    {viewingContent.is_active ? 'Active' : 'Inactive'}
+                                </Badge>
+                                <span className="text-sm text-gray-500">Version {viewingContent.version}</span>
+                                <span className="text-sm text-gray-500">Updated: {formatDate(viewingContent.updated_at)}</span>
+                            </div>
+
+                            <div className="rounded-lg border p-4">
+                                <ContentRenderer content={viewingContent.content_json} />
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

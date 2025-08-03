@@ -1322,7 +1322,11 @@ const categories = [
     { id: 'beauty', name: 'Beauty & Cosmetics', icon: Sparkles, color: 'bg-indigo-100 text-indigo-700' },
 ];
 
-export default function CertificationLearningPage() {
+interface CertificationLearningPageProps {
+    harmfulContents?: any[];
+}
+
+export default function CertificationLearningPage({ harmfulContents = [] }: CertificationLearningPageProps) {
     const [activeTab, setActiveTab] = useState('certifications');
     const [selectedCert, setSelectedCert] = useState<(typeof certifications)[number] | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1730,7 +1734,7 @@ export default function CertificationLearningPage() {
 
                     {activeTab === 'avoid' && (
                         <div className="mt-8">
-                            <HarmfulIngredientsSection harmfulItems={harmfulItemsToShow} categories={categories} />
+                            <HarmfulIngredientsSection harmfulContents={harmfulContents || []} />
                         </div>
                     )}
                 </div>

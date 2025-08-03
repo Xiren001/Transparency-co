@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HarmfulContentController;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Controllers\ImageController;
@@ -81,6 +82,16 @@ Route::middleware(['auth', 'verified', 'admin.role'])->group(function () {
     Route::post('companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 
+    // Harmful content routes
+    Route::prefix('admin/harmfulcontent')->name('admin.harmfulcontent.')->group(function () {
+        Route::get('/', [HarmfulContentController::class, 'index'])->name('index');
+        Route::post('/', [HarmfulContentController::class, 'store'])->name('store');
+        Route::post('/upload-image', [HarmfulContentController::class, 'uploadImage'])->name('upload-image');
+        Route::post('/{harmfulContent}', [HarmfulContentController::class, 'update'])->name('update');
+        Route::delete('/{harmfulContent}', [HarmfulContentController::class, 'destroy'])->name('destroy');
+        Route::post('/{harmfulContent}/toggle-status', [HarmfulContentController::class, 'toggleStatus'])->name('toggle-status')->where('harmfulContent', '[0-9]+');
+    });
+
     // User management routes (admin only)
     Route::middleware(['role:admin'])->group(function () {
         Route::get('admin/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
@@ -119,8 +130,19 @@ Route::post('/api/search-analytics', [SearchSuggestionController::class, 'logSea
 Route::get('/api/products/top-clicked', [ProductController::class, 'topClicked']);
 
 Route::get('/certifications', function () {
-    return Inertia::render('certifications/Page');
+    $harmfulContents = \App\Models\HarmfulContent::where('is_active', true)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return Inertia::render('certifications/Page', [
+        'harmfulContents' => $harmfulContents,
+    ]);
 })->name('certifications');
+
+
+
+// Customer view for harmful content
+Route::get('/harmful-ingredients', [HarmfulContentController::class, 'customerView'])->name('harmful-ingredients');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

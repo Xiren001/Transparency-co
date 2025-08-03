@@ -101,7 +101,6 @@ export default function Welcome() {
                     {/* <Laravel12Default /> */}
                 </main>
             </div>
-            <div className="hidden h-4 lg:block"></div>
         </MainLayout>
     );
 }

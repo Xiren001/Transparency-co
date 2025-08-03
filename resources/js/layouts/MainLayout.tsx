@@ -1,4 +1,5 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
+import CatLoader from '@/components/CatLoader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -71,17 +72,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <>
-            {loading && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/90 transition-opacity dark:bg-[#0a0a0a]/90">
-                    <div className="border-primary h-12 w-12 animate-spin rounded-full border-4 border-t-transparent" />
-                </div>
-            )}
+            {loading && <CatLoader />}
             <Head title="Home Page">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
-            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 tracking-tighter text-[#1b1b18] uppercase sm:px-8 lg:justify-center dark:bg-[#0a0a0a]">
-                <header className="sticky top-0 z-50 w-full max-w-[1000px] border-b bg-white py-6 text-sm not-has-[nav]:hidden lg:max-w-[2000px] dark:bg-[#0a0a0a]">
+            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 py-6 tracking-tighter text-[#1b1b18] uppercase sm:px-8 lg:justify-center lg:py-2 dark:bg-[#0a0a0a]">
+                <header className="sticky top-2 z-50 w-full max-w-[1000px] rounded-lg border bg-white px-2 py-4 text-sm not-has-[nav]:hidden lg:max-w-[2000px] lg:px-6 dark:bg-[#0a0a0a]">
                     <nav className="flex items-center justify-center gap-4">
                         <div className="flex flex-1 items-center justify-between">
                             {/* Logo */}
@@ -92,7 +89,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 <span className="font-schoolbell text-xl font-bold tracking-widest capitalize dark:text-white">Transparency Co.</span>
                             </a>
                             {/* Desktop Navigation */}
-                            <div className="hidden items-center space-x-8 md:flex">
+                            <div className="hidden items-center space-x-8 lg:flex">
                                 {navigation.map((item) => (
                                     <a
                                         key={item.name}
@@ -105,7 +102,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 ))}
                             </div>
                             {/* Desktop Actions */}
-                            <div className="hidden items-center space-x-4 md:flex">
+                            <div className="hidden items-center space-x-4 lg:flex">
                                 <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
                                     <Search className="h-5 w-5 dark:text-white" />
                                     <span className="sr-only">Search</span>
@@ -191,7 +188,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             </div>
                             {/* Mobile Menu */}
                             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                                <SheetTrigger asChild className="md:hidden">
+                                <SheetTrigger asChild className="lg:hidden">
                                     <Button variant="ghost" size="icon">
                                         <Menu className="h-5 w-5 fill-current dark:text-white" />
                                         <span className="sr-only">Toggle menu</span>

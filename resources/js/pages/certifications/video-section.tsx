@@ -19,7 +19,7 @@ export default function VideoSection({ selectedCategory }: VideoSectionProps) {
     return (
         <div className="w-full py-0">
             <div className="w-full">
-                <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+                <div className="container mx-auto px-0 py-4 sm:py-6 lg:py-8">
                     <div className="mb-4 sm:mb-6">
                         <h2 className="mb-2 text-xl font-bold text-gray-900 sm:text-2xl dark:text-[#e0e0e5]">Learn More</h2>
                         <p className="text-sm text-gray-600 sm:text-base dark:text-gray-400">

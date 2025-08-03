@@ -217,3 +217,41 @@
     scrollbar-color: #d1d5db transparent;
     scroll-behavior: smooth !important;
   }
+
+/* Cat Loader Animations */
+@keyframes tail {
+    0% {
+        transform: rotateZ(60deg);
+    }
+    50% {
+        transform: rotateZ(0deg);
+    }
+    100% {
+        transform: rotateZ(-20deg);
+    }
+}
+
+@keyframes zzz {
+    0% {
+        color: transparent;
+    }
+    50% {
+        color: rgb(40, 40, 40);
+    }
+    100% {
+        color: transparent;
+    }
+}
+
+.tail {
+    animation: tail 0.5s ease-in infinite alternate-reverse;
+    transform-origin: top;
+}
+
+.zzz {
+    animation: zzz 2s linear infinite;
+}
+
+.bigzzz {
+    animation: zzz 2.3s linear infinite;
+}
