@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'admin.role' => \App\Http\Middleware\AdminRoleMiddleware::class,
             'role.or' => \App\Http\Middleware\RoleOrMiddleware::class,
+            'harmful.content' => \App\Http\Middleware\HarmfulContentPermissionMiddleware::class,
         ]);
     })
 

@@ -15,13 +15,23 @@ class UserController extends Controller
 {
     public function index(): Response
     {
+        $this->authorize('view users');
+
         $users = User::with(['roles', 'permissions'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         $roles = Role::all();
         $permissions = Permission::all()->groupBy(function ($permission) {
-            return explode(' ', $permission->name)[1] ?? 'other';
+            $name = $permission->name;
+
+            // Special handling for harmful content permissions
+            if (str_contains($name, 'harmful content')) {
+                return 'harmful_content';
+            }
+
+            // Group by second word for other permissions
+            return explode(' ', $name)[1] ?? 'other';
         });
 
         // Get current user with roles and permissions
@@ -40,6 +50,8 @@ class UserController extends Controller
 
     public function assignRole(Request $request, User $user)
     {
+        $this->authorize('assign roles');
+
         $request->validate([
             'role' => 'required|string|exists:roles,name',
         ]);
@@ -52,6 +64,8 @@ class UserController extends Controller
 
     public function assignPermissions(Request $request, User $user)
     {
+        $this->authorize('assign permissions');
+
         $request->validate([
             'permissions' => 'array',
             'permissions.*' => 'string|exists:permissions,name',
@@ -60,7 +74,7 @@ class UserController extends Controller
         $permissions = $request->input('permissions', []);
         $user->syncPermissions($permissions);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin/users.index')
             ->with('success', 'Permissions assigned successfully.');
     }
 }

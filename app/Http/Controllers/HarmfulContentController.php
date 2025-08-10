@@ -16,6 +16,8 @@ class HarmfulContentController extends Controller
      */
     public function index()
     {
+        $this->authorize('view harmful content');
+
         $harmfulContents = HarmfulContent::orderBy('created_at', 'desc')->get();
 
         return Inertia::render('Admin/HarmfulContent/Index', [
@@ -28,6 +30,8 @@ class HarmfulContentController extends Controller
      */
     public function create()
     {
+        $this->authorize('create harmful content');
+
         return Inertia::render('Admin/HarmfulContent/Create');
     }
 
@@ -36,6 +40,8 @@ class HarmfulContentController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create harmful content');
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'content_json' => 'required',
@@ -86,6 +92,8 @@ class HarmfulContentController extends Controller
      */
     public function show(string $id)
     {
+        $this->authorize('view harmful content');
+
         $harmfulContent = HarmfulContent::findOrFail($id);
 
         return Inertia::render('Admin/HarmfulContent/Show', [
@@ -98,6 +106,8 @@ class HarmfulContentController extends Controller
      */
     public function edit(string $id)
     {
+        $this->authorize('edit harmful content');
+
         $harmfulContent = HarmfulContent::findOrFail($id);
 
         return Inertia::render('Admin/HarmfulContent/Edit', [
@@ -110,6 +120,8 @@ class HarmfulContentController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $this->authorize('edit harmful content');
+
         $harmfulContent = HarmfulContent::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
@@ -165,6 +177,8 @@ class HarmfulContentController extends Controller
      */
     public function destroy(string $id)
     {
+        $this->authorize('delete harmful content');
+
         $harmfulContent = HarmfulContent::findOrFail($id);
         $harmfulContent->delete();
 
@@ -179,6 +193,8 @@ class HarmfulContentController extends Controller
      */
     public function uploadImage(Request $request)
     {
+        $this->authorize('upload harmful content images');
+
         Log::info('Upload image request received', ['files' => $request->allFiles()]);
 
         $validator = Validator::make($request->all(), [
@@ -227,6 +243,8 @@ class HarmfulContentController extends Controller
      */
     public function toggleStatus(HarmfulContent $harmfulContent)
     {
+        $this->authorize('manage harmful content status');
+
         Log::info('Toggle status called', [
             'id' => $harmfulContent->id,
             'current_status' => $harmfulContent->is_active,

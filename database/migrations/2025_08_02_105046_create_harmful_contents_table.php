@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->longText('content_json'); // Store TipTap JSON content
-            $table->text('content_html')->nullable(); // Optional HTML backup
+            $table->longText('content_html')->nullable(); // Optional HTML backup
             $table->string('slug')->unique();
             $table->boolean('is_active')->default(true);
             $table->integer('version')->default(1);

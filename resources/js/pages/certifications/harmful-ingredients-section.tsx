@@ -1,11 +1,7 @@
 import ContentRenderer from '@/components/editor/ContentRenderer';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import StyledCard from '@/components/ui/styled-card';
-import { categoryBackgrounds } from '@/constants/backgrounds';
-import { Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useState } from 'react';
 
 interface HarmfulContent {
@@ -43,52 +39,139 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
         setIsViewModalOpen(true);
     };
 
+    const extractFirstImageFromContent = (content: HarmfulContent): string | null => {
+        // Try to find image in content_html first
+        let firstImageSrc = null;
+        if (content.content_html) {
+            const imgMatch = content.content_html.match(/<img[^>]+src="([^"]+)"[^>]*>/i);
+            firstImageSrc = imgMatch ? imgMatch[1] : null;
+        }
+
+        // If no image in HTML, try to find in JSON content
+        if (!firstImageSrc && content.content_json && content.content_json.content) {
+            const findImageInJson = (nodes: any[]): string | null => {
+                for (const node of nodes) {
+                    if (node.type === 'image' && node.attrs && node.attrs.src) {
+                        return node.attrs.src;
+                    }
+                    if (node.content && Array.isArray(node.content)) {
+                        const found = findImageInJson(node.content);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            };
+
+            firstImageSrc = findImageInJson(content.content_json.content);
+        }
+
+        return firstImageSrc;
+    };
+
+    const extractTextContent = (content: HarmfulContent): string => {
+        if (content.content_html) {
+            return content.content_html.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
+        }
+        return 'Click to view content...';
+    };
+
+    const removeImagesFromContent = (content: any): any => {
+        if (!content || !content.content) return content;
+
+        const removeImagesFromNodes = (nodes: any[]): any[] => {
+            return nodes.filter((node) => {
+                if (node.type === 'image') {
+                    return false; // Remove image nodes
+                }
+                if (node.content && Array.isArray(node.content)) {
+                    node.content = removeImagesFromNodes(node.content);
+                }
+                return true;
+            });
+        };
+
+        return {
+            ...content,
+            content: removeImagesFromNodes(content.content),
+        };
+    };
+
     return (
         <>
-            <div className="container mx-auto mb-6">
-                <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-[#e0e0e5]">Harmful Ingredients & Practices</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Stay informed about potentially harmful ingredients and practices in everyday products. Our research-backed content helps you make
-                    informed decisions about your health and safety.
-                </p>
-            </div>
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    {harmfulContents.map((content, index) => {
-                        // Use category-based background if available, otherwise fallback to rotating backgrounds
-                        let background: 'peach' | 'lavender' | 'green' | 'pink' = 'peach';
-                        let customBackground: string | undefined;
-                        let label = 'IMPORTANT';
-
-                        if (content.category && categoryBackgrounds[content.category as keyof typeof categoryBackgrounds]) {
-                            const categoryBg = categoryBackgrounds[content.category as keyof typeof categoryBackgrounds];
-                            background = categoryBg.background as 'peach' | 'lavender' | 'green' | 'pink';
-                            customBackground = categoryBg.customBackground;
-                            label = categoryBg.label;
-                        } else {
-                            const backgrounds: Array<'peach' | 'lavender' | 'green' | 'pink'> = ['peach', 'lavender', 'green', 'pink'];
-                            background = backgrounds[index % backgrounds.length];
-                        }
+                    {harmfulContents.map((content) => {
+                        const firstImage = extractFirstImageFromContent(content);
+                        const textContent = extractTextContent(content);
 
                         return (
-                            <StyledCard
+                            <div
                                 key={content.id}
-                                background={background}
-                                customBackground={customBackground}
-                                backgroundImage={content.image_url}
-                                label={label}
-                                title={content.title}
-                                body={`Updated: ${formatDate(content.updated_at)} • Version: ${content.version}`}
-                                linkText="View Details →"
-                                onLinkClick={() => handleView(content)}
+                                className="cursor-pointer overflow-hidden rounded-lg bg-white shadow-lg transition-shadow hover:shadow-xl dark:bg-gray-800"
+                                onClick={() => handleView(content)}
                             >
-                                <div className="mt-4 flex justify-end">
-                                    <Button variant="outline" size="sm" onClick={() => handleView(content)}>
-                                        <Eye className="mr-2 h-4 w-4" />
-                                        View Content
-                                    </Button>
+                                {/* Card Content */}
+                                <div className="flex">
+                                    {/* Left - Image */}
+                                    <div className="flex h-48 w-1/3 items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                        {firstImage ? (
+                                            <img src={firstImage} alt="Content image" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <div className="text-center text-gray-400">
+                                                <div className="mb-2 text-2xl">📷</div>
+                                                <div className="text-xs">No Image</div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Right - Text Content */}
+                                    <div className="w-2/3 p-4">
+                                        <div className="mb-2">
+                                            {content.category && (
+                                                <Badge variant="outline" className="mb-2 text-xs">
+                                                    {content.category.replace(/-/g, ' ')}
+                                                </Badge>
+                                            )}
+                                            <Badge variant={content.is_active ? 'default' : 'secondary'} className="ml-2 text-xs">
+                                                {content.is_active ? 'Active' : 'Inactive'}
+                                            </Badge>
+                                        </div>
+
+                                        <h2 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900 dark:text-white">{content.title}</h2>
+
+                                        <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                                            <div
+                                                className="break-words whitespace-pre-wrap"
+                                                style={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 4,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {textContent}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </StyledCard>
+
+                                {/* Bottom Section - Metadata */}
+                                <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                        <div className="font-semibold">{new Date(content.created_at).getDate().toString().padStart(2, '0')}</div>
+                                        <div className="text-xs uppercase">
+                                            {new Date(content.created_at).toLocaleDateString('en-US', { month: 'long' })}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 text-gray-400">
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-xs">Click to read more</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         );
                     })}
 
@@ -108,21 +191,102 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
             <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
                 <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{viewingContent?.title}</DialogTitle>
+                        <DialogTitle>Content Preview</DialogTitle>
+                        <DialogDescription>
+                            View detailed information about this harmful ingredient or practice. The content below provides comprehensive details and
+                            research-backed information.
+                        </DialogDescription>
                     </DialogHeader>
 
                     {viewingContent && (
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <Badge variant={viewingContent.is_active ? 'default' : 'secondary'}>
-                                    {viewingContent.is_active ? 'Active' : 'Inactive'}
-                                </Badge>
-                                <span className="text-sm text-gray-500">Version {viewingContent.version}</span>
-                                <span className="text-sm text-gray-500">Updated: {formatDate(viewingContent.updated_at)}</span>
-                            </div>
+                        <div className="font-milk space-y-6">
+                            {/* Blog Card Display */}
+                            <div
+                                className="overflow-hidden rounded-lg bg-white shadow-lg dark:bg-gray-800"
+                                style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
+                            >
+                                {/* Card Content */}
+                                <div className="flex">
+                                    {/* Left - Image */}
+                                    <div className="flex h-64 w-1/3 items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                        {(() => {
+                                            const firstImageSrc = extractFirstImageFromContent(viewingContent);
+                                            if (firstImageSrc) {
+                                                return <img src={firstImageSrc} alt="Content image" className="h-full w-full object-cover" />;
+                                            } else {
+                                                return (
+                                                    <div className="text-center text-gray-400">
+                                                        <div className="mb-2 text-2xl">📷</div>
+                                                        <div className="text-xs">No Image</div>
+                                                    </div>
+                                                );
+                                            }
+                                        })()}
+                                    </div>
 
-                            <div className="rounded-lg border p-4">
-                                <ContentRenderer content={viewingContent.content_json} />
+                                    {/* Right - Full Text Content */}
+                                    <div className="w-2/3 min-w-0 p-6">
+                                        <div className="mb-3">
+                                            {viewingContent.category && (
+                                                <Badge variant="outline" className="mb-2 text-xs">
+                                                    {viewingContent.category.replace(/-/g, ' ')}
+                                                </Badge>
+                                            )}
+                                            <Badge variant={viewingContent.is_active ? 'default' : 'secondary'} className="ml-2 text-xs">
+                                                {viewingContent.is_active ? 'Active' : 'Inactive'}
+                                            </Badge>
+                                        </div>
+
+                                        <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{viewingContent.title}</h2>
+
+                                        <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                                            {viewingContent.content_html ? (
+                                                <div
+                                                    className="overflow-wrap-anywhere break-words break-all whitespace-normal"
+                                                    style={{
+                                                        wordBreak: 'break-word',
+                                                        overflowWrap: 'break-word',
+                                                        whiteSpace: 'normal',
+                                                        maxWidth: '100%',
+                                                    }}
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: viewingContent.content_html.replace(/<img[^>]*>/gi, ''),
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div
+                                                    className="prose dark:prose-invert overflow-wrap-anywhere max-w-none break-words break-all whitespace-normal"
+                                                    style={{
+                                                        wordBreak: 'break-word',
+                                                        overflowWrap: 'break-word',
+                                                        whiteSpace: 'normal',
+                                                        maxWidth: '100%',
+                                                    }}
+                                                >
+                                                    <ContentRenderer content={removeImagesFromContent(viewingContent.content_json)} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Bottom Section - Metadata */}
+                                <div className="flex items-center justify-between border-t bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-gray-700">
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                        <div className="font-semibold">
+                                            {new Date(viewingContent.created_at).getDate().toString().padStart(2, '0')}
+                                        </div>
+                                        <div className="text-xs uppercase">
+                                            {new Date(viewingContent.created_at).toLocaleDateString('en-US', { month: 'long' })}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 text-gray-400">
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-xs">View more</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}

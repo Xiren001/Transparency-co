@@ -33,6 +33,14 @@ class PermissionsSeeder extends Seeder
             'edit companies',
             'delete companies',
 
+            // Harmful Content Management
+            'view harmful content',
+            'create harmful content',
+            'edit harmful content',
+            'delete harmful content',
+            'manage harmful content status',
+            'upload harmful content images',
+
             // Newsletter Management
             'view newsletter subscribers',
             'export newsletter data',
@@ -78,6 +86,9 @@ class PermissionsSeeder extends Seeder
                 'edit products',
                 'view companies',
                 'edit companies',
+                'view harmful content',
+                'edit harmful content',
+                'manage harmful content status',
                 'moderate content',
                 'approve content',
                 'reject content',
@@ -98,6 +109,12 @@ class PermissionsSeeder extends Seeder
                 'create companies',
                 'edit companies',
                 'delete companies',
+                'view harmful content',
+                'create harmful content',
+                'edit harmful content',
+                'delete harmful content',
+                'manage harmful content status',
+                'upload harmful content images',
                 'publish content',
                 'view analytics',
                 'view dashboard',

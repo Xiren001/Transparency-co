@@ -83,13 +83,13 @@ Route::middleware(['auth', 'verified', 'admin.role'])->group(function () {
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 
     // Harmful content routes
-    Route::prefix('admin/harmfulcontent')->name('admin.harmfulcontent.')->group(function () {
-        Route::get('/', [HarmfulContentController::class, 'index'])->name('index');
-        Route::post('/', [HarmfulContentController::class, 'store'])->name('store');
-        Route::post('/upload-image', [HarmfulContentController::class, 'uploadImage'])->name('upload-image');
-        Route::post('/{harmfulContent}', [HarmfulContentController::class, 'update'])->name('update');
-        Route::delete('/{harmfulContent}', [HarmfulContentController::class, 'destroy'])->name('destroy');
-        Route::post('/{harmfulContent}/toggle-status', [HarmfulContentController::class, 'toggleStatus'])->name('toggle-status')->where('harmfulContent', '[0-9]+');
+    Route::prefix('admin/harmfulcontent')->name('admin.harmfulcontent.')->middleware(['harmful.content'])->group(function () {
+        Route::get('/', [HarmfulContentController::class, 'index'])->middleware(['harmful.content:view harmful content'])->name('index');
+        Route::post('/', [HarmfulContentController::class, 'store'])->middleware(['harmful.content:create harmful content'])->name('store');
+        Route::post('/upload-image', [HarmfulContentController::class, 'uploadImage'])->middleware(['harmful.content:upload harmful content images'])->name('upload-image');
+        Route::post('/{harmfulContent}', [HarmfulContentController::class, 'update'])->middleware(['harmful.content:edit harmful content'])->name('update');
+        Route::delete('/{harmfulContent}', [HarmfulContentController::class, 'destroy'])->middleware(['harmful.content:delete harmful content'])->name('destroy');
+        Route::post('/{harmfulContent}/toggle-status', [HarmfulContentController::class, 'toggleStatus'])->middleware(['harmful.content:manage harmful content status'])->name('toggle-status')->where('harmfulContent', '[0-9]+');
     });
 
     // User management routes (admin only)

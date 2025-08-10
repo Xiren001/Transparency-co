@@ -311,10 +311,11 @@ export default function UsersIndex() {
                         </DialogHeader>
                         <div className="py-4">
                             <Tabs defaultValue="users" className="w-full">
-                                <TabsList className="grid w-full grid-cols-4">
+                                <TabsList className="grid w-full grid-cols-5">
                                     <TabsTrigger value="users">Users</TabsTrigger>
                                     <TabsTrigger value="products">Products</TabsTrigger>
                                     <TabsTrigger value="companies">Companies</TabsTrigger>
+                                    <TabsTrigger value="harmful_content">Harmful Content</TabsTrigger>
                                     <TabsTrigger value="system">System</TabsTrigger>
                                 </TabsList>
 
@@ -349,6 +350,39 @@ export default function UsersIndex() {
                                         </div>
                                     </TabsContent>
                                 ))}
+
+                                {/* Special handling for harmful content permissions */}
+                                {permissions.harmful_content && (
+                                    <TabsContent value="harmful_content" className="space-y-4">
+                                        <div className="grid grid-cols-1 gap-3">
+                                            {permissions.harmful_content.map((permission) => (
+                                                <div key={permission.id} className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id={`permission-${permission.id}`}
+                                                        checked={permissionForm.data.permissions.includes(permission.name)}
+                                                        onCheckedChange={(checked) => {
+                                                            const currentPermissions = permissionForm.data.permissions;
+                                                            if (checked) {
+                                                                permissionForm.setData('permissions', [...currentPermissions, permission.name]);
+                                                            } else {
+                                                                permissionForm.setData(
+                                                                    'permissions',
+                                                                    currentPermissions.filter((p) => p !== permission.name),
+                                                                );
+                                                            }
+                                                        }}
+                                                    />
+                                                    <label
+                                                        htmlFor={`permission-${permission.id}`}
+                                                        className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    >
+                                                        {permission.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </TabsContent>
+                                )}
                             </Tabs>
                         </div>
                         <DialogFooter>

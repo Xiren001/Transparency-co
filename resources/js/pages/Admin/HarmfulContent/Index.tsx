@@ -12,7 +12,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Plus, ToggleLeft, ToggleRight } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface HarmfulContent {
@@ -59,6 +59,9 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
         imagePreview: '',
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'pending' | null>(null);
+    const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleCreate = () => {
         setEditingContent(null);
@@ -191,6 +194,174 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
         });
     };
 
+    const removeImagesFromContent = (content: any): any => {
+        if (!content || !content.content) return content;
+
+        const removeImagesFromNodes = (nodes: any[]): any[] => {
+            return nodes.filter((node) => {
+                if (node.type === 'image') {
+                    return false; // Remove image nodes
+                }
+                if (node.content && Array.isArray(node.content)) {
+                    node.content = removeImagesFromNodes(node.content);
+                }
+                return true;
+            });
+        };
+
+        return {
+            ...content,
+            content: removeImagesFromNodes(content.content),
+        };
+    };
+
+    const autoSave = useCallback(async () => {
+        if (!formData.title.trim() || !formData.content_json) {
+            console.log('Auto-save skipped: missing title or content');
+            return;
+        }
+
+        console.log('Starting auto-save...', {
+            isEdit: !!editingContent,
+            id: editingContent?.id,
+            title: formData.title,
+        });
+
+        setAutoSaveStatus('saving');
+        try {
+            const url = editingContent ? `/admin/harmfulcontent/${editingContent.id}` : '/admin/harmfulcontent';
+            const method = editingContent ? 'post' : 'post';
+
+            const formDataToSend = new FormData();
+            formDataToSend.append('title', formData.title);
+            formDataToSend.append('content_json', JSON.stringify(formData.content_json));
+            formDataToSend.append('content_html', formData.content_html);
+            formDataToSend.append('category', formData.category);
+            formDataToSend.append('auto_save', 'true');
+
+            // Don't include image in auto-save unless it's new
+            if (formData.image && !editingContent) {
+                formDataToSend.append('image', formData.image);
+            }
+
+            console.log('Sending auto-save request to:', url);
+
+            const response = await axios[method](url, formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log('Auto-save response:', response.data);
+
+            if (response.data.success) {
+                setLastSaved(new Date());
+                setAutoSaveStatus('saved');
+
+                // Update the editing content if it's an edit
+                if (editingContent && response.data.data) {
+                    setEditingContent(response.data.data);
+                    setContents((prev) =>
+                        prev.map((content) => (content.id === editingContent.id ? { ...content, ...response.data.data } : content)),
+                    );
+                } else if (!editingContent && response.data.data) {
+                    // If it's a new content, update editing content with the returned data
+                    console.log('New content created, updating state:', response.data.data);
+                    setEditingContent(response.data.data);
+                    setContents((prev) => {
+                        const existing = prev.find((c) => c.id === response.data.data.id);
+                        if (existing) {
+                            return prev.map((content) => (content.id === response.data.data.id ? { ...content, ...response.data.data } : content));
+                        } else {
+                            return [response.data.data, ...prev];
+                        }
+                    });
+                }
+
+                // Clear the saved status after 3 seconds
+                setTimeout(() => setAutoSaveStatus(null), 3000);
+            } else {
+                console.error('Auto-save failed:', response.data);
+                setAutoSaveStatus(null);
+            }
+        } catch (error: any) {
+            console.error('Auto-save error:', error);
+            console.error('Error response:', error.response?.data);
+            setAutoSaveStatus(null);
+            // Don't show error toast for auto-save failures to avoid spam
+        }
+    }, [formData, editingContent]);
+
+    const triggerAutoSave = useCallback(() => {
+        setAutoSaveStatus('pending');
+
+        // Clear existing timeout
+        if (autoSaveTimeoutRef.current) {
+            clearTimeout(autoSaveTimeoutRef.current);
+        }
+
+        // Set new timeout for auto-save (2 seconds after user stops typing)
+        autoSaveTimeoutRef.current = setTimeout(() => {
+            autoSave();
+        }, 2000);
+    }, [autoSave]);
+
+    // Handle content changes for auto-save
+    const handleContentChange = useCallback(
+        (content: any, html?: string) => {
+            setFormData((prev) => ({
+                ...prev,
+                content_json: content,
+                content_html: html || prev.content_html,
+            }));
+            triggerAutoSave();
+        },
+        [triggerAutoSave],
+    );
+
+    // Handle manual save from editor
+    const handleEditorSave = useCallback(
+        ({ json, html }: { json: any; html: string }) => {
+            setFormData((prev) => ({
+                ...prev,
+                content_json: json,
+                content_html: html,
+            }));
+            triggerAutoSave();
+        },
+        [triggerAutoSave],
+    );
+
+    const handleTitleChange = useCallback(
+        (value: string) => {
+            setFormData((prev) => ({ ...prev, title: value }));
+            if (value.trim()) {
+                triggerAutoSave();
+            }
+        },
+        [triggerAutoSave],
+    );
+
+    // Clean up timeout on unmount or modal close
+    useEffect(() => {
+        return () => {
+            if (autoSaveTimeoutRef.current) {
+                clearTimeout(autoSaveTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Reset auto-save state when modal closes
+    useEffect(() => {
+        if (!isModalOpen) {
+            setAutoSaveStatus(null);
+            setLastSaved(null);
+            if (autoSaveTimeoutRef.current) {
+                clearTimeout(autoSaveTimeoutRef.current);
+            }
+        }
+    }, [isModalOpen]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Harmful Content Management" />
@@ -212,7 +383,6 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                 <TableHead className="w-[150px]">Category</TableHead>
                                 <TableHead className="w-[120px]">Version</TableHead>
                                 <TableHead className="w-[150px]">Created</TableHead>
-                                <TableHead className="w-[100px]">Image</TableHead>
                                 <TableHead className="w-[200px] text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -236,13 +406,6 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                     </TableCell>
                                     <TableCell>{content.version}</TableCell>
                                     <TableCell>{formatDate(content.created_at)}</TableCell>
-                                    <TableCell>
-                                        {content.image_url ? (
-                                            <img src={content.image_url} alt="Content image" className="h-8 w-8 rounded object-cover" />
-                                        ) : (
-                                            <span className="text-muted-foreground">-</span>
-                                        )}
-                                    </TableCell>
                                     <TableCell>
                                         <div className="flex justify-end space-x-2">
                                             <Button variant="outline" size="sm" onClick={() => handleView(content)} className="h-8 px-3">
@@ -275,7 +438,30 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogContent className="max-w-[95vw] overflow-hidden rounded-lg p-0">
                         <DialogHeader className="border-b px-6 py-4">
-                            <DialogTitle>{editingContent ? 'Edit Harmful Content' : 'Create New Harmful Content'}</DialogTitle>
+                            <div className="flex items-center gap-6">
+                                <DialogTitle>{editingContent ? 'Edit Harmful Content' : 'Create New Harmful Content'}</DialogTitle>
+                                <div className="flex items-center gap-2 text-sm">
+                                    {autoSaveStatus === 'saving' && (
+                                        <span className="text-blue-600">
+                                            <span className="mr-1">💾</span>
+                                            Saving...
+                                        </span>
+                                    )}
+                                    {autoSaveStatus === 'saved' && (
+                                        <span className="text-green-600">
+                                            <span className="mr-1">✅</span>
+                                            Auto-saved
+                                        </span>
+                                    )}
+                                    {autoSaveStatus === 'pending' && (
+                                        <span className="text-yellow-600">
+                                            <span className="mr-1">⏳</span>
+                                            Pending...
+                                        </span>
+                                    )}
+                                    {lastSaved && <span className="text-gray-500">Last saved: {lastSaved.toLocaleTimeString()}</span>}
+                                </div>
+                            </div>
                         </DialogHeader>
 
                         <div className="flex h-[calc(90vh-120px)]">
@@ -291,7 +477,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                             <Input
                                                 id="title"
                                                 value={formData.title}
-                                                onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                                                onChange={(e) => handleTitleChange(e.target.value)}
                                                 placeholder="Enter content title"
                                                 className="text-lg font-semibold"
                                             />
@@ -319,17 +505,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                     {/* Content Editor */}
                                     <div>
                                         <Label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Content</Label>
-                                        <TipTapEditor
-                                            content={formData.content_json}
-                                            onChange={(content) => setFormData((prev) => ({ ...prev, content_json: content }))}
-                                            onSave={({ json, html }) =>
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    content_json: json,
-                                                    content_html: html,
-                                                }))
-                                            }
-                                        />
+                                        <TipTapEditor content={formData.content_json} onChange={handleContentChange} onSave={handleEditorSave} />
                                     </div>
                                 </div>
                             </div>
@@ -344,7 +520,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                         {/* Card Content */}
                                         <div className="flex">
                                             {/* Left - Image */}
-                                            <div className="flex h-48 w-1/3 items-center justify-center bg-gray-200">
+                                            <div className="flex w-1/3 items-center justify-center bg-gray-200">
                                                 {(() => {
                                                     // Extract first image from editor content
                                                     const contentHtml = formData.content_html || editingContent?.content_html || '';
@@ -402,15 +578,23 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                     {formData.title || 'Your Title Here'}
                                                 </h2>
 
-                                                <div className="line-clamp-4 text-sm text-gray-600">
+                                                <div className="h-25 overflow-hidden text-sm leading-relaxed text-gray-600">
                                                     {formData.content_html ? (
                                                         <div
+                                                            className="break-words whitespace-pre-wrap"
+                                                            style={{
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 4,
+                                                                WebkitBoxOrient: 'vertical',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                            }}
                                                             dangerouslySetInnerHTML={{
-                                                                __html: formData.content_html.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+                                                                __html: formData.content_html.replace(/<img[^>]*>/gi, ''),
                                                             }}
                                                         />
                                                     ) : (
-                                                        'Your content will appear here...'
+                                                        <div className="text-gray-400 italic">Your content will appear here...</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -505,15 +689,16 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
 
                                                 <h2 className="mb-4 text-2xl font-bold text-gray-900">{formData.title || 'Your Title Here'}</h2>
 
-                                                <div className="text-sm leading-relaxed text-gray-600">
+                                                <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-600">
                                                     {formData.content_html ? (
                                                         <div
+                                                            className="break-words whitespace-pre-wrap"
                                                             dangerouslySetInnerHTML={{
-                                                                __html: formData.content_html,
+                                                                __html: formData.content_html.replace(/<img[^>]*>/gi, ''),
                                                             }}
                                                         />
                                                     ) : (
-                                                        'Your content will appear here...'
+                                                        <div className="text-gray-400 italic">Your content will appear here...</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -630,15 +815,23 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
 
                                             <h2 className="mb-2 text-lg font-bold text-gray-900">{viewingContent.title}</h2>
 
-                                            <div className="text-sm text-gray-600">
+                                            <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-600">
                                                 {viewingContent.content_html ? (
                                                     <div
+                                                        className="break-words whitespace-pre-wrap"
+                                                        style={{
+                                                            display: '-webkit-box',
+                                                            WebkitLineClamp: 4,
+                                                            WebkitBoxOrient: 'vertical',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                        }}
                                                         dangerouslySetInnerHTML={{
-                                                            __html: viewingContent.content_html.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
+                                                            __html: viewingContent.content_html.replace(/<img[^>]*>/gi, ''),
                                                         }}
                                                     />
                                                 ) : (
-                                                    'No content available...'
+                                                    <div className="text-gray-400 italic">No content available...</div>
                                                 )}
                                             </div>
                                         </div>
@@ -677,7 +870,18 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                 <div className="rounded-lg border bg-gray-50 p-4">
                                     <h3 className="mb-3 text-lg font-semibold text-gray-700">Full Content</h3>
                                     <div className="rounded-lg border bg-white p-4">
-                                        <ContentRenderer content={viewingContent.content_json} />
+                                        {viewingContent.content_html ? (
+                                            <div
+                                                className="prose dark:prose-invert max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words whitespace-pre-wrap"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: viewingContent.content_html.replace(/<img[^>]*>/gi, ''),
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="prose dark:prose-invert max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words whitespace-pre-wrap">
+                                                <ContentRenderer content={removeImagesFromContent(viewingContent.content_json)} />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
