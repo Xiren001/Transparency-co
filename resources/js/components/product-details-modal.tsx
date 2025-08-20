@@ -90,7 +90,7 @@ export default function ProductDetailsModal({ product, isOpen, onOpenChange }: P
     if (!product) {
         return (
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent className="font-milk max-h-[95vh] w-full overflow-y-auto px-4 py-10 tracking-tighter uppercase sm:w-[95vw] sm:max-w-7xl md:px-6 md:py-8 dark:bg-[#1a1a1f] dark:text-[#e0e0e5]">
+                <DialogContent className="font-milk max-h-[95vh] w-full overflow-y-auto px-4 py-10 tracking-tighter uppercase sm:w-[95vw] sm:max-w-7xl md:px-6 md:py-8 dark:bg-[#282828] dark:text-[#e0e0e5]">
                     <div className="text-center text-gray-500 dark:text-[#b8b8c0]">No product data available.</div>
                 </DialogContent>
             </Dialog>
@@ -99,11 +99,11 @@ export default function ProductDetailsModal({ product, isOpen, onOpenChange }: P
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="font-milk max-h-[95vh] w-full overflow-y-auto px-4 py-10 tracking-tighter uppercase sm:w-[95vw] sm:max-w-7xl md:px-6 md:py-8 dark:bg-[#1a1a1f] dark:text-[#e0e0e5]">
+            <DialogContent className="font-milk max-h-[95vh] w-full overflow-y-auto px-4 py-10 tracking-tighter uppercase sm:w-[95vw] sm:max-w-7xl md:px-6 md:py-8 dark:bg-[#282828] dark:text-[#e0e0e5]">
                 <div className="flex w-full min-w-0 flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-12">
                     {/* Left Column: Product Image Gallery */}
                     <div className="flex flex-col items-center gap-4 lg:flex-row-reverse">
-                        <div className="relative aspect-[4/3] h-full w-full max-w-[600px] overflow-hidden rounded bg-gray-100 lg:max-w-none dark:bg-[#23232a]">
+                        <div className="relative aspect-[4/3] h-full w-full max-w-[600px] overflow-hidden rounded bg-gray-100 lg:max-w-none dark:bg-[#282828]">
                             <img
                                 src={getProductImage(product!.images, selectedImageIndex)}
                                 alt={`${getProductName(product!.name)} view ${selectedImageIndex + 1}`}
@@ -115,7 +115,7 @@ export default function ProductDetailsModal({ product, isOpen, onOpenChange }: P
                                 <button
                                     key={index}
                                     onClick={() => handleImageSelect(index)}
-                                    className={`h-15 w-15 overflow-hidden border-2 bg-gray-100 transition-all duration-200 dark:bg-[#23232a] ${selectedImageIndex === index ? 'border-gray-900 dark:border-[#e0e0e5]' : 'border-transparent hover:border-gray-300 dark:hover:border-[#3d3d45]'}`}
+                                    className={`h-15 w-15 overflow-hidden border-2 bg-gray-100 transition-all duration-200 dark:bg-[#282828] ${selectedImageIndex === index ? 'border-gray-900 dark:border-[#e0e0e5]' : 'border-transparent hover:border-gray-300 dark:hover:border-[#3d3d45]'}`}
                                 >
                                     <img
                                         src={image ? `/images/${image.replace(/\\/g, '/')}` : '/placeholder.svg'}

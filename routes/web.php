@@ -87,10 +87,35 @@ Route::middleware(['auth', 'verified', 'admin.role'])->group(function () {
         Route::get('/', [HarmfulContentController::class, 'index'])->middleware(['harmful.content:view harmful content'])->name('index');
         Route::post('/', [HarmfulContentController::class, 'store'])->middleware(['harmful.content:create harmful content'])->name('store');
         Route::post('/upload-image', [HarmfulContentController::class, 'uploadImage'])->middleware(['harmful.content:upload harmful content images'])->name('upload-image');
+        Route::get('/storage-stats', [HarmfulContentController::class, 'getStorageStats'])->middleware(['harmful.content:view harmful content'])->name('storage-stats');
         Route::post('/{harmfulContent}', [HarmfulContentController::class, 'update'])->middleware(['harmful.content:edit harmful content'])->name('update');
         Route::delete('/{harmfulContent}', [HarmfulContentController::class, 'destroy'])->middleware(['harmful.content:delete harmful content'])->name('destroy');
         Route::post('/{harmfulContent}/toggle-status', [HarmfulContentController::class, 'toggleStatus'])->middleware(['harmful.content:manage harmful content status'])->name('toggle-status')->where('harmfulContent', '[0-9]+');
     });
+
+    // Direct access to harmful content images from storage
+    Route::get('/storage/app/public/images/{filename}', function ($filename) {
+        $path = storage_path('app/public/images/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404, 'Image not found');
+        }
+
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $mimeTypes = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+        ];
+        $mimeType = $mimeTypes[$extension] ?? 'application/octet-stream';
+
+        return response()->file($path, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'public, max-age=31536000', // Cache for 1 year
+        ]);
+    })->where('filename', '.*')->name('harmful.images.direct');
 
     // User management routes (admin only)
     Route::middleware(['role:admin'])->group(function () {

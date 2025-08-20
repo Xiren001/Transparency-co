@@ -248,8 +248,8 @@ export default function CategoriesSection() {
     };
 
     return (
-        <section className="rounded-lg bg-gray-50 py-8 dark:bg-[#1a1a1f]">
-            <div className="container mx-auto px-4">
+        <section className="rounded-lg bg-gray-50 bg-white/80 pt-8 dark:bg-transparent">
+            <div className="container mx-auto px-0">
                 {/* Section Title */}
                 <h2 className="mb-8 text-center text-3xl font-light tracking-wide text-gray-900 md:text-4xl dark:text-[#e0e0e5]">
                     Browse by Categories
@@ -267,19 +267,19 @@ export default function CategoriesSection() {
                                     <div
                                         key={category.id}
                                         onClick={() => handleCategoryClick(category.id)}
-                                        className={`group flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                        className={`group flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
                                             isSelected ? 'ring-primary ring-2' : ''
                                         }`}
                                     >
                                         {/* Icon */}
                                         <div
                                             className={`group-hover:bg-primary/10 dark:group-hover:bg-primary/20 mb-2 rounded-full p-2 transition-colors duration-300 ${
-                                                isSelected ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100 dark:bg-[#2d2d35]'
+                                                isSelected ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100 dark:bg-[#121212]'
                                             }`}
                                         >
                                             <IconComponent
                                                 className={`group-hover:text-primary h-6 w-6 transition-colors duration-300 ${
-                                                    isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#e0e0e5]'
+                                                    isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#b1db9e]'
                                                 }`}
                                             />
                                         </div>
@@ -307,19 +307,19 @@ export default function CategoriesSection() {
                                 <div
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category.id)}
-                                    className={`group flex cursor-pointer flex-col items-center rounded-lg bg-white p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                    className={`group flex cursor-pointer flex-col items-center rounded-lg bg-white p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
                                         isSelected ? 'ring-primary ring-2' : ''
                                     }`}
                                 >
                                     {/* Icon */}
                                     <div
                                         className={`group-hover:bg-primary/10 dark:group-hover:bg-primary/20 mb-3 rounded-full p-3 transition-colors duration-300 ${
-                                            isSelected ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100 dark:bg-[#2d2d35]'
+                                            isSelected ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100 dark:bg-[#121212]'
                                         }`}
                                     >
                                         <IconComponent
                                             className={`group-hover:text-primary h-8 w-8 transition-colors duration-300 ${
-                                                isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#e0e0e5]'
+                                                isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#b1db9e]'
                                             }`}
                                         />
                                     </div>
@@ -354,7 +354,7 @@ export default function CategoriesSection() {
                                         <div
                                             key={subCategory.id}
                                             onClick={() => handleSubCategoryClick(subCategory.id)}
-                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
                                                 selectedSubCategory === subCategory.id ? 'ring-primary ring-2' : ''
                                             }`}
                                         >
@@ -382,7 +382,7 @@ export default function CategoriesSection() {
                                     <div
                                         key={subCategory.id}
                                         onClick={() => handleSubCategoryClick(subCategory.id)}
-                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg bg-white p-3 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg bg-white p-3 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
                                             selectedSubCategory === subCategory.id ? 'ring-primary ring-2' : ''
                                         }`}
                                     >
@@ -422,7 +422,7 @@ export default function CategoriesSection() {
                                         <div
                                             key={item}
                                             onClick={() => handleItemClick(item)}
-                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
                                                 selectedItem === item ? 'ring-primary ring-2' : ''
                                             }`}
                                         >
@@ -450,7 +450,7 @@ export default function CategoriesSection() {
                                     <div
                                         key={item}
                                         onClick={() => handleItemClick(item)}
-                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg bg-white p-3 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50 ${
+                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg bg-white p-3 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
                                             selectedItem === item ? 'ring-primary ring-2' : ''
                                         }`}
                                     >

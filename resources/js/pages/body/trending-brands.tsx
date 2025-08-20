@@ -88,7 +88,7 @@ export default function TrendingBrands() {
     const infiniteBrands = [...brands, ...brands, ...brands];
 
     return (
-        <section className="rounded-lg border-gray-100 bg-white py-12 dark:border-[#2d2d35] dark:bg-[#1a1a1f]">
+        <section className="rounded-lg border-gray-100 bg-white py-12 dark:border-[#2d2d35] dark:bg-transparent">
             <div className="container mx-auto px-4">
                 {/* Section Title */}
                 <h2 className="mb-8 text-center text-sm font-medium tracking-[0.2em] text-gray-600 uppercase dark:text-[#b8b8c0]">Trending Brands</h2>
@@ -96,8 +96,8 @@ export default function TrendingBrands() {
                 {/* Brands Container */}
                 <div className="relative overflow-hidden">
                     {/* Gradient overlays for smooth edges */}
-                    <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-20 bg-gradient-to-r from-white to-transparent dark:from-[#1a1a1f]"></div>
-                    <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-20 bg-gradient-to-l from-white to-transparent dark:from-[#1a1a1f]"></div>
+                    <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-20 bg-gradient-to-r from-white to-transparent dark:from-[#121212]"></div>
+                    <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-20 bg-gradient-to-l from-white to-transparent dark:from-[#121212]"></div>
 
                     {/* Scrolling brands container */}
                     <div

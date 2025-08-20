@@ -1,7 +1,7 @@
 import ContentRenderer from '@/components/editor/ContentRenderer';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useState } from 'react';
 
 interface HarmfulContent {
@@ -70,7 +70,10 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
     const extractTextContent = (content: HarmfulContent): string => {
         if (content.content_html) {
-            return content.content_html.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
+            // Remove images but preserve other HTML formatting for preview
+            const contentWithoutImages = content.content_html.replace(/<img[^>]*>/gi, '');
+            // Strip HTML tags for text-only preview
+            return contentWithoutImages.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
         }
         return 'Click to view content...';
     };
@@ -107,13 +110,13 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                         return (
                             <div
                                 key={content.id}
-                                className="cursor-pointer overflow-hidden rounded-lg bg-white shadow-lg transition-shadow hover:shadow-xl dark:bg-gray-800"
+                                className="cursor-pointer overflow-hidden rounded-lg bg-white shadow-lg transition-shadow hover:shadow-xl dark:bg-[#282828]"
                                 onClick={() => handleView(content)}
                             >
                                 {/* Card Content */}
                                 <div className="flex">
                                     {/* Left - Image */}
-                                    <div className="flex h-48 w-1/3 items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                    <div className="flex h-48 w-1/3 items-center justify-center bg-gray-200 dark:bg-[#282828]">
                                         {firstImage ? (
                                             <img src={firstImage} alt="Content image" className="h-full w-full object-cover" />
                                         ) : (
@@ -132,42 +135,46 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                                     {content.category.replace(/-/g, ' ')}
                                                 </Badge>
                                             )}
-                                            <Badge variant={content.is_active ? 'default' : 'secondary'} className="ml-2 text-xs">
-                                                {content.is_active ? 'Active' : 'Inactive'}
-                                            </Badge>
                                         </div>
 
                                         <h2 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900 dark:text-white">{content.title}</h2>
 
-                                        <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                                            <div
-                                                className="break-words whitespace-pre-wrap"
-                                                style={{
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 4,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                }}
-                                            >
-                                                {textContent}
-                                            </div>
+                                        <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                                            {content.content_html ? (
+                                                <div
+                                                    className="prose prose-sm dark:prose-invert prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
+                                                    style={{
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 4,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: content.content_html.replace(/<img[^>]*>/gi, ''),
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="text-gray-400 italic">Click to view content...</div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Bottom Section - Metadata */}
-                                <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        <div className="font-semibold">{new Date(content.created_at).getDate().toString().padStart(2, '0')}</div>
-                                        <div className="text-xs uppercase">
+                                <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-1 dark:border-[#2d2d35] dark:bg-[#282828]">
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                        <div className="font-semibold text-gray-700 dark:text-[#b1db9e]">
+                                            {new Date(content.created_at).getDate().toString().padStart(2, '0')}
+                                        </div>
+                                        <div className="text-xs text-gray-500 uppercase dark:text-[#b1db9e]">
                                             {new Date(content.created_at).toLocaleDateString('en-US', { month: 'long' })}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3 text-gray-400">
+                                    <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center gap-1">
-                                            <span className="text-xs">Click to read more</span>
+                                            <span className="text-xs dark:text-[#b1db9e]">Click to read more</span>
                                         </div>
                                     </div>
                                 </div>
@@ -177,9 +184,9 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
                     {harmfulContents.length === 0 && (
                         <div className="col-span-full">
-                            <Card className="rounded-2xl bg-white shadow-sm dark:bg-[#18181c]">
+                            <Card className="rounded-2xl bg-white shadow-sm dark:bg-[#282828]">
                                 <CardContent className="py-12 text-center">
-                                    <p className="text-gray-500 dark:text-gray-400">No harmful content available. Check back later for updates.</p>
+                                    <p className="text-gray-500 dark:text-[#b8b8c0]">No harmful content available. Check back later for updates.</p>
                                 </CardContent>
                             </Card>
                         </div>
@@ -189,26 +196,18 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
             {/* View Modal */}
             <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-                <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>Content Preview</DialogTitle>
-                        <DialogDescription>
-                            View detailed information about this harmful ingredient or practice. The content below provides comprehensive details and
-                            research-backed information.
-                        </DialogDescription>
-                    </DialogHeader>
-
+                <DialogContent className="font-milk max-h-[90vh] max-w-4xl overflow-y-auto border-gray-200 bg-white uppercase dark:border-[#2d2d35] dark:bg-[#282828]">
                     {viewingContent && (
-                        <div className="font-milk space-y-6">
+                        <div className="font-milk space-y-6 text-gray-900 dark:text-gray-100">
                             {/* Blog Card Display */}
                             <div
-                                className="overflow-hidden rounded-lg bg-white shadow-lg dark:bg-gray-800"
+                                className="preview-card overflow-hidden rounded-lg bg-white shadow-lg dark:bg-[#282828]"
                                 style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
                                 {/* Card Content */}
                                 <div className="flex">
                                     {/* Left - Image */}
-                                    <div className="flex h-64 w-1/3 items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                    <div className="flex h-64 w-1/3 items-center justify-center bg-gray-200 dark:bg-[#2d2d35]">
                                         {(() => {
                                             const firstImageSrc = extractFirstImageFromContent(viewingContent);
                                             if (firstImageSrc) {
@@ -228,41 +227,27 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                     <div className="w-2/3 min-w-0 p-6">
                                         <div className="mb-3">
                                             {viewingContent.category && (
-                                                <Badge variant="outline" className="mb-2 text-xs">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="mb-2 border-gray-300 text-xs text-gray-700 dark:border-[#b1db9e] dark:text-[#b1db9e]"
+                                                >
                                                     {viewingContent.category.replace(/-/g, ' ')}
                                                 </Badge>
                                             )}
-                                            <Badge variant={viewingContent.is_active ? 'default' : 'secondary'} className="ml-2 text-xs">
-                                                {viewingContent.is_active ? 'Active' : 'Inactive'}
-                                            </Badge>
                                         </div>
 
-                                        <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{viewingContent.title}</h2>
+                                        <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-100">{viewingContent.title}</h2>
 
-                                        <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                                        <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                                             {viewingContent.content_html ? (
                                                 <div
-                                                    className="overflow-wrap-anywhere break-words break-all whitespace-normal"
-                                                    style={{
-                                                        wordBreak: 'break-word',
-                                                        overflowWrap: 'break-word',
-                                                        whiteSpace: 'normal',
-                                                        maxWidth: '100%',
-                                                    }}
+                                                    className="prose prose-sm dark:prose-invert prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
                                                     dangerouslySetInnerHTML={{
                                                         __html: viewingContent.content_html.replace(/<img[^>]*>/gi, ''),
                                                     }}
                                                 />
                                             ) : (
-                                                <div
-                                                    className="prose dark:prose-invert overflow-wrap-anywhere max-w-none break-words break-all whitespace-normal"
-                                                    style={{
-                                                        wordBreak: 'break-word',
-                                                        overflowWrap: 'break-word',
-                                                        whiteSpace: 'normal',
-                                                        maxWidth: '100%',
-                                                    }}
-                                                >
+                                                <div className="prose prose-sm dark:prose-invert prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words">
                                                     <ContentRenderer content={removeImagesFromContent(viewingContent.content_json)} />
                                                 </div>
                                             )}
@@ -271,19 +256,19 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                 </div>
 
                                 {/* Bottom Section - Metadata */}
-                                <div className="flex items-center justify-between border-t bg-gray-50 px-6 py-4 dark:border-gray-600 dark:bg-gray-700">
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        <div className="font-semibold">
+                                <div className="flex items-center justify-between border-t bg-gray-50 px-6 py-4 dark:border-[#2d2d35] dark:bg-[#282828]">
+                                    <div className="text-sm text-gray-600 dark:text-[#b1db9e]">
+                                        <div className="font-semibold text-gray-700 dark:text-[#b1db9e]">
                                             {new Date(viewingContent.created_at).getDate().toString().padStart(2, '0')}
                                         </div>
-                                        <div className="text-xs uppercase">
+                                        <div className="text-xs text-gray-500 uppercase dark:text-[#b1db9e]">
                                             {new Date(viewingContent.created_at).toLocaleDateString('en-US', { month: 'long' })}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3 text-gray-400">
+                                    <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center gap-1">
-                                            <span className="text-xs">View more</span>
+                                            <span className="text-xs dark:text-[#b1db9e]">View more</span>
                                         </div>
                                     </div>
                                 </div>

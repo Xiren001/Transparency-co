@@ -164,7 +164,7 @@ export default function UsersIndex() {
             case 'content_manager':
                 return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
             default:
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+                return 'bg-gray-100 text-gray-800 dark:bg-[#2d2d35] dark:text-[#e0e0e5]';
         }
     };
 
@@ -176,7 +176,7 @@ export default function UsersIndex() {
         if (permissionName.includes('delete')) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
         if (permissionName.includes('create')) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
         if (permissionName.includes('edit')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-[#2d2d35] dark:text-[#e0e0e5]';
     };
 
     return (
@@ -188,7 +188,7 @@ export default function UsersIndex() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Manage user roles and permissions</p>
+                        <p className="text-sm text-gray-600 dark:text-[#b8b8c0]">Manage user roles and permissions</p>
                     </div>
                 </div>
 
@@ -256,7 +256,7 @@ export default function UsersIndex() {
                                                     </Badge>
                                                 ))}
                                                 {user.permissions.length > 3 && (
-                                                    <Badge className="bg-gray-100 text-xs text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                                                    <Badge className="bg-gray-100 text-xs text-gray-800 dark:bg-[#2d2d35] dark:text-[#e0e0e5]">
                                                         +{user.permissions.length - 3} more
                                                     </Badge>
                                                 )}

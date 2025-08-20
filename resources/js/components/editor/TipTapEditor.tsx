@@ -239,7 +239,12 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                             },
                         ])
                         .run();
-                    toast.success('Image uploaded successfully');
+
+                    if (response.data.reused) {
+                        toast.success('Image reused from existing uploads');
+                    } else {
+                        toast.success('Image uploaded successfully');
+                    }
                 } else {
                     toast.error(response.data.message || 'Failed to upload image');
                 }

@@ -429,8 +429,8 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                 </div>
 
                 {contents.length === 0 && (
-                    <div className="rounded-lg border bg-white p-12 text-center dark:bg-gray-800">
-                        <p className="text-gray-500 dark:text-gray-400">No harmful content found. Create your first content item.</p>
+                    <div className="rounded-lg border bg-white p-12 text-center dark:bg-[#1a1a1f]">
+                        <p className="text-gray-500 dark:text-[#b8b8c0]">No harmful content found. Create your first content item.</p>
                     </div>
                 )}
 
@@ -471,7 +471,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                     <div className="grid grid-cols-2 gap-6">
                                         {/* Title Input */}
                                         <div>
-                                            <Label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <Label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700 dark:text-[#b8b8c0]">
                                                 Title
                                             </Label>
                                             <Input
@@ -486,11 +486,11 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                         {/* Category and Image Controls */}
 
                                         <div>
-                                            <Label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Category</Label>
+                                            <Label className="mb-2 block text-sm font-medium text-gray-700 dark:text-[#b8b8c0]">Category</Label>
                                             <select
                                                 value={formData.category}
                                                 onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                                                className="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                                className="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-[#2d2d35] dark:bg-[#2d2d35] dark:text-white"
                                             >
                                                 <option value="">Select a category</option>
                                                 {categories.map((category) => (
@@ -504,19 +504,19 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
 
                                     {/* Content Editor */}
                                     <div>
-                                        <Label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Content</Label>
+                                        <Label className="mb-2 block text-sm font-medium text-gray-700 dark:text-[#b8b8c0]">Content</Label>
                                         <TipTapEditor content={formData.content_json} onChange={handleContentChange} onSave={handleEditorSave} />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Right Side - Live Preview */}
-                            <div className="w-1/2 overflow-y-auto bg-gray-50 p-8 dark:bg-gray-900">
+                            <div className="w-1/2 overflow-y-auto bg-gray-50 p-8 dark:bg-[#23232a]">
                                 <div className="space-y-6">
-                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Card Preview</h3>
+                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-[#b8b8c0]">Card Preview</h3>
 
                                     {/* Blog Card Preview */}
-                                    <div className="overflow-hidden rounded-lg bg-white shadow-lg">
+                                    <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg">
                                         {/* Card Content */}
                                         <div className="flex">
                                             {/* Left - Image */}
@@ -581,7 +581,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                 <div className="h-25 overflow-hidden text-sm leading-relaxed text-gray-600">
                                                     {formData.content_html ? (
                                                         <div
-                                                            className="break-words whitespace-pre-wrap"
+                                                            className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
                                                             style={{
                                                                 display: '-webkit-box',
                                                                 WebkitLineClamp: 4,
@@ -625,11 +625,11 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                 </div>
 
                                 {/* Full Content Preview */}
-                                <div className="border-t border-gray-200 pt-8 dark:border-gray-700">
-                                    <h3 className="mb-6 text-lg font-semibold text-gray-700 dark:text-gray-300">Full Content Preview</h3>
+                                <div className="border-t border-gray-200 pt-8 dark:border-[#2d2d35]">
+                                    <h3 className="mb-6 text-lg font-semibold text-gray-700 dark:text-[#b8b8c0]">Full Content Preview</h3>
 
                                     {/* Full Blog Card Preview */}
-                                    <div className="overflow-hidden rounded-lg bg-white shadow-lg">
+                                    <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg">
                                         {/* Card Content */}
                                         <div className="flex">
                                             {/* Left - Image */}
@@ -692,7 +692,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                 <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-600">
                                                     {formData.content_html ? (
                                                         <div
-                                                            className="break-words whitespace-pre-wrap"
+                                                            className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
                                                             dangerouslySetInnerHTML={{
                                                                 __html: formData.content_html.replace(/<img[^>]*>/gi, ''),
                                                             }}
@@ -731,7 +731,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="flex justify-end gap-2 border-t bg-gray-50 px-6 py-4 dark:bg-gray-900">
+                        <div className="flex justify-end gap-2 border-t bg-gray-50 px-6 py-4 dark:bg-[#23232a]">
                             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                                 Cancel
                             </Button>
@@ -752,7 +752,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                         {viewingContent && (
                             <div className="space-y-6">
                                 {/* Blog Card Display */}
-                                <div className="overflow-hidden rounded-lg bg-white shadow-lg">
+                                <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg">
                                     {/* Card Content */}
                                     <div className="flex">
                                         {/* Left - Image */}
@@ -818,7 +818,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                             <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-600">
                                                 {viewingContent.content_html ? (
                                                     <div
-                                                        className="break-words whitespace-pre-wrap"
+                                                        className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
                                                         style={{
                                                             display: '-webkit-box',
                                                             WebkitLineClamp: 4,
@@ -872,13 +872,13 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                     <div className="rounded-lg border bg-white p-4">
                                         {viewingContent.content_html ? (
                                             <div
-                                                className="prose dark:prose-invert max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words whitespace-pre-wrap"
+                                                className="prose prose-sm dark:prose-invert prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words"
                                                 dangerouslySetInnerHTML={{
                                                     __html: viewingContent.content_html.replace(/<img[^>]*>/gi, ''),
                                                 }}
                                             />
                                         ) : (
-                                            <div className="prose dark:prose-invert max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words whitespace-pre-wrap">
+                                            <div className="prose prose-sm dark:prose-invert prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words">
                                                 <ContentRenderer content={removeImagesFromContent(viewingContent.content_json)} />
                                             </div>
                                         )}

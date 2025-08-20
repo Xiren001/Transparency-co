@@ -1,7 +1,6 @@
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-import { Bell, Calendar, Home, Mail, MessageSquare, Settings, User } from 'lucide-react';
 import * as React from 'react';
 
 import MainLayout from '@/layouts/MainLayout';
@@ -19,21 +18,8 @@ const navigation = [
     { name: 'Learn', href: '/certifications' },
 ];
 
-const navIconMap: Record<string, any> = {
-    Home: Home,
-    'My Profile': User,
-    'My Vacancy': Calendar,
-    Message: MessageSquare,
-    Subscription: Mail,
-    Notification: Bell,
-    Setting: Settings,
-};
-
 export default function Welcome() {
     const { auth, products } = usePage<SharedData>().props;
-    const [isOpen, setIsOpen] = React.useState(false);
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-    const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
@@ -47,22 +33,6 @@ export default function Welcome() {
         return () => window.removeEventListener('load', handleLoad);
     }, []);
 
-    React.useEffect(() => {
-        const down = (e: KeyboardEvent) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                setIsSearchOpen((open) => !open);
-            }
-        };
-        document.addEventListener('keydown', down);
-        return () => document.removeEventListener('keydown', down);
-    }, []);
-
-    const handleNavigation = (href: string) => {
-        // You can replace this with your routing solution (React Router, etc.)
-        window.location.href = href;
-    };
-
     const { csrf_token } = usePage().props;
     // added part
 
@@ -70,7 +40,7 @@ export default function Welcome() {
         <MainLayout>
             {/* Global Loading Spinner Overlay and Head can be removed from here, now in MainLayout */}
             <div className="flex w-full items-start justify-center opacity-100 transition-opacity duration-750 starting:opacity-0">
-                <main className="flex w-full max-w-[1000px] flex-col gap-4 lg:max-w-[2000px] lg:flex-col">
+                <main className="flex w-full max-w-[1000px] flex-col gap-4 pt-16 md:pt-16 lg:max-w-[2000px] lg:flex-col lg:pt-22">
                     <HeroSection />
                     {/* <FeaturedSection /> */}
                     <CategoriesSection />

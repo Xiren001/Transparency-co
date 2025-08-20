@@ -1385,7 +1385,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
     return (
         <MainLayout>
             {/* Hero Section - aligned with body/hero-section.tsx */}
-            <section className="relative min-h-[200px] w-full rounded-lg border border-gray-200 bg-white shadow-sm sm:min-h-[250px] md:min-h-[300px] dark:border-[#2d2d35] dark:bg-[#1a1a1f]">
+            <section className="relative min-h-[200px] w-full rounded-lg border border-gray-200 bg-white shadow-sm sm:min-h-[250px] md:min-h-[300px] dark:border-[#2d2d35] dark:bg-[#282828]">
                 <div className="relative z-10 container mx-auto items-center justify-center px-4 py-6 text-center sm:py-8 md:py-10 lg:py-12">
                     <h1 className="font-milk mb-4 text-lg font-light tracking-wide text-gray-900 sm:mb-6 sm:text-xl md:mb-8 md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl dark:text-[#e0e0e5]">
                         Learn About Certifications That Matter
@@ -1402,7 +1402,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                             className={`rounded-lg px-3 py-2 text-xs font-medium uppercase transition-colors sm:px-4 sm:text-sm ${
                                 activeTab === 'certifications'
                                     ? 'bg-primary dark:bg-primary text-white shadow-sm dark:text-black'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#282828] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]'
                             }`}
                             onClick={() => setActiveTab('certifications')}
                             disabled={activeTab === 'certifications'}
@@ -1413,7 +1413,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                             className={`rounded-lg px-3 py-2 text-xs font-medium uppercase transition-colors sm:px-4 sm:text-sm ${
                                 activeTab === 'avoid'
                                     ? 'bg-primary dark:bg-primary text-white shadow-sm dark:text-black'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#23232a] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#282828] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]'
                             }`}
                             onClick={() => setActiveTab('avoid')}
                             disabled={activeTab === 'avoid'}
@@ -1433,12 +1433,14 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                 const certs = groupedCertifications[category.id] as typeof certifications | undefined;
                                 if (!certs || certs.length === 0) return null;
                                 return (
-                                    <div key={category.id} className="overflow-hidden rounded-lg bg-white py-3 sm:py-4 dark:bg-[#1a1a1f]">
+                                    <div key={category.id} className="mb-12 overflow-hidden rounded-lg bg-white py-3 sm:py-4 dark:bg-transparent">
                                         {/* Category Header - aligned with body/featured-section.tsx */}
                                         <div className="container mx-auto mb-4 flex items-center justify-between px-4 sm:mb-6 sm:px-6 md:px-0">
                                             <div className="flex items-center gap-2 sm:gap-3">
-                                                {category.icon && <category.icon className="text-primary h-5 w-5 sm:h-6 sm:w-6" />}
-                                                <h2 className="text-lg font-light text-gray-900 sm:text-xl md:text-2xl dark:text-[#e0e0e5]">
+                                                {category.icon && (
+                                                    <category.icon className="text-primary h-5 w-5 sm:h-6 sm:w-6 dark:text-[#b1db9e]" />
+                                                )}
+                                                <h2 className="text-lg font-light text-gray-900 sm:text-xl md:text-2xl dark:text-[#b1db9e]">
                                                     {category.name}
                                                 </h2>
                                             </div>
@@ -1485,7 +1487,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                             </button>
 
                                             {/* Carousel Container */}
-                                            <div className="flex items-center justify-center px-8 py-2 sm:px-16">
+                                            <div className="flex items-center justify-center px-8 py-2 sm:px-8">
                                                 <div className="flex items-center gap-2 transition-all duration-500 ease-in-out sm:gap-4">
                                                     {/* Previous Card */}
                                                     {(() => {
@@ -1494,7 +1496,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                         const prevCert = certs[prevIndex];
                                                         return (
                                                             <div
-                                                                className="group relative flex h-[280px] w-[280px] flex-shrink-0 scale-90 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white px-4 py-8 opacity-60 shadow-sm transition-all duration-500 ease-in-out hover:shadow-md sm:h-[320px] sm:w-[320px] sm:p-6 md:w-[420px] dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
+                                                                className="group relative flex h-[280px] w-[280px] flex-shrink-0 scale-90 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white px-4 py-8 opacity-60 shadow-sm transition-all duration-500 ease-in-out hover:shadow-md sm:h-[320px] sm:w-[320px] sm:p-6 md:w-[420px] dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50"
                                                                 onClick={() => openModal(prevCert)}
                                                             >
                                                                 {/* Info Icon */}
@@ -1511,7 +1513,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                                 {/* Header with Logo and Basic Info */}
                                                                 <div className="mb-3 flex items-start gap-3 sm:mb-4 sm:gap-4">
                                                                     <div
-                                                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-contain bg-center bg-no-repeat sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#2d2d35]"
+                                                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-contain bg-center bg-no-repeat sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#282828]"
                                                                         style={{ backgroundImage: `url(${prevCert.logo || '/placeholder.svg'})` }}
                                                                     />
                                                                     <div className="min-w-0 flex-1">
@@ -1522,7 +1524,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                                             Issued by: {prevCert.issuingOrg || 'Unknown Organization'}
                                                                         </p>
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900 dark:text-blue-200">
+                                                                            <span className="rounded-full border border-[#b1db9e] px-2 py-1 text-xs font-semibold text-[#b1db9e] dark:border-[#b1db9e] dark:text-[#b1db9e]">
                                                                                 {category.name}
                                                                             </span>
                                                                         </div>
@@ -1565,7 +1567,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                         const currentCert = certs[currentIndex];
                                                         return (
                                                             <div
-                                                                className="group relative flex h-[280px] w-[280px] flex-shrink-0 scale-110 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white px-4 py-8 shadow-lg transition-all duration-500 ease-in-out hover:-translate-y-1 hover:shadow-xl sm:h-[320px] sm:w-[320px] sm:p-6 md:w-[420px] dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:border-[#3d3d45] dark:hover:shadow-[#2d2d35]/50"
+                                                                className="group relative flex h-[280px] w-[280px] flex-shrink-0 scale-110 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white px-4 py-8 shadow-lg transition-all duration-500 ease-in-out hover:-translate-y-1 hover:shadow-xl sm:h-[320px] sm:w-[320px] sm:p-6 md:w-[420px] dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:border-[#3d3d45] dark:hover:shadow-[#2d2d35]/50"
                                                                 onClick={() => openModal(currentCert)}
                                                             >
                                                                 {/* Info Icon */}
@@ -1582,19 +1584,19 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                                 {/* Header with Logo and Basic Info */}
                                                                 <div className="mb-3 flex items-start gap-3 sm:mb-4 sm:gap-4">
                                                                     <div
-                                                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-contain bg-center bg-no-repeat sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#2d2d35]"
+                                                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-contain bg-center bg-no-repeat sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#282828]"
                                                                         style={{ backgroundImage: `url(${currentCert.logo || '/placeholder.svg'})` }}
                                                                     />
 
                                                                     <div className="min-w-0 flex-1">
-                                                                        <h3 className="group-hover:text-primary dark:group-hover:text-primary/80 mb-1 truncate text-sm font-bold text-gray-900 transition-colors sm:text-lg dark:text-[#e0e0e5]">
+                                                                        <h3 className="group-hover:text-primary dark:group-hover:text-primary/80 mb-1 truncate text-sm font-bold text-gray-900 transition-colors sm:text-lg dark:text-[#ffffff]">
                                                                             {currentCert.name}
                                                                         </h3>
-                                                                        <p className="mb-2 truncate text-xs text-gray-600 sm:text-sm dark:text-gray-400">
+                                                                        <p className="mb-2 truncate text-xs text-gray-600 sm:text-sm dark:text-gray-200">
                                                                             Issued by: {currentCert.issuingOrg || 'Unknown Organization'}
                                                                         </p>
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700 transition-colors group-hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:group-hover:bg-blue-800">
+                                                                            <span className="rounded-full border border-[#b1db9e] px-2 py-1 text-xs font-semibold text-[#b1db9e] transition-colors group-hover:border-[#b1db9e]/80 dark:border-[#b1db9e] dark:text-[#b1db9e] dark:group-hover:border-[#b1db9e]/80">
                                                                                 {category.name}
                                                                             </span>
                                                                         </div>
@@ -1603,21 +1605,21 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
 
                                                                 {/* Brief Description */}
                                                                 <div className="mb-3 flex-1 sm:mb-4">
-                                                                    <p className="line-clamp-3 text-xs text-gray-600 sm:text-sm dark:text-gray-400">
+                                                                    <p className="line-clamp-3 text-xs text-gray-600 sm:text-sm dark:text-gray-200">
                                                                         {currentCert.description}
                                                                     </p>
                                                                 </div>
 
                                                                 {/* Key Standards Preview */}
                                                                 <div className="mb-3 sm:mb-4">
-                                                                    <h4 className="mb-1 text-xs font-semibold text-gray-900 sm:mb-2 sm:text-sm dark:text-[#e0e0e5]">
+                                                                    <h4 className="mb-1 text-xs font-semibold text-gray-900 sm:mb-2 sm:text-sm dark:text-[#ffffff]">
                                                                         Key Standards
                                                                     </h4>
                                                                     <ul className="space-y-0.5 sm:space-y-1">
                                                                         {currentCert.standards?.slice(0, 2).map((standard, index) => (
                                                                             <li
                                                                                 key={index}
-                                                                                className="flex items-start gap-1 text-xs text-gray-600 sm:gap-2 dark:text-gray-400"
+                                                                                className="flex items-start gap-1 text-xs text-gray-600 sm:gap-2 dark:text-gray-200"
                                                                             >
                                                                                 <span className="mt-0.5 text-green-500">•</span>
                                                                                 <span className="line-clamp-1">
@@ -1638,7 +1640,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                         const nextCert = certs[nextIndex];
                                                         return (
                                                             <div
-                                                                className="group relative flex h-[280px] w-[280px] flex-shrink-0 scale-90 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white px-4 py-8 opacity-60 shadow-sm transition-all duration-500 ease-in-out hover:shadow-md sm:h-[320px] sm:w-[320px] sm:p-6 md:w-[420px] dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:shadow-[#2d2d35]/50"
+                                                                className="group relative flex h-[280px] w-[280px] flex-shrink-0 scale-90 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white px-4 py-8 opacity-60 shadow-sm transition-all duration-500 ease-in-out hover:shadow-md sm:h-[320px] sm:w-[320px] sm:p-6 md:w-[420px] dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50"
                                                                 onClick={() => openModal(nextCert)}
                                                             >
                                                                 {/* Info Icon */}
@@ -1655,7 +1657,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                                 {/* Header with Logo and Basic Info */}
                                                                 <div className="mb-3 flex items-start gap-3 sm:mb-4 sm:gap-4">
                                                                     <div
-                                                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-contain bg-center bg-no-repeat sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#2d2d35]"
+                                                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-contain bg-center bg-no-repeat sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#282828]"
                                                                         style={{ backgroundImage: `url(${nextCert.logo || '/placeholder.svg'})` }}
                                                                     />
 
@@ -1667,7 +1669,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                                                             Issued by: {nextCert.issuingOrg || 'Unknown Organization'}
                                                                         </p>
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900 dark:text-blue-200">
+                                                                            <span className="rounded-full border border-[#b1db9e] px-2 py-1 text-xs font-semibold text-[#b1db9e] dark:border-[#b1db9e] dark:text-[#b1db9e]">
                                                                                 {category.name}
                                                                             </span>
                                                                         </div>
@@ -1747,7 +1749,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
             {isModalOpen && selectedCert && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4" onClick={closeModal}>
                     <div
-                        className="font-milk max-h-[95vh] w-full overflow-y-auto rounded-lg bg-white px-3 py-6 tracking-tighter uppercase sm:w-[95vw] sm:max-w-5xl sm:px-4 md:px-8 md:py-10 dark:bg-[#1a1a1f] dark:text-[#e0e0e5]"
+                        className="font-milk max-h-[95vh] w-full overflow-y-auto rounded-lg bg-white px-3 py-6 tracking-tighter uppercase sm:w-[95vw] sm:max-w-5xl sm:px-4 md:px-8 md:py-10 dark:bg-[#282828] dark:text-[#e0e0e5]"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
@@ -1764,7 +1766,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                     <h2 className="mb-1 text-lg font-light text-gray-900 sm:mb-2 sm:text-xl md:text-2xl dark:text-[#e0e0e5]">
                                         {selectedCert.fullName || selectedCert.name}
                                     </h2>
-                                    <p className="mb-1 text-xs text-gray-600 sm:mb-2 sm:text-sm dark:text-gray-400">
+                                    <p className="mb-1 text-xs text-gray-600 sm:mb-2 sm:text-sm dark:text-[#b1db9e]">
                                         Issued by: {selectedCert.issuingOrg || 'Unknown Organization'}
                                     </p>
                                     <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -1774,7 +1776,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                         >
                                             {categories.find((c) => c.id === selectedCert.category)?.name}
                                         </Badge>
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        <span className="text-xs text-gray-500 dark:text-[#b1db9e]">
                                             Verified {selectedCert.verifiedDate || 'Recently'}
                                         </span>
                                     </div>
@@ -1801,7 +1803,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                         {selectedCert.standards?.map((standard, index) => (
                                             <li
                                                 key={index}
-                                                className="flex items-start gap-2 text-xs text-gray-600 sm:gap-3 sm:text-sm dark:text-gray-400"
+                                                className="flex items-start gap-2 text-xs text-gray-600 sm:gap-3 sm:text-sm dark:text-gray-200"
                                             >
                                                 <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-green-500 sm:h-1.5 sm:w-1.5"></span>
                                                 <span>{standard.replace(/^[^\s]*\s/, '')}</span>
@@ -1817,7 +1819,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                 {/* Why It Matters */}
                                 <div className="space-y-2 sm:space-y-3">
                                     <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">Why It Matters</h3>
-                                    <p className="text-xs leading-relaxed text-gray-600 sm:text-sm dark:text-gray-400">
+                                    <p className="text-xs leading-relaxed text-gray-600 sm:text-sm dark:text-gray-200">
                                         {selectedCert.whyItMatters || 'Impact information not available'}
                                     </p>
                                 </div>
@@ -1827,11 +1829,11 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                     <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">Brands That Use It</h3>
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                         {selectedCert.brands?.map((brand, index) => (
-                                            <Badge key={index} variant="outline" className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]">
+                                            <Badge key={index} variant="outline" className="text-xs dark:border-[#2d2d35] dark:text-[#ffffff]">
                                                 {brand}
                                             </Badge>
                                         )) || (
-                                            <Badge variant="outline" className="text-xs dark:border-[#2d2d35] dark:text-[#b8b8c0]">
+                                            <Badge variant="outline" className="text-xs dark:border-[#2d2d35] dark:text-[#ffffff]">
                                                 Brand information not available
                                             </Badge>
                                         )}
@@ -1841,7 +1843,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
                                 {/* What It Means */}
                                 <div className="space-y-2 sm:space-y-3">
                                     <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">What It Means</h3>
-                                    <p className="text-xs leading-relaxed text-gray-600 sm:text-sm dark:text-gray-400">{selectedCert.description}</p>
+                                    <p className="text-xs leading-relaxed text-gray-600 sm:text-sm dark:text-gray-200">{selectedCert.description}</p>
                                 </div>
 
                                 {/* Learn More Button */}
@@ -1872,7 +1874,7 @@ export default function CertificationLearningPage({ harmfulContents = [] }: Cert
             )}
             <button
                 onClick={scrollToTop}
-                className="fixed right-4 bottom-4 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 hover:bg-gray-100 sm:right-8 sm:bottom-8 sm:h-10 sm:w-10 dark:border dark:border-[#2d2d35] dark:bg-[#23232a] dark:hover:bg-[#2d2d35]"
+                className="fixed right-4 bottom-4 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 hover:bg-gray-100 sm:right-8 sm:bottom-8 sm:h-10 sm:w-10 dark:border dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:bg-[#2d2d35]"
                 aria-label="Back to top"
             >
                 <svg
