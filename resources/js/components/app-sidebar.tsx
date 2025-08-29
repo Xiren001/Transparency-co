@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { AlertTriangle, BookOpen, Folder, Home, LayoutGrid, Mail, Package, Users } from 'lucide-react';
+import { AlertTriangle, BookOpen, Folder, Home, LayoutGrid, Mail, Package, Users, Video } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -64,6 +64,11 @@ export function AppSidebar() {
                 title: 'Companies',
                 href: '/companies',
                 icon: Folder,
+            },
+            {
+                title: 'Videos',
+                href: '/admin/videos',
+                icon: Video,
             },
         );
 

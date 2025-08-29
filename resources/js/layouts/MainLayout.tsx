@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import Fuse from 'fuse.js';
 import { Bell, Calendar, Home, LogOut, Mail, Menu, MessageSquare, Search, Settings, User } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { route } from 'ziggy-js';
@@ -127,18 +128,18 @@ function SuggestionDropdown({
         <div
             ref={dropdownRef}
             id="navbar-search-suggestions"
-            className="absolute top-full right-0 left-0 z-20 mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg lg:max-h-60 xl:max-h-80 dark:border-[#23232a] dark:bg-[#18181c]"
+            className="absolute top-full right-0 left-0 z-20 mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg lg:max-h-60 xl:max-h-80 dark:border-[#282828] dark:bg-[#121212]"
             role="listbox"
             aria-label="Search suggestions"
         >
             {loading && (
                 <div className="flex items-center justify-center py-3 lg:py-4">
                     <div className="border-muted-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent lg:h-5 lg:w-5"></div>
-                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Loading...</span>
+                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-200">Loading...</span>
                 </div>
             )}
             {!loading && !error && suggestions.length === 0 && searchQuery.trim() && (
-                <div className="py-3 text-center text-xs text-gray-500 lg:py-4 lg:text-sm dark:text-gray-400">No results found</div>
+                <div className="py-3 text-center text-xs text-gray-500 lg:py-4 lg:text-sm dark:text-gray-200">No results found</div>
             )}
             {error && <div className="py-3 text-center text-xs text-red-500 lg:py-4 lg:text-sm dark:text-red-400">{error}</div>}
             {suggestions.length > 0 && (
@@ -147,7 +148,7 @@ function SuggestionDropdown({
                         <button
                             key={`${item.type}-${item.id}`}
                             id={`navbar-suggestion-${idx}`}
-                            className={`font-milk block w-full px-2 py-2 text-left text-xs uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 lg:px-3 lg:py-2.5 lg:text-sm dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32] ${highlightedIndex === idx ? 'bg-gray-100 dark:bg-[#23232a]' : ''} ${suggestionLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                            className={`font-milk block w-full px-2 py-2 text-left text-xs uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 lg:px-3 lg:py-2.5 lg:text-sm dark:text-white dark:hover:bg-[#282828] dark:active:bg-[#282828] ${highlightedIndex === idx ? 'bg-gray-100 dark:bg-[#23232a]' : ''} ${suggestionLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
                             onMouseEnter={() => setHighlightedIndex(idx)}
                             onMouseLeave={() => setHighlightedIndex(null)}
                             onMouseDown={(e) => {
@@ -236,6 +237,60 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         }
     }, []);
 
+    // Fuzzy search function using Fuse.js
+    function applyFuzzySearch(data: any, query: string) {
+        if (!query.trim()) return data;
+
+        const fuseOptions = {
+            // Threshold: 0.0 = perfect match, 1.0 = very loose match
+            threshold: 0.3,
+            // Include score in results
+            includeScore: true,
+            // Keys to search in
+            keys: ['name', 'description', 'category', 'sub_category', 'item'],
+            // Ignore location
+            ignoreLocation: true,
+            // Use extended search (supports regex-like patterns)
+            useExtendedSearch: true,
+            // Minimum character length for matching
+            minMatchCharLength: 2,
+        };
+
+        // Create Fuse instances for each data type
+        const productFuse = new Fuse(data.products || [], fuseOptions);
+        const companyFuse = new Fuse(data.companies || [], fuseOptions);
+
+        // Search products with fuzzy matching
+        const fuzzyProducts = productFuse
+            .search(query)
+            .slice(0, 5) // Limit to top 5 results
+            .map((result) => result.item);
+
+        // Search companies with fuzzy matching
+        const fuzzyCompanies = companyFuse
+            .search(query)
+            .slice(0, 5) // Limit to top 5 results
+            .map((result) => result.item);
+
+        // For categories, use simple fuzzy matching
+        const fuzzyCategories = (data.categories || [])
+            .filter(
+                (cat: string) =>
+                    cat.toLowerCase().includes(query.toLowerCase()) ||
+                    query
+                        .toLowerCase()
+                        .split('')
+                        .every((char) => cat.toLowerCase().includes(char)),
+            )
+            .slice(0, 5);
+
+        return {
+            products: fuzzyProducts,
+            companies: fuzzyCompanies,
+            categories: fuzzyCategories,
+        };
+    }
+
     // Fetch suggestions as user types
     useEffect(() => {
         if (!searchQuery.trim()) {
@@ -253,7 +308,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     if (!res.ok) throw new Error('Failed to fetch suggestions');
                     return res.json();
                 })
-                .then((data) => setSuggestions(data))
+                .then((data) => {
+                    // Apply fuzzy search to the results for better matching
+                    const fuzzyResults = applyFuzzySearch(data, searchQuery);
+                    setSuggestions(fuzzyResults);
+                })
                 .catch(() => {
                     setSuggestions({ products: [], companies: [], categories: [] });
                     setSuggestionsError('Could not load suggestions. Please try again.');
@@ -395,12 +454,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
-            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 py-6 tracking-tighter text-[#1b1b18] uppercase sm:px-8 lg:justify-center lg:py-2 dark:bg-[#121212]">
-                <header className="fixed top-0 z-50 w-full max-w-[1000px] border bg-white px-2 py-4 text-sm not-has-[nav]:hidden lg:max-w-[2000px] lg:px-6 dark:bg-[#121212]">
+            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 py-6 tracking-tighter text-[#1b1b18] uppercase transition-all duration-500 ease-in-out sm:px-8 lg:justify-center lg:py-2 dark:bg-[#121212]">
+                <header className="fixed top-0 z-50 w-full max-w-[1000px] border-b bg-white px-2 py-4 text-sm transition-all duration-500 ease-in-out not-has-[nav]:hidden lg:max-w-[2000px] lg:px-6 dark:bg-[#121212]">
                     <nav className="flex items-center justify-center gap-4">
                         <div className="flex flex-1 items-center justify-between">
                             {/* Logo */}
-                            <a href="/" className="flex cursor-pointer items-center space-x-2">
+                            <a href="/" className="flex cursor-pointer items-center space-x-2 px-2">
                                 <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
                                     <span className="text-primary-foreground text-lg font-bold">T</span>
                                 </div>
@@ -413,7 +472,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     <a
                                         key={item.name}
                                         href={item.href}
-                                        className="font-milk text-foreground hover:bg-muted/90 m-0 rounded-lg py-2 text-base uppercase transition lg:px-4 dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                        className="font-milk text-foreground hover:bg-muted/90 m-0 rounded-lg py-2 text-base uppercase transition-all duration-300 ease-in-out lg:px-4 dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {item.name}
@@ -467,7 +526,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     setShowSuggestions(false);
                                                 }
                                             }}
-                                            className="font-milk [&::placeholder]:font-milk h-9 w-full pr-8 pl-8 text-xs uppercase lg:h-12 lg:pr-10 lg:pl-14 lg:text-sm dark:text-white"
+                                            className="font-milk [&::placeholder]:font-milk h-9 w-full !rounded-2xl bg-[#f0f0f0] pr-8 pl-8 text-xs text-[#1b1b18] uppercase transition-all duration-300 ease-in-out lg:h-12 lg:pr-10 lg:pl-14 lg:text-sm dark:bg-[#282828] dark:text-white"
                                             autoComplete="off"
                                             aria-label="Search for products, companies, or categories"
                                             aria-autocomplete="list"
@@ -483,7 +542,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     setSuggestions({ products: [], companies: [], categories: [] });
                                                     setShowSuggestions(false);
                                                     setHighlightedIndex(null);
-                                                    router.get(route('home'));
+                                                    // Just clear local state without navigation - we're already on home page
+                                                    // This prevents any loading or navigation
                                                     setTimeout(() => {
                                                         inputRef.current?.focus();
                                                     }, 0);
@@ -523,7 +583,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                                         {/* Quick Search Suggestions */}
                                         {!searchQuery && !showSuggestions && isSearchFocused && (
-                                            <div className="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-[#23232a] dark:bg-[#18181c]">
+                                            <div className="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg transition-all duration-300 ease-in-out dark:border-[#282828] dark:bg-[#121212]">
                                                 <div className="mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                                                     Quick Search
                                                 </div>
@@ -540,11 +600,31 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     ].map((term) => (
                                                         <button
                                                             key={term}
-                                                            onClick={() => {
-                                                                setSearchQuery(term);
-                                                                handleSearch(term, false);
+                                                            onMouseDown={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
                                                             }}
-                                                            className="font-milk cursor-pointer rounded-full border border-gray-200 px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-gray-50 hover:text-gray-800 active:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:active:bg-gray-700"
+                                                            onClick={() => {
+                                                                // Use Inertia router for smooth navigation with same scroll behavior as search suggestions
+                                                                router.get(
+                                                                    route('home'),
+                                                                    { search: term },
+                                                                    {
+                                                                        onFinish: () => {
+                                                                            setIsSearching(false);
+                                                                            setTimeout(() => {
+                                                                                const catalog = document.getElementById('product-catalog-section');
+                                                                                if (catalog) {
+                                                                                    setTimeout(() => {
+                                                                                        customSmoothScrollTo(catalog, 700); // 700ms duration - same as search suggestions
+                                                                                    }, 500); // 1 second pause before scrolling - same as search suggestions
+                                                                                }
+                                                                            }, 100);
+                                                                        },
+                                                                    },
+                                                                );
+                                                            }}
+                                                            className="font-milk cursor-pointer rounded-full border border-gray-200 px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-[#121212] hover:text-gray-800 active:bg-gray-100 dark:border-[#282828] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:active:bg-gray-700"
                                                         >
                                                             {term}
                                                         </button>
@@ -559,7 +639,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     <a
                                         key={item.name}
                                         href={item.href}
-                                        className="font-milk text-foreground hover:bg-muted/40 m-0 rounded-lg px-4 py-2 text-base uppercase transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                        className="font-milk text-foreground hover:bg-muted/40 m-0 rounded-lg px-4 py-2 text-base uppercase transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {item.name}
@@ -587,7 +667,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                             </Avatar>
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56 dark:border-[#2d2d35] dark:bg-[#23232a]" align="end" forceMount>
+                                    <DropdownMenuContent
+                                        className="w-56 transition-all duration-300 ease-in-out dark:border-[#2d2d35] dark:bg-[#23232a]"
+                                        align="end"
+                                        forceMount
+                                    >
                                         {auth.user ? (
                                             <>
                                                 {hasAdminRole ? (
@@ -695,7 +779,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 setShowSuggestions(false);
                                             }
                                         }}
-                                        className="font-milk [&::placeholder]:font-milk h-11 w-full pr-8 pl-10 text-xs uppercase dark:text-white"
+                                        className="font-milk [&::placeholder]:font-milk h-11 w-full !rounded-2xl bg-[#f0f0f0] pr-8 pl-10 text-xs text-[#1b1b18] uppercase transition-all duration-300 ease-in-out dark:bg-[#282828] dark:text-white"
                                         autoComplete="off"
                                         aria-label="Search for products, companies, or categories"
                                         disabled={searchInProgress}
@@ -708,7 +792,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 setSuggestions({ products: [], companies: [], categories: [] });
                                                 setShowSuggestions(false);
                                                 setHighlightedIndex(null);
-                                                router.get(route('home'));
+                                                // Just clear local state without navigation - we're already on home page
+                                                // This prevents any loading or navigation
                                                 setTimeout(() => {
                                                     inputRef.current?.focus();
                                                 }, 0);
@@ -734,15 +819,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         </div>
                                     )}
                                     {showSuggestions && searchQuery.trim().length > 0 && (
-                                        <div className="absolute top-full right-0 left-0 z-20 mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg dark:border-[#23232a] dark:bg-[#18181c]">
+                                        <div className="absolute top-full right-0 left-0 z-20 mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white py-2 shadow-lg transition-all duration-300 ease-in-out dark:border-[#282828] dark:bg-[#121212]">
                                             {suggestionsLoading && (
                                                 <div className="flex items-center justify-center py-3">
                                                     <div className="border-muted-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
-                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Loading...</span>
+                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-200">Loading...</span>
                                                 </div>
                                             )}
                                             {!suggestionsLoading && !suggestionsError && allSuggestions.length === 0 && (
-                                                <div className="py-3 text-center text-xs text-gray-500 dark:text-gray-400">No results found</div>
+                                                <div className="py-3 text-center text-xs text-gray-500 dark:text-gray-200">No results found</div>
                                             )}
                                             {suggestionsError && (
                                                 <div className="py-3 text-center text-xs text-red-500 dark:text-red-400">{suggestionsError}</div>
@@ -752,7 +837,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     {allSuggestions.map((item, idx) => (
                                                         <button
                                                             key={`${item.type}-${item.id}`}
-                                                            className={`font-milk block w-full px-2 py-2 text-left text-xs uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 dark:text-white dark:hover:bg-[#23232a] dark:active:bg-[#2a2a32] ${highlightedIndex === idx ? 'bg-gray-100 dark:bg-[#23232a]' : ''} ${suggestionLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                                                            className={`font-milk block w-full px-2 py-2 text-left text-xs uppercase transition-colors hover:bg-gray-100 active:bg-gray-200 dark:text-white dark:hover:bg-[#282828] dark:active:bg-[#282828] ${highlightedIndex === idx ? 'bg-gray-100 dark:bg-[#23232a]' : ''} ${suggestionLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
                                                             onMouseEnter={() => setHighlightedIndex(idx)}
                                                             onMouseLeave={() => setHighlightedIndex(null)}
                                                             onMouseDown={(e) => {
@@ -778,7 +863,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                                     {/* Mobile Quick Search Suggestions */}
                                     {!searchQuery && !showSuggestions && isSearchFocused && (
-                                        <div className="absolute top-full right-0 left-0 z-20 mt-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-[#23232a] dark:bg-[#18181c]">
+                                        <div className="absolute top-full right-0 left-0 z-20 mt-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg transition-all duration-300 ease-in-out dark:border-[#282828] dark:bg-[#121212]">
                                             <div className="mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                                                 Quick Search
                                             </div>
@@ -795,9 +880,29 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 ].map((term) => (
                                                     <button
                                                         key={term}
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                        }}
                                                         onClick={() => {
-                                                            setSearchQuery(term);
-                                                            handleSearch(term, false);
+                                                            // Use Inertia router for smooth navigation with same scroll behavior as search suggestions
+                                                            router.get(
+                                                                route('home'),
+                                                                { search: term },
+                                                                {
+                                                                    onFinish: () => {
+                                                                        setIsSearching(false);
+                                                                        setTimeout(() => {
+                                                                            const catalog = document.getElementById('product-catalog-section');
+                                                                            if (catalog) {
+                                                                                setTimeout(() => {
+                                                                                    customSmoothScrollTo(catalog, 700); // 700ms duration - same as search suggestions
+                                                                                }, 500); // 1 second pause before scrolling - same as search suggestions
+                                                                            }
+                                                                        }, 100);
+                                                                    },
+                                                                },
+                                                            );
                                                         }}
                                                         className="font-milk cursor-pointer rounded-full border border-gray-200 px-2 py-1 text-xs text-gray-600 uppercase transition-colors hover:bg-gray-50 hover:text-gray-800 active:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:active:bg-gray-700"
                                                     >
@@ -821,7 +926,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 <SheetContent
                                     side="left"
                                     hideDefaultClose={true}
-                                    className="bg-background text-foreground flex h-full w-[270px] max-w-[90vw] flex-col rounded-r-2xl p-0 shadow-xl dark:bg-[#1a1a1f] dark:text-[#e0e0e5]"
+                                    className="bg-background text-foreground flex h-full w-[270px] max-w-[90vw] flex-col rounded-r-2xl p-0 shadow-xl transition-all duration-500 ease-in-out dark:bg-[#1a1a1f] dark:text-[#e0e0e5]"
                                 >
                                     {/* Top Bar: Dark Mode Toggle & Close Button */}
                                     <div className="flex items-center justify-between px-4 pt-4 pb-2 uppercase">
@@ -849,7 +954,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                             <AvatarFallback>{auth.user?.name ? auth.user.name[0].toUpperCase() : 'U'}</AvatarFallback>
                                         </Avatar>
                                         <div className="font-milk text-lg font-semibold">{auth.user?.name || 'Guest'}</div>
-                                        <div className="text-xs text-white/70">{auth.user?.email || ''}</div>
+                                        <div className="text-dark text-xs dark:text-white/70">{auth.user?.email || ''}</div>
                                     </div>
                                     {/* Navigation Links & Actions */}
                                     <div className="flex flex-1 flex-col justify-between uppercase">
@@ -858,7 +963,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 <a
                                                     key={item.name}
                                                     href={item.href}
-                                                    className="font-milk text-foreground hover:bg-muted/40 rounded-lg px-3 py-2 text-base uppercase transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                    className="font-milk text-foreground hover:bg-muted/40 rounded-lg px-3 py-2 text-base uppercase transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                     onClick={() => setIsOpen(false)}
                                                 >
                                                     {item.name}
@@ -871,7 +976,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     {hasAdminRole ? (
                                                         <a
                                                             href={route('dashboard')}
-                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                             onClick={() => setIsOpen(false)}
                                                         >
                                                             Dashboard
@@ -879,7 +984,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     ) : (
                                                         <a
                                                             href={route('profile.edit')}
-                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                             onClick={() => setIsOpen(false)}
                                                         >
                                                             Profile
@@ -889,7 +994,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                         href={route('logout')}
                                                         method="post"
                                                         as="button"
-                                                        className="font-milk bg-muted/40 text-foreground hover:bg-muted/60 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-base uppercase dark:bg-white/10 dark:text-[#e0e0e5] dark:hover:bg-white/20"
+                                                        className="font-milk bg-muted/40 text-foreground hover:bg-muted/60 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-base uppercase transition-all duration-300 ease-in-out dark:bg-white/10 dark:text-[#e0e0e5] dark:hover:bg-white/20"
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         <LogOut className="h-5 w-5" />
@@ -900,14 +1005,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 <>
                                                     <a
                                                         href={route('login')}
-                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         Log in
                                                     </a>
                                                     <a
                                                         href={route('register')}
-                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         Sign up
@@ -922,7 +1027,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     </nav>
                 </header>
                 <div className="flex w-full items-start justify-center opacity-100 transition-opacity duration-750 starting:opacity-0">
-                    <main className="flex w-full max-w-[1000px] flex-col gap-4 lg:max-w-[2000px] lg:flex-col">{children}</main>
+                    <main className="z-0 flex w-full max-w-[1000px] flex-col pt-16 transition-all duration-500 ease-in-out md:pt-16 lg:max-w-[2000px] lg:flex-col lg:pt-22">
+                        {children}
+                    </main>
                 </div>
                 <div className="hidden h-4 lg:block"></div>
             </div>

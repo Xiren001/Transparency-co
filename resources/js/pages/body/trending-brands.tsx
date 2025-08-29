@@ -88,7 +88,7 @@ export default function TrendingBrands() {
     const infiniteBrands = [...brands, ...brands, ...brands];
 
     return (
-        <section className="rounded-lg border-gray-100 bg-white py-12 dark:border-[#2d2d35] dark:bg-transparent">
+        <section className="rounded-lg border-gray-100 bg-white pt-2 pb-12 dark:border-[#2d2d35] dark:bg-transparent">
             <div className="container mx-auto px-4">
                 {/* Section Title */}
                 <h2 className="mb-8 text-center text-sm font-medium tracking-[0.2em] text-gray-600 uppercase dark:text-[#b8b8c0]">Trending Brands</h2>

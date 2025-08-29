@@ -40,9 +40,11 @@ export default function Welcome() {
         <MainLayout>
             {/* Global Loading Spinner Overlay and Head can be removed from here, now in MainLayout */}
             <div className="flex w-full items-start justify-center opacity-100 transition-opacity duration-750 starting:opacity-0">
-                <main className="flex w-full max-w-[1000px] flex-col gap-4 pt-16 md:pt-16 lg:max-w-[2000px] lg:flex-col lg:pt-22">
+                <main className="z-0 flex w-full max-w-[1000px] flex-col lg:max-w-[2000px] lg:flex-col">
                     <HeroSection />
+
                     {/* <FeaturedSection /> */}
+
                     <CategoriesSection />
                     <div className="product-catalog-section" id="product-catalog-section">
                         <ProductCatalog

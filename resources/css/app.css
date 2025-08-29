@@ -464,7 +464,11 @@ html {
 
 /* Enhanced toggle button styles */
 .appearance-toggle {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.appearance-toggle * {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .appearance-toggle:hover {
@@ -478,7 +482,29 @@ html {
 
 /* Smooth theme transition for the entire page */
 * {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.5s ease-in-out, border-color 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
+
+/* Enhanced dark mode transitions */
+.dark-mode-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transitions for specific elements */
+.bg-transition {
+    transition: background-color 0.5s ease-in-out;
+}
+
+.border-transition {
+    transition: border-color 0.5s ease-in-out;
+}
+
+.text-transition {
+    transition: color 0.5s ease-in-out;
+}
+
+.shadow-transition {
+    transition: box-shadow 0.5s ease-in-out;
 }
 
 /* Disable transitions for specific elements that shouldn't animate */
@@ -494,4 +520,16 @@ html {
 
 .duration-400 * {
     transition-duration: 400ms;
+}
+
+            
+@media (max-width: 639px) {
+    .show-below-sm {
+        display: block !important;
+    }
+}
+@media (min-width: 640px) {
+    .show-below-sm {
+        display: none !important;
+    }
 }

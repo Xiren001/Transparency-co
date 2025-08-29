@@ -525,7 +525,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
     };
 
     return (
-        <div className="h-auto rounded-lg bg-white/80 sm:min-h-screen dark:bg-transparent">
+        <div className="h-auto rounded-lg bg-white sm:min-h-screen dark:bg-[#121212]">
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col gap-8 lg:flex-row">
                     <div className="w-full lg:hidden">
@@ -608,8 +608,8 @@ export default function CustomerView({ products: initialProducts, filters: initi
                     <div className="hidden w-64 flex-shrink-0 lg:block">
                         <div className="rounded-lg bg-white p-6 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#282828]">
                             <div className="mb-6 flex items-center gap-2">
-                                <Filter className="h-4 w-4 text-gray-900 dark:text-[#b1db9e]" />
-                                <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#b1db9e]">FILTER</span>
+                                <Filter className="h-4 w-4 text-gray-900 dark:text-[#6298F0]" />
+                                <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#6298F0]">FILTER</span>
                             </div>
 
                             <div className="mb-8">
@@ -629,7 +629,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                             id={`desktop-${cert}`}
                                                             checked={selectedCertificates.includes(cert)}
                                                             onCheckedChange={() => toggleCertificate(cert)}
-                                                            className="dark:border-[#b1db9e]"
+                                                            className="dark:border-[#6298F0]"
                                                         />
                                                         <label
                                                             htmlFor={`desktop-${cert}`}
@@ -653,7 +653,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                             </div>
 
                             <div>
-                                <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#b1db9e]">PRICE</h3>
+                                <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#6298F0]">PRICE</h3>
                                 <div className="space-y-3">
                                     {priceRanges.map((range) => (
                                         <div key={range.value} className="flex items-center space-x-2">
@@ -661,7 +661,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                 id={`desktop-${range.value}`}
                                                 checked={selectedPriceRange === range.value}
                                                 onCheckedChange={() => setSelectedPriceRange(range.value)}
-                                                className="dark:border-[#b1db9e]"
+                                                className="dark:border-[#6298F0]"
                                             />
                                             <label
                                                 htmlFor={`desktop-${range.value}`}
@@ -699,7 +699,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                             <DropdownMenuItem
                                                 key={option}
                                                 onClick={() => setSortBy(option)}
-                                                className={sortBy === option ? 'bg-gray-100 dark:bg-[#2d2d35]' : 'dark:text-[#b1db9e]'}
+                                                className={sortBy === option ? 'bg-gray-100 dark:bg-[#2d2d35]' : 'dark:text-[#6298F0]'}
                                             >
                                                 {option}
                                             </DropdownMenuItem>
@@ -712,7 +712,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         variant={gridView === '2-col' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('2-col')}
-                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#b1db9e] dark:hover:bg-[#2d2d35]"
+                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#6298F0] dark:hover:bg-[#2d2d35]"
                                     >
                                         <Grid2X2 className="h-4 w-4" />
                                     </Button>
@@ -720,7 +720,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         variant={gridView === '3-col' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('3-col')}
-                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#b1db9e] dark:hover:bg-[#2d2d35]"
+                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#6298F0] dark:hover:bg-[#2d2d35]"
                                     >
                                         <Grid3X3 className="h-4 w-4" />
                                     </Button>
@@ -728,7 +728,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         variant={gridView === 'list' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('list')}
-                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#b1db9e] dark:hover:bg-[#2d2d35]"
+                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#6298F0] dark:hover:bg-[#2d2d35]"
                                     >
                                         <List className="h-4 w-4" />
                                     </Button>
@@ -778,7 +778,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                             <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
                                                                 {product.name || 'Unnamed Product'}
                                                             </h3>
-                                                            <p className="mb-1 text-xs text-blue-600 dark:text-[#b1db9e]">
+                                                            <p className="mb-1 text-xs text-blue-600 dark:text-[#6298F0]">
                                                                 {getCompanyName(product.company)}
                                                             </p>
                                                             <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
@@ -872,7 +872,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                       <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
                                                           {product.name || 'Unnamed Product'}
                                                       </h3>
-                                                      <p className="mb-1 text-xs text-blue-600 dark:text-[#b1db9e]">
+                                                      <p className="mb-1 text-xs text-blue-600 dark:text-[#6298F0]">
                                                           {getCompanyName(product.company)}
                                                       </p>
                                                       <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">
@@ -1010,7 +1010,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                       <h3 className="mb-1 line-clamp-2 max-w-full min-w-0 overflow-hidden text-sm font-medium break-words text-ellipsis whitespace-normal text-gray-900 dark:text-[#e0e0e5]">
                                                           {product.name || 'Unnamed Product'}
                                                       </h3>
-                                                      <p className="mb-1 text-xs text-blue-600 dark:text-[#b1db9e]">
+                                                      <p className="mb-1 text-xs text-blue-600 dark:text-[#6298F0]">
                                                           {getCompanyName(product.company)}
                                                       </p>
                                                       <p className="mb-2 line-clamp-1 max-w-full overflow-hidden text-xs break-words text-ellipsis whitespace-normal text-gray-500 dark:text-[#b8b8c0]">

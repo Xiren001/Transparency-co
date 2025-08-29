@@ -29,20 +29,20 @@ function StatCard({
     sub?: string;
 }) {
     return (
-        <div className="flex min-h-[90px] min-w-0 flex-col justify-between rounded-2xl bg-white p-4 shadow-sm sm:p-6 dark:bg-[#18181c]">
+        <div className="bg-card border-border flex min-h-[90px] min-w-0 flex-col justify-between rounded-2xl border p-4 shadow-sm sm:p-6">
             <div className="mb-2 flex items-center gap-3">
-                {icon && <span className="inline-flex items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-[#23232a]">{icon}</span>}
-                <span className="truncate text-xs font-medium text-gray-500 dark:text-gray-400">{title}</span>
+                {icon && <span className="bg-muted inline-flex items-center justify-center rounded-lg p-2">{icon}</span>}
+                <span className="text-muted-foreground truncate text-xs font-medium">{title}</span>
             </div>
             <div className="flex items-end gap-2">
-                <span className="truncate text-2xl font-bold text-gray-900 dark:text-white">{value}</span>
+                <span className="text-foreground truncate text-2xl font-bold">{value}</span>
                 {change && (
                     <span className={`text-xs font-semibold ${changeType === 'up' ? 'text-green-500' : 'text-red-500'}`}>
                         {changeType === 'up' ? '↑' : '↓'} {change}
                     </span>
                 )}
             </div>
-            {sub && <div className="mt-1 truncate text-xs text-gray-400">{sub}</div>}
+            {sub && <div className="text-muted-foreground mt-1 truncate text-xs">{sub}</div>}
         </div>
     );
 }
@@ -53,9 +53,9 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex min-h-screen w-full flex-col gap-8 bg-[#f7f8fa] p-2 sm:p-4 md:p-6 lg:p-8 xl:p-12 dark:bg-[#101014]">
+            <div className="container mx-auto px-2 py-10">
                 {/* Top Stat Cards */}
-                <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-4 md:gap-6">
+                <div className="mb-8 grid w-full grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-4 md:gap-6">
                     <StatCard
                         title="Total Users"
                         value={analytics.users.total}
@@ -87,7 +87,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Search Analytics Section */}
-                <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+                <div className="mb-8 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
                     <StatCard
                         title="Total Searches"
                         value={analytics.search.totalQueries}
@@ -100,29 +100,26 @@ export default function Dashboard() {
                         icon={<MousePointer className="h-5 w-5 text-cyan-500" />}
                         sub="Last 30 days"
                     />
-                    <div className="col-span-1 flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm md:col-span-2 dark:bg-[#18181c]">
-                        <div className="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Top Search Queries</div>
-                        <ul className="text-sm text-gray-800 dark:text-gray-100">
-                            {analytics.search.topQueries.length === 0 && <li className="text-gray-400">No data</li>}
+                    <div className="bg-card border-border col-span-1 flex flex-col gap-2 rounded-2xl border p-4 shadow-sm md:col-span-2">
+                        <div className="text-muted-foreground mb-2 text-xs font-semibold">Top Search Queries</div>
+                        <ul className="text-foreground text-sm">
+                            {analytics.search.topQueries.length === 0 && <li className="text-muted-foreground">No data</li>}
                             {analytics.search.topQueries.map((q: any) => (
-                                <li key={q.query} className="flex justify-between border-b border-gray-100 py-1 dark:border-[#23232a]">
+                                <li key={q.query} className="border-border flex justify-between border-b py-1">
                                     <span>{q.query}</span>
-                                    <span className="text-xs text-gray-400">{q.count}x</span>
+                                    <span className="text-muted-foreground text-xs">{q.count}x</span>
                                 </li>
                             ))}
                         </ul>
-                        <div className="mt-4 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Top Clicked Suggestions</div>
-                        <ul className="text-sm text-gray-800 dark:text-gray-100">
-                            {analytics.search.topClickedSuggestions.length === 0 && <li className="text-gray-400">No data</li>}
+                        <div className="text-muted-foreground mt-4 mb-2 text-xs font-semibold">Top Clicked Suggestions</div>
+                        <ul className="text-foreground text-sm">
+                            {analytics.search.topClickedSuggestions.length === 0 && <li className="text-muted-foreground">No data</li>}
                             {analytics.search.topClickedSuggestions.map((c: any, i: number) => (
-                                <li
-                                    key={c.suggestion_value + '-' + i}
-                                    className="flex justify-between border-b border-gray-100 py-1 dark:border-[#23232a]"
-                                >
+                                <li key={c.suggestion_value + '-' + i} className="border-border flex justify-between border-b py-1">
                                     <span>
-                                        {c.suggestion_value} <span className="text-xs text-gray-400">({c.suggestion_type})</span>
+                                        {c.suggestion_value} <span className="text-muted-foreground text-xs">({c.suggestion_type})</span>
                                     </span>
-                                    <span className="text-xs text-gray-400">{c.count}x</span>
+                                    <span className="text-muted-foreground text-xs">{c.count}x</span>
                                 </li>
                             ))}
                         </ul>
@@ -130,14 +127,12 @@ export default function Dashboard() {
                 </div>
 
                 {/* Main Chart and Side Panel */}
-                <div className="grid w-full flex-1 grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
+                <div className="mb-8 grid w-full flex-1 grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
                     {/* Main Line Chart Card */}
-                    <div className="col-span-2 flex h-full min-h-[320px] min-w-0 flex-col rounded-2xl bg-white p-2 shadow-sm sm:p-4 md:p-8 dark:bg-[#18181c]">
+                    <div className="bg-card border-border col-span-2 flex h-full min-h-[320px] min-w-0 flex-col rounded-2xl border p-2 shadow-sm sm:p-4 md:p-8">
                         <div className="mb-4 flex items-center justify-between">
-                            <div className="text-lg font-semibold text-gray-900 dark:text-white">User Signups Trend</div>
-                            <button className="rounded-lg bg-gray-100 px-3 py-1 text-xs font-medium text-gray-500 dark:bg-[#23232a] dark:text-gray-400">
-                                Download CSV
-                            </button>
+                            <div className="text-foreground text-lg font-semibold">User Signups Trend</div>
+                            <button className="bg-muted text-muted-foreground rounded-lg px-3 py-1 text-xs font-medium">Download CSV</button>
                         </div>
                         <div className="min-h-[220px] w-full flex-1 md:min-h-[260px] xl:min-h-[320px]">
                             <ResponsiveContainer width="100%" height="100%">
@@ -163,8 +158,8 @@ export default function Dashboard() {
                     {/* Side Panel */}
                     <div className="flex w-full min-w-0 flex-col gap-4 sm:gap-6">
                         {/* Pie Chart for Product Categories */}
-                        <div className="flex h-full min-w-0 flex-col items-center justify-center rounded-2xl bg-white p-2 shadow-sm sm:p-4 dark:bg-[#18181c]">
-                            <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Products by Category</div>
+                        <div className="bg-card border-border flex h-full min-w-0 flex-col items-center justify-center rounded-2xl border p-2 shadow-sm sm:p-4">
+                            <div className="text-foreground mb-2 text-sm font-semibold">Products by Category</div>
                             <div className="flex min-h-[180px] w-full flex-1 items-center justify-center">
                                 <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0}>
                                     <PieChart>
@@ -200,7 +195,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Bottom Cards (Top Products, Top Clicked, etc.) */}
-                <div className="mt-2 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-6 lg:grid-cols-4">
+                <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-6 lg:grid-cols-4">
                     <StatCard
                         title="Top Product"
                         value={analytics.products.mostViewed}

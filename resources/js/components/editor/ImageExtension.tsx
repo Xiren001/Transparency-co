@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 
 const ImageComponent = ({ node, updateAttributes, deleteNode }: any) => {
     const { src, alt, title } = node.attrs;
-    
+
     // Extract filename from src URL or use alt/title
     const getImageName = () => {
         if (src) {
@@ -29,14 +29,19 @@ const ImageComponent = ({ node, updateAttributes, deleteNode }: any) => {
 
     return (
         <NodeViewWrapper className="group relative my-4">
-            <div className="flex items-center gap-3 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 hover:border-gray-400 transition-colors">
+            <div className="flex items-center gap-3 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 transition-colors hover:border-gray-400">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
                     <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6l.586-.586a2 2 0 012.828 0L20 8m-6-6l-.586.586a2 2 0 00-2.828 0L8 8m-6-6l.586-.586a2 2 0 00-2.828 0L4 8" />
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6l.586-.586a2 2 0 012.828 0L20 8m-6-6l-.586.586a2 2 0 00-2.828 0L8 8m-6-6l.586-.586a2 2 0 00-2.828 0L4 8"
+                        />
                     </svg>
                 </div>
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{imageName}</p>
+                <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900">{imageName}</p>
                     <p className="text-xs text-gray-500">Image file</p>
                 </div>
                 <button

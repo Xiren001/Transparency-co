@@ -183,19 +183,21 @@ export default function UsersIndex() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="User Management" />
 
-            <div className="flex min-h-screen w-full flex-col gap-8 bg-[#f7f8fa] p-2 sm:p-4 md:p-6 lg:p-8 xl:p-12 dark:bg-[#101014]">
+            <div className="container mx-auto px-2 py-10">
                 {/* Header */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-                        <p className="text-sm text-gray-600 dark:text-[#b8b8c0]">Manage user roles and permissions</p>
+                        <h1 className="text-3xl font-bold">User Management</h1>
+                        <p className="text-muted-foreground text-sm">Manage user roles and permissions</p>
                     </div>
                 </div>
 
                 {/* Search */}
-                <div className="relative">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <Input placeholder="Search users..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+                <div className="mb-6">
+                    <div className="relative">
+                        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                        <Input placeholder="Search users..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-9" />
+                    </div>
                 </div>
 
                 {/* Users Table */}

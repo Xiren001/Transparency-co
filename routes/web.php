@@ -11,6 +11,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CompanyController;
 use App\Models\Company;
 use App\Http\Controllers\Api\SearchSuggestionController;
+use App\Models\Video;
 
 Route::get('/', function (Request $request) {
     $query = Product::query();
@@ -56,15 +57,27 @@ Route::get('/', function (Request $request) {
 
     $products = $query->with('company')->latest()->paginate(12);
 
+    // Get active videos for the certifications page (limit to 3)
+    $videos = Video::active()->take(3)->get();
+
     return Inertia::render('welcome', [
         'auth' => [
             'user' => $request->user(),
             'isAdmin' => $request->user() && $request->user()->hasRole('admin'),
         ],
         'products' => $products,
+        'videos' => $videos,
     ]);
 })->name('home');
 
+// Certifications page with videos
+Route::get('/certifications', function () {
+    $videos = Video::active()->take(3)->get();
+
+    return Inertia::render('certifications/Page', [
+        'videos' => $videos,
+    ]);
+})->name('certifications');
 
 Route::middleware(['auth', 'verified', 'admin.role'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -81,6 +94,15 @@ Route::middleware(['auth', 'verified', 'admin.role'])->group(function () {
     Route::post('companies', [CompanyController::class, 'store'])->name('companies.store');
     Route::post('companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+
+    // Video routes
+    Route::prefix('admin/videos')->name('admin.videos.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\VideoController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\VideoController::class, 'store'])->name('store');
+        Route::post('/{video}', [\App\Http\Controllers\Admin\VideoController::class, 'update'])->name('update');
+        Route::delete('/{video}', [\App\Http\Controllers\Admin\VideoController::class, 'destroy'])->name('destroy');
+        Route::post('/{video}/toggle-status', [\App\Http\Controllers\Admin\VideoController::class, 'toggleStatus'])->name('toggle-status');
+    });
 
     // Harmful content routes
     Route::prefix('admin/harmfulcontent')->name('admin.harmfulcontent.')->middleware(['harmful.content'])->group(function () {
@@ -153,18 +175,6 @@ Route::post('/api/search-suggestions/click', [SearchSuggestionController::class,
 Route::post('/api/search-analytics', [SearchSuggestionController::class, 'logSearch']);
 
 Route::get('/api/products/top-clicked', [ProductController::class, 'topClicked']);
-
-Route::get('/certifications', function () {
-    $harmfulContents = \App\Models\HarmfulContent::where('is_active', true)
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return Inertia::render('certifications/Page', [
-        'harmfulContents' => $harmfulContents,
-    ]);
-})->name('certifications');
-
-
 
 // Customer view for harmful content
 Route::get('/harmful-ingredients', [HarmfulContentController::class, 'customerView'])->name('harmful-ingredients');

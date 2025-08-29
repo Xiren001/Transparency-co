@@ -164,17 +164,17 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                 {/* Bottom Section - Metadata */}
                                 <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-1 dark:border-[#2d2d35] dark:bg-[#282828]">
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        <div className="font-semibold text-gray-700 dark:text-[#b1db9e]">
+                                        <div className="font-semibold text-gray-700 dark:text-[#6298F0]">
                                             {new Date(content.created_at).getDate().toString().padStart(2, '0')}
                                         </div>
-                                        <div className="text-xs text-gray-500 uppercase dark:text-[#b1db9e]">
+                                        <div className="text-xs text-gray-500 uppercase dark:text-[#6298F0]">
                                             {new Date(content.created_at).toLocaleDateString('en-US', { month: 'long' })}
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center gap-1">
-                                            <span className="text-xs dark:text-[#b1db9e]">Click to read more</span>
+                                            <span className="text-xs dark:text-[#6298F0]">Click to read more</span>
                                         </div>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                             {viewingContent.category && (
                                                 <Badge
                                                     variant="outline"
-                                                    className="mb-2 border-gray-300 text-xs text-gray-700 dark:border-[#b1db9e] dark:text-[#b1db9e]"
+                                                    className="mb-2 border-gray-300 text-xs text-gray-700 dark:border-[#6298F0] dark:text-[#6298F0]"
                                                 >
                                                     {viewingContent.category.replace(/-/g, ' ')}
                                                 </Badge>
@@ -257,18 +257,18 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
                                 {/* Bottom Section - Metadata */}
                                 <div className="flex items-center justify-between border-t bg-gray-50 px-6 py-4 dark:border-[#2d2d35] dark:bg-[#282828]">
-                                    <div className="text-sm text-gray-600 dark:text-[#b1db9e]">
-                                        <div className="font-semibold text-gray-700 dark:text-[#b1db9e]">
+                                    <div className="text-sm text-gray-600 dark:text-[#6298F0]">
+                                        <div className="font-semibold text-gray-700 dark:text-[#6298F0]">
                                             {new Date(viewingContent.created_at).getDate().toString().padStart(2, '0')}
                                         </div>
-                                        <div className="text-xs text-gray-500 uppercase dark:text-[#b1db9e]">
+                                        <div className="text-xs text-gray-500 uppercase dark:text-[#6298F0]">
                                             {new Date(viewingContent.created_at).toLocaleDateString('en-US', { month: 'long' })}
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center gap-1">
-                                            <span className="text-xs dark:text-[#b1db9e]">View more</span>
+                                            <span className="text-xs dark:text-[#6298F0]">View more</span>
                                         </div>
                                     </div>
                                 </div>

@@ -248,10 +248,10 @@ export default function CategoriesSection() {
     };
 
     return (
-        <section className="rounded-lg bg-gray-50 bg-white/80 pt-8 dark:bg-transparent">
+        <section className="rounded-lg bg-gray-50 bg-white pt-12 dark:bg-[#121212]">
             <div className="container mx-auto px-0">
                 {/* Section Title */}
-                <h2 className="mb-8 text-center text-3xl font-light tracking-wide text-gray-900 md:text-4xl dark:text-[#e0e0e5]">
+                <h2 className="mb-8 text-center text-xl font-light tracking-wide text-gray-900 sm:text-3xl md:text-4xl dark:text-[#e0e0e5]">
                     Browse by Categories
                 </h2>
 
@@ -279,7 +279,7 @@ export default function CategoriesSection() {
                                         >
                                             <IconComponent
                                                 className={`group-hover:text-primary h-6 w-6 transition-colors duration-300 ${
-                                                    isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#b1db9e]'
+                                                    isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#6298F0]'
                                                 }`}
                                             />
                                         </div>
@@ -319,7 +319,7 @@ export default function CategoriesSection() {
                                     >
                                         <IconComponent
                                             className={`group-hover:text-primary h-8 w-8 transition-colors duration-300 ${
-                                                isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#b1db9e]'
+                                                isSelected ? 'text-primary' : 'text-gray-700 dark:text-[#6298F0]'
                                             }`}
                                         />
                                     </div>

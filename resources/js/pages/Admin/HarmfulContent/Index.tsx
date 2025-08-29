@@ -2,6 +2,7 @@ import ContentRenderer from '@/components/editor/ContentRenderer';
 import TipTapEditor from '@/components/editor/TipTapEditor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -365,72 +366,79 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Harmful Content Management" />
-            <div className="flex min-h-screen w-full flex-col gap-8 bg-[#f7f8fa] p-2 sm:p-4 md:p-6 lg:p-8 xl:p-12 dark:bg-[#101014]">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Harmful Content Management</h1>
+            <div className="container mx-auto px-2 py-10">
+                <div className="mb-6 flex items-center justify-between">
+                    <h1 className="text-3xl font-bold">Harmful Content Management</h1>
                     <Button onClick={handleCreate}>
                         <Plus className="mr-2 h-4 w-4" />
                         Create New Content
                     </Button>
                 </div>
 
-                <div className="bg-card rounded-lg border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="hover:bg-muted/50">
-                                <TableHead className="w-[300px]">Title</TableHead>
-                                <TableHead className="w-[120px]">Status</TableHead>
-                                <TableHead className="w-[150px]">Category</TableHead>
-                                <TableHead className="w-[120px]">Version</TableHead>
-                                <TableHead className="w-[150px]">Created</TableHead>
-                                <TableHead className="w-[200px] text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {contents.map((content) => (
-                                <TableRow key={content.id} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">{content.title}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={content.is_active ? 'default' : 'secondary'}>
-                                            {content.is_active ? 'Active' : 'Inactive'}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        {content.category ? (
-                                            <Badge variant="outline" className="capitalize">
-                                                {content.category.replace(/-/g, ' ')}
-                                            </Badge>
-                                        ) : (
-                                            <span className="text-muted-foreground">-</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>{content.version}</TableCell>
-                                    <TableCell>{formatDate(content.created_at)}</TableCell>
-                                    <TableCell>
-                                        <div className="flex justify-end space-x-2">
-                                            <Button variant="outline" size="sm" onClick={() => handleView(content)} className="h-8 px-3">
-                                                View
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={() => handleEdit(content)} className="h-8 px-3">
-                                                Edit
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={() => handleToggleStatus(content.id)} className="h-8 px-3">
-                                                {content.is_active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
-                                            </Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(content.id)} className="h-8 px-3">
-                                                Delete
-                                            </Button>
-                                        </div>
-                                    </TableCell>
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-muted/50">
+                                    <TableHead className="w-[300px]">Title</TableHead>
+                                    <TableHead className="w-[120px]">Status</TableHead>
+                                    <TableHead className="w-[150px]">Category</TableHead>
+                                    <TableHead className="w-[120px]">Version</TableHead>
+                                    <TableHead className="w-[150px]">Created</TableHead>
+                                    <TableHead className="w-[200px] text-right">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            </TableHeader>
+                            <TableBody>
+                                {contents.map((content) => (
+                                    <TableRow key={content.id} className="hover:bg-muted/50">
+                                        <TableCell className="font-medium">{content.title}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={content.is_active ? 'default' : 'secondary'}>
+                                                {content.is_active ? 'Active' : 'Inactive'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            {content.category ? (
+                                                <Badge variant="outline" className="capitalize">
+                                                    {content.category.replace(/-/g, ' ')}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-muted-foreground">-</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>{content.version}</TableCell>
+                                        <TableCell>{formatDate(content.created_at)}</TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-end space-x-2">
+                                                <Button variant="outline" size="sm" onClick={() => handleView(content)} className="h-8 px-3">
+                                                    View
+                                                </Button>
+                                                <Button variant="outline" size="sm" onClick={() => handleEdit(content)} className="h-8 px-3">
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleToggleStatus(content.id)}
+                                                    className="h-8 px-3"
+                                                >
+                                                    {content.is_active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                                                </Button>
+                                                <Button variant="destructive" size="sm" onClick={() => handleDelete(content.id)} className="h-8 px-3">
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
 
                 {contents.length === 0 && (
-                    <div className="rounded-lg border bg-white p-12 text-center dark:bg-[#1a1a1f]">
-                        <p className="text-gray-500 dark:text-[#b8b8c0]">No harmful content found. Create your first content item.</p>
+                    <div className="bg-card rounded-lg border p-12 text-center">
+                        <p className="text-muted-foreground">No harmful content found. Create your first content item.</p>
                     </div>
                 )}
 

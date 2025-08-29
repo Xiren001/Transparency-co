@@ -27,5 +27,11 @@ class DatabaseSeeder extends Seeder
 
         // Assign the admin role to the user
         $user->assignRole('admin');
+
+        // Seed sample data
+        $this->call([
+            CompanySeeder::class,
+            VideoSeeder::class,
+        ]);
     }
 }
