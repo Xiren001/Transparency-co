@@ -110,7 +110,7 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                         return (
                             <div
                                 key={content.id}
-                                className="cursor-pointer overflow-hidden rounded-lg bg-white shadow-lg transition-shadow hover:shadow-xl dark:bg-[#282828]"
+                                className="cursor-pointer overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-shadow hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526]"
                                 onClick={() => handleView(content)}
                             >
                                 {/* Card Content */}
@@ -131,7 +131,10 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                     <div className="w-2/3 p-4">
                                         <div className="mb-2">
                                             {content.category && (
-                                                <Badge variant="outline" className="mb-2 text-xs">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="mb-2 border-none bg-[#ecf0f3] text-xs shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
+                                                >
                                                     {content.category.replace(/-/g, ' ')}
                                                 </Badge>
                                             )}
@@ -184,7 +187,7 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
                     {harmfulContents.length === 0 && (
                         <div className="col-span-full">
-                            <Card className="rounded-2xl bg-white shadow-sm dark:bg-[#282828]">
+                            <Card className="mt-4 rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526]">
                                 <CardContent className="py-12 text-center">
                                     <p className="text-gray-500 dark:text-[#b8b8c0]">No harmful content available. Check back later for updates.</p>
                                 </CardContent>
@@ -196,12 +199,12 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
             {/* View Modal */}
             <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-                <DialogContent className="font-milk max-h-[90vh] max-w-4xl overflow-y-auto border-gray-200 bg-white uppercase dark:border-[#2d2d35] dark:bg-[#282828]">
+                <DialogContent className="font-milk max-h-[90vh] max-w-4xl overflow-y-auto rounded-[12px] bg-[#ecf0f3] uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] dark:border-[#2d2d35] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] [&>button]:border-0 [&>button]:bg-[#ecf0f3] [&>button]:p-2 [&>button]:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] [&>button]:outline-none [&>button]:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] [&>button]:dark:bg-[#181a1b] [&>button]:dark:text-[#f3f4f6] [&>button]:dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] [&>button]:dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                     {viewingContent && (
                         <div className="font-milk space-y-6 text-gray-900 dark:text-gray-100">
                             {/* Blog Card Display */}
                             <div
-                                className="preview-card overflow-hidden rounded-lg bg-white shadow-lg dark:bg-[#282828]"
+                                className="preview-card overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                                 style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
                                 {/* Card Content */}
@@ -229,7 +232,7 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                             {viewingContent.category && (
                                                 <Badge
                                                     variant="outline"
-                                                    className="mb-2 border-gray-300 text-xs text-gray-700 dark:border-[#6298F0] dark:text-[#6298F0]"
+                                                    className="mb-2 border-none bg-[#ecf0f3] text-xs shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                                 >
                                                     {viewingContent.category.replace(/-/g, ' ')}
                                                 </Badge>

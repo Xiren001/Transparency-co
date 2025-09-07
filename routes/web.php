@@ -70,12 +70,39 @@ Route::get('/', function (Request $request) {
     ]);
 })->name('home');
 
+// About page
+Route::get('/about', function () {
+    $stats = [
+        'products_count' => \App\Models\Product::count(),
+        'companies_count' => \App\Models\Company::count(),
+        'users_count' => \App\Models\User::count(),
+    ];
+
+    return Inertia::render('about/Page', [
+        'stats' => $stats,
+    ]);
+})->name('about');
+
+// Services page
+Route::get('/services', function () {
+    return Inertia::render('services/Page');
+})->name('services');
+
+// Contact page
+Route::get('/contact', function () {
+    return Inertia::render('contact/Page');
+})->name('contact');
+
 // Certifications page with videos
 Route::get('/certifications', function () {
     $videos = Video::active()->take(3)->get();
+    $harmfulContents = \App\Models\HarmfulContent::where('is_active', true)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
     return Inertia::render('certifications/Page', [
         'videos' => $videos,
+        'harmfulContents' => $harmfulContents,
     ]);
 })->name('certifications');
 

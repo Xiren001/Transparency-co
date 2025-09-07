@@ -29,4 +29,4 @@ class RoleOrMiddleware
 
         return $next($request);
     }
-} 
+}

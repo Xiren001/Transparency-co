@@ -133,7 +133,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
             }),
             CodeBlock.configure({
                 HTMLAttributes: {
-                    class: 'bg-gray-100 rounded p-2 font-mono text-sm',
+                    class: 'bg-gray-100 dark:bg-[#282828] rounded p-2 font-mono text-sm text-gray-900 dark:text-white',
                 },
             }),
             Placeholder.configure({
@@ -157,7 +157,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none',
+                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none dark:prose-invert',
                 placeholder: 'Start writing your content here...',
                 style: 'width: 100%; max-width: 100%; min-width: 0; word-break: break-word; overflow-wrap: break-word; white-space: normal; min-height: 350px; padding: 0; margin: 0; box-sizing: border-box;',
             },
@@ -333,7 +333,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
 
     return (
         <div
-            className="rounded-lg border"
+            className="rounded-lg border border-gray-200 bg-white dark:border-[#282828] dark:bg-[#121212]"
             style={{
                 width: '100%',
                 maxWidth: '100%',
@@ -343,7 +343,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
             }}
         >
             {isEditing && (
-                <div className="flex flex-wrap gap-2 border-b bg-gray-50 p-2">
+                <div className="flex flex-wrap gap-2 border-b border-gray-200 bg-gray-50 p-2 dark:border-[#282828] dark:bg-[#282828]">
                     {/* Text Formatting */}
                     <div className="flex gap-1">
                         <Button
@@ -396,21 +396,21 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                             </Button>
 
                             {showHighlightColors && (
-                                <div className="absolute top-full left-0 z-50 mt-1 rounded-lg border bg-white p-2 shadow-lg">
+                                <div className="absolute top-full left-0 z-50 mt-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-[#282828] dark:bg-[#121212]">
                                     <div className="grid grid-cols-4 gap-1">
                                         {highlightColors.map((colorOption) => (
                                             <button
                                                 key={colorOption.color}
                                                 onClick={() => applyHighlight(colorOption.color)}
-                                                className="flex flex-col items-center gap-1 rounded p-2 hover:bg-gray-100"
+                                                className="flex flex-col items-center gap-1 rounded p-2 hover:bg-gray-100 dark:hover:bg-[#282828]"
                                                 title={colorOption.name}
                                             >
                                                 <div className="h-6 w-6 rounded border" style={{ backgroundColor: colorOption.bgColor }} />
-                                                <span className="text-xs text-gray-600">{colorOption.name}</span>
+                                                <span className="text-xs text-gray-600 dark:text-gray-300">{colorOption.name}</span>
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="mt-2 border-t pt-2">
+                                    <div className="mt-2 border-t border-gray-200 pt-2 dark:border-[#282828]">
                                         <Button variant="outline" size="sm" onClick={removeHighlight} className="w-full text-xs">
                                             Remove Highlight
                                         </Button>
@@ -433,21 +433,21 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                             </Button>
 
                             {showTextColors && (
-                                <div className="absolute top-full left-0 z-50 mt-1 rounded-lg border bg-white p-2 shadow-lg">
+                                <div className="absolute top-full left-0 z-50 mt-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-[#282828] dark:bg-[#121212]">
                                     <div className="grid grid-cols-4 gap-1">
                                         {textColors.map((colorOption) => (
                                             <button
                                                 key={colorOption.color}
                                                 onClick={() => applyTextColor(colorOption.color)}
-                                                className="flex flex-col items-center gap-1 rounded p-2 hover:bg-gray-100"
+                                                className="flex flex-col items-center gap-1 rounded p-2 hover:bg-gray-100 dark:hover:bg-[#282828]"
                                                 title={colorOption.name}
                                             >
                                                 <div className="h-6 w-6 rounded border" style={{ backgroundColor: colorOption.color }} />
-                                                <span className="text-xs text-gray-600">{colorOption.name}</span>
+                                                <span className="text-xs text-gray-600 dark:text-gray-300">{colorOption.name}</span>
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="mt-2 border-t pt-2">
+                                    <div className="mt-2 border-t border-gray-200 pt-2 dark:border-[#282828]">
                                         <Button variant="outline" size="sm" onClick={removeTextColor} className="w-full text-xs">
                                             Remove Text Color
                                         </Button>
@@ -457,7 +457,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                         </div>
                     </div>
 
-                    <div className="h-6 w-px bg-gray-300" />
+                    <div className="h-6 w-px bg-gray-300 dark:bg-[#282828]" />
 
                     {/* Headings */}
                     <div className="flex gap-1">
@@ -489,7 +489,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                         </Button>
                     </div>
 
-                    <div className="h-6 w-px bg-gray-300" />
+                    <div className="h-6 w-px bg-gray-300 dark:bg-[#282828]" />
 
                     {/* Lists */}
                     <div className="flex gap-1">
@@ -512,7 +512,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                         </Button>
                     </div>
 
-                    <div className="h-6 w-px bg-gray-300" />
+                    <div className="h-6 w-px bg-gray-300 dark:bg-[#282828]" />
 
                     {/* Text Alignment */}
                     <div className="flex gap-1">
@@ -553,7 +553,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                         </Button>
                     </div>
 
-                    <div className="h-6 w-px bg-gray-300" />
+                    <div className="h-6 w-px bg-gray-300 dark:bg-[#282828]" />
 
                     {/* Code and Blockquote */}
                     <div className="flex gap-1">
@@ -585,7 +585,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                         </Button>
                     </div>
 
-                    <div className="h-6 w-px bg-gray-300" />
+                    <div className="h-6 w-px bg-gray-300 dark:bg-[#282828]" />
 
                     {/* Links and Images */}
                     <div className="flex gap-1">
@@ -605,7 +605,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                         </Button>
                     </div>
 
-                    <div className="h-6 w-px bg-gray-300" />
+                    <div className="h-6 w-px bg-gray-300 dark:bg-[#282828]" />
 
                     {/* Special Blocks */}
                     <Button variant="outline" size="sm" onClick={() => editor.chain().focus().setNode('dangerBlock').run()} title="Danger Block">
@@ -651,14 +651,14 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
 
             {/* Link Input */}
             {showLinkInput && (
-                <div className="border-b bg-blue-50 p-2">
+                <div className="border-b border-gray-200 bg-blue-50 p-2 dark:border-[#282828] dark:bg-[#282828]">
                     <div className="flex gap-2">
                         <input
                             type="url"
                             placeholder="Enter URL..."
                             value={linkUrl}
                             onChange={(e) => setLinkUrl(e.target.value)}
-                            className="flex-1 rounded border px-2 py-1 text-sm"
+                            className="flex-1 rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 placeholder-gray-500 dark:border-[#282828] dark:bg-[#121212] dark:text-white dark:placeholder-gray-400"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleLink();
@@ -687,7 +687,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
             )}
 
             <div
-                className="p-4"
+                className="bg-white p-4 dark:bg-[#121212]"
                 style={{
                     width: '100%',
                     maxWidth: '100%',
@@ -718,6 +718,10 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                                 min-height: 350px;
                                 padding: 0;
                                 margin: 0;
+                                color: #111827;
+                            }
+                            .dark .ProseMirror {
+                                color: #ffffff;
                             }
                             .ProseMirror p {
                                 word-break: break-word !important;
@@ -803,6 +807,10 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
                                 font-style: italic;
                                 color: #6b7280;
                             }
+                            .dark .ProseMirror blockquote {
+                                border-left: 4px solid #374151;
+                                color: #9ca3af;
+                            }
                             .ProseMirror blockquote p {
                                 margin: 0.5em 0;
                             }
@@ -821,7 +829,7 @@ const TipTapEditor = ({ content, onChange, onSave, isEditing = true }: TipTapEdi
             </div>
 
             {isEditing && (
-                <div className="border-t bg-gray-50 p-2 text-xs text-gray-500">
+                <div className="border-t border-gray-200 bg-gray-50 p-2 text-xs text-gray-500 dark:border-[#282828] dark:bg-[#282828] dark:text-gray-400">
                     <p>Keyboard shortcuts: Ctrl+B (Bold), Ctrl+I (Italic), Ctrl+U (Underline), Ctrl+Z (Undo), Ctrl+Y (Redo)</p>
                     <p>Lists: Use Tab to indent, Shift+Tab to outdent</p>
                     <p>Headings: Ctrl+1 (H1), Ctrl+2 (H2), Ctrl+3 (H3)</p>

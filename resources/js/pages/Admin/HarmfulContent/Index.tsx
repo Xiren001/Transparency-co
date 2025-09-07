@@ -444,37 +444,41 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
 
                 {/* Create/Edit Modal */}
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                    <DialogContent className="max-w-[95vw] overflow-hidden rounded-lg p-0">
-                        <DialogHeader className="border-b px-6 py-4">
+                    <DialogContent className="max-w-[95vw] overflow-hidden rounded-lg bg-white p-0 dark:bg-[#121212]">
+                        <DialogHeader className="border-b border-gray-200 bg-white px-6 py-4 dark:border-[#282828] dark:bg-[#121212]">
                             <div className="flex items-center gap-6">
-                                <DialogTitle>{editingContent ? 'Edit Harmful Content' : 'Create New Harmful Content'}</DialogTitle>
+                                <DialogTitle className="text-gray-900 dark:text-white">
+                                    {editingContent ? 'Edit Harmful Content' : 'Create New Harmful Content'}
+                                </DialogTitle>
                                 <div className="flex items-center gap-2 text-sm">
                                     {autoSaveStatus === 'saving' && (
-                                        <span className="text-blue-600">
+                                        <span className="text-blue-600 dark:text-blue-400">
                                             <span className="mr-1">💾</span>
                                             Saving...
                                         </span>
                                     )}
                                     {autoSaveStatus === 'saved' && (
-                                        <span className="text-green-600">
+                                        <span className="text-green-600 dark:text-green-400">
                                             <span className="mr-1">✅</span>
                                             Auto-saved
                                         </span>
                                     )}
                                     {autoSaveStatus === 'pending' && (
-                                        <span className="text-yellow-600">
+                                        <span className="text-yellow-600 dark:text-yellow-400">
                                             <span className="mr-1">⏳</span>
                                             Pending...
                                         </span>
                                     )}
-                                    {lastSaved && <span className="text-gray-500">Last saved: {lastSaved.toLocaleTimeString()}</span>}
+                                    {lastSaved && (
+                                        <span className="text-gray-500 dark:text-gray-400">Last saved: {lastSaved.toLocaleTimeString()}</span>
+                                    )}
                                 </div>
                             </div>
                         </DialogHeader>
 
-                        <div className="flex h-[calc(90vh-120px)]">
+                        <div className="flex h-[calc(90vh-120px)] bg-white dark:bg-[#121212]">
                             {/* Left Side - Editor */}
-                            <div className="w-1/2 overflow-y-auto border-r p-8">
+                            <div className="w-1/2 overflow-y-auto border-r border-gray-200 bg-white p-8 dark:border-[#282828] dark:bg-[#121212]">
                                 <div className="space-y-8">
                                     <div className="grid grid-cols-2 gap-6">
                                         {/* Title Input */}
@@ -487,7 +491,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                 value={formData.title}
                                                 onChange={(e) => handleTitleChange(e.target.value)}
                                                 placeholder="Enter content title"
-                                                className="text-lg font-semibold"
+                                                className="border-gray-300 bg-white text-lg font-semibold text-gray-900 dark:border-[#282828] dark:bg-[#282828] dark:text-white"
                                             />
                                         </div>
 
@@ -498,7 +502,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                             <select
                                                 value={formData.category}
                                                 onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                                                className="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-[#2d2d35] dark:bg-[#2d2d35] dark:text-white"
+                                                className="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-[#282828] dark:bg-[#282828] dark:text-white"
                                             >
                                                 <option value="">Select a category</option>
                                                 {categories.map((category) => (
@@ -519,16 +523,16 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                             </div>
 
                             {/* Right Side - Live Preview */}
-                            <div className="w-1/2 overflow-y-auto bg-gray-50 p-8 dark:bg-[#23232a]">
+                            <div className="w-1/2 overflow-y-auto bg-gray-50 p-8 dark:bg-[#121212]">
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-semibold text-gray-700 dark:text-[#b8b8c0]">Card Preview</h3>
 
                                     {/* Blog Card Preview */}
-                                    <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg">
+                                    <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg dark:bg-[#282828]">
                                         {/* Card Content */}
                                         <div className="flex">
                                             {/* Left - Image */}
-                                            <div className="flex w-1/3 items-center justify-center bg-gray-200">
+                                            <div className="flex w-1/3 items-center justify-center bg-gray-200 dark:bg-[#121212]">
                                                 {(() => {
                                                     // Extract first image from editor content
                                                     const contentHtml = formData.content_html || editingContent?.content_html || '';
@@ -563,7 +567,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                         return <img src={firstImageSrc} alt="Content image" className="h-full w-full object-cover" />;
                                                     } else {
                                                         return (
-                                                            <div className="text-center text-gray-400">
+                                                            <div className="text-center text-gray-400 dark:text-gray-500">
                                                                 <div className="mb-2 text-2xl">📷</div>
                                                                 <div className="text-xs">No Image</div>
                                                             </div>
@@ -582,14 +586,14 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                     )}
                                                 </div>
 
-                                                <h2 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900">
+                                                <h2 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900 dark:text-white">
                                                     {formData.title || 'Your Title Here'}
                                                 </h2>
 
-                                                <div className="h-25 overflow-hidden text-sm leading-relaxed text-gray-600">
+                                                <div className="h-25 overflow-hidden text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                                                     {formData.content_html ? (
                                                         <div
-                                                            className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
+                                                            className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 dark:prose-invert max-w-none break-words"
                                                             style={{
                                                                 display: '-webkit-box',
                                                                 WebkitLineClamp: 4,
@@ -602,15 +606,17 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                             }}
                                                         />
                                                     ) : (
-                                                        <div className="text-gray-400 italic">Your content will appear here...</div>
+                                                        <div className="text-gray-400 italic dark:text-gray-500">
+                                                            Your content will appear here...
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Bottom Section - Metadata */}
-                                        <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3">
-                                            <div className="text-sm text-gray-500">
+                                        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-[#121212] dark:bg-[#121212]">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
                                                 <div className="font-semibold">
                                                     {editingContent
                                                         ? new Date(editingContent.created_at).getDate().toString().padStart(2, '0')
@@ -623,7 +629,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 text-gray-400">
+                                            <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
                                                 <div className="flex items-center gap-1">
                                                     <span className="text-xs">See more</span>
                                                 </div>
@@ -633,15 +639,15 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                 </div>
 
                                 {/* Full Content Preview */}
-                                <div className="border-t border-gray-200 pt-8 dark:border-[#2d2d35]">
+                                <div className="border-t border-gray-200 pt-8 dark:border-[#282828]">
                                     <h3 className="mb-6 text-lg font-semibold text-gray-700 dark:text-[#b8b8c0]">Full Content Preview</h3>
 
                                     {/* Full Blog Card Preview */}
-                                    <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg">
+                                    <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg dark:bg-[#282828]">
                                         {/* Card Content */}
                                         <div className="flex">
                                             {/* Left - Image */}
-                                            <div className="flex h-64 w-1/3 items-center justify-center bg-gray-200">
+                                            <div className="flex h-64 w-1/3 items-center justify-center bg-gray-200 dark:bg-[#121212]">
                                                 {(() => {
                                                     // Extract first image from editor content
                                                     const contentHtml = formData.content_html || editingContent?.content_html || '';
@@ -676,7 +682,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                         return <img src={firstImageSrc} alt="Content image" className="h-full w-full object-cover" />;
                                                     } else {
                                                         return (
-                                                            <div className="text-center text-gray-400">
+                                                            <div className="text-center text-gray-400 dark:text-gray-500">
                                                                 <div className="mb-2 text-2xl">📷</div>
                                                                 <div className="text-xs">No Image</div>
                                                             </div>
@@ -695,26 +701,30 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                     )}
                                                 </div>
 
-                                                <h2 className="mb-4 text-2xl font-bold text-gray-900">{formData.title || 'Your Title Here'}</h2>
+                                                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                                                    {formData.title || 'Your Title Here'}
+                                                </h2>
 
-                                                <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-600">
+                                                <div className="max-h-[80vh] min-h-fit overflow-y-auto text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                                                     {formData.content_html ? (
                                                         <div
-                                                            className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
+                                                            className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 dark:prose-invert max-w-none break-words"
                                                             dangerouslySetInnerHTML={{
                                                                 __html: formData.content_html.replace(/<img[^>]*>/gi, ''),
                                                             }}
                                                         />
                                                     ) : (
-                                                        <div className="text-gray-400 italic">Your content will appear here...</div>
+                                                        <div className="text-gray-400 italic dark:text-gray-500">
+                                                            Your content will appear here...
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Bottom Section - Metadata */}
-                                        <div className="flex items-center justify-between border-t bg-gray-50 px-6 py-4">
-                                            <div className="text-sm text-gray-500">
+                                        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-[#121212] dark:bg-[#121212]">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
                                                 <div className="font-semibold">
                                                     {editingContent
                                                         ? new Date(editingContent.created_at).getDate().toString().padStart(2, '0')
@@ -727,7 +737,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 text-gray-400">
+                                            <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
                                                 <div className="flex items-center gap-1">
                                                     <span className="text-xs">View Research</span>
                                                 </div>
@@ -739,7 +749,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="flex justify-end gap-2 border-t bg-gray-50 px-6 py-4 dark:bg-[#23232a]">
+                        <div className="flex justify-end gap-2 border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-[#282828] dark:bg-[#121212]">
                             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                                 Cancel
                             </Button>
@@ -752,19 +762,19 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
 
                 {/* View Modal */}
                 <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-                    <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Content Preview</DialogTitle>
+                    <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto bg-white dark:bg-[#121212]">
+                        <DialogHeader className="border-b border-gray-200 dark:border-[#282828]">
+                            <DialogTitle className="text-gray-900 dark:text-white">Content Preview</DialogTitle>
                         </DialogHeader>
 
                         {viewingContent && (
-                            <div className="space-y-6">
+                            <div className="space-y-6 p-6">
                                 {/* Blog Card Display */}
-                                <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg">
+                                <div className="preview-card overflow-hidden rounded-lg bg-white shadow-lg dark:bg-[#282828]">
                                     {/* Card Content */}
                                     <div className="flex">
                                         {/* Left - Image */}
-                                        <div className="flex h-48 w-1/3 items-center justify-center bg-gray-200">
+                                        <div className="flex h-48 w-1/3 items-center justify-center bg-gray-200 dark:bg-[#121212]">
                                             {(() => {
                                                 // Extract first image from editor content
                                                 const contentHtml = viewingContent.content_html || '';
@@ -799,7 +809,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                     return <img src={firstImageSrc} alt="Content image" className="h-full w-full object-cover" />;
                                                 } else {
                                                     return (
-                                                        <div className="text-center text-gray-400">
+                                                        <div className="text-center text-gray-400 dark:text-gray-500">
                                                             <div className="mb-2 text-2xl">📷</div>
                                                             <div className="text-xs">No Image</div>
                                                         </div>
@@ -821,12 +831,12 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                 </Badge>
                                             </div>
 
-                                            <h2 className="mb-2 text-lg font-bold text-gray-900">{viewingContent.title}</h2>
+                                            <h2 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">{viewingContent.title}</h2>
 
-                                            <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-600">
+                                            <div className="h-20 overflow-hidden text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                                                 {viewingContent.content_html ? (
                                                     <div
-                                                        className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-w-none break-words"
+                                                        className="prose prose-sm prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 dark:prose-invert max-w-none break-words"
                                                         style={{
                                                             display: '-webkit-box',
                                                             WebkitLineClamp: 4,
@@ -839,15 +849,15 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                                         }}
                                                     />
                                                 ) : (
-                                                    <div className="text-gray-400 italic">No content available...</div>
+                                                    <div className="text-gray-400 italic dark:text-gray-500">No content available...</div>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Bottom Section - Metadata */}
-                                    <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3">
-                                        <div className="text-sm text-gray-500">
+                                    <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-[#121212] dark:bg-[#121212]">
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">
                                             <div className="font-semibold">
                                                 {new Date(viewingContent.created_at).getDate().toString().padStart(2, '0')}
                                             </div>
@@ -856,7 +866,7 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-3 text-gray-400">
+                                        <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
                                             <div className="flex items-center gap-1">
                                                 <div className="h-4 w-4">👁️</div>
                                                 <span className="text-xs">1.2k</span>
@@ -875,9 +885,9 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                 </div>
 
                                 {/* Full Content Section */}
-                                <div className="rounded-lg border bg-gray-50 p-4">
-                                    <h3 className="mb-3 text-lg font-semibold text-gray-700">Full Content</h3>
-                                    <div className="rounded-lg border bg-white p-4">
+                                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-[#282828] dark:bg-[#121212]">
+                                    <h3 className="mb-3 text-lg font-semibold text-gray-700 dark:text-[#b8b8c0]">Full Content</h3>
+                                    <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-[#282828] dark:bg-[#282828]">
                                         {viewingContent.content_html ? (
                                             <div
                                                 className="prose prose-sm dark:prose-invert prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1 max-h-[80vh] min-h-fit max-w-none overflow-y-auto break-words"
@@ -894,22 +904,24 @@ export default function HarmfulContentIndex({ harmfulContents }: HarmfulContentI
                                 </div>
 
                                 {/* Content Details */}
-                                <div className="grid grid-cols-2 gap-4 rounded-lg border bg-gray-50 p-4">
+                                <div className="grid grid-cols-2 gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-[#282828] dark:bg-[#121212]">
                                     <div>
-                                        <span className="text-sm font-medium text-gray-600">Version:</span>
-                                        <span className="ml-2 text-sm text-gray-900">{viewingContent.version}</span>
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Version:</span>
+                                        <span className="ml-2 text-sm text-gray-900 dark:text-white">{viewingContent.version}</span>
                                     </div>
                                     <div>
-                                        <span className="text-sm font-medium text-gray-600">Created:</span>
-                                        <span className="ml-2 text-sm text-gray-900">{formatDate(viewingContent.created_at)}</span>
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Created:</span>
+                                        <span className="ml-2 text-sm text-gray-900 dark:text-white">{formatDate(viewingContent.created_at)}</span>
                                     </div>
                                     <div>
-                                        <span className="text-sm font-medium text-gray-600">Category:</span>
-                                        <span className="ml-2 text-sm text-gray-900">{viewingContent.category || 'None'}</span>
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Category:</span>
+                                        <span className="ml-2 text-sm text-gray-900 dark:text-white">{viewingContent.category || 'None'}</span>
                                     </div>
                                     <div>
-                                        <span className="text-sm font-medium text-gray-600">Status:</span>
-                                        <span className="ml-2 text-sm text-gray-900">{viewingContent.is_active ? 'Active' : 'Inactive'}</span>
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Status:</span>
+                                        <span className="ml-2 text-sm text-gray-900 dark:text-white">
+                                            {viewingContent.is_active ? 'Active' : 'Inactive'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

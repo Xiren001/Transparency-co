@@ -14,9 +14,8 @@ import { route } from 'ziggy-js';
 const navigation = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/contact' },
     { name: 'Learn', href: '/certifications' },
+    { name: 'Contact', href: '/contact' },
 ];
 
 const navIconMap: Record<string, any> = {
@@ -373,6 +372,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         setIsSearching(true);
         const params: Record<string, string> = {};
         if (q) params.search = q;
+        // Clear category parameters when performing a new search to avoid conflicts
+        // The backend will handle both search and category filters, but we want to start fresh with search
         router.get(route('home'), params, {
             onFinish: () => {
                 setIsSearching(false);
@@ -454,14 +455,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
-            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-[#FDFDFC] px-4 py-6 tracking-tighter text-[#1b1b18] uppercase transition-all duration-500 ease-in-out sm:px-8 lg:justify-center lg:py-2 dark:bg-[#121212]">
-                <header className="fixed top-0 z-50 w-full max-w-[1000px] border-b bg-white px-2 py-4 text-sm transition-all duration-500 ease-in-out not-has-[nav]:hidden lg:max-w-[2000px] lg:px-6 dark:bg-[#121212]">
+            <div className="font-milk flex min-h-0 flex-col items-center gap-y-4 bg-transparent px-4 py-6 tracking-tighter text-[#1b1b18] uppercase transition-all duration-500 ease-in-out sm:px-8 lg:justify-center lg:py-2 dark:bg-transparent">
+                <header className="fixed top-0 z-50 w-full max-w-[1000px] rounded-[12px] bg-[#ecf0f3] px-2 py-4 text-sm shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-500 ease-in-out not-has-[nav]:hidden lg:max-w-[2000px] lg:px-6 dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]">
                     <nav className="flex items-center justify-center gap-4">
                         <div className="flex flex-1 items-center justify-between">
                             {/* Logo */}
                             <a href="/" className="flex cursor-pointer items-center space-x-2 px-2">
-                                <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
-                                    <span className="text-primary-foreground text-lg font-bold">T</span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
+                                    <span className="text-lg font-bold text-[#1b1b18] dark:text-[#f3f4f6]">T</span>
                                 </div>
                                 {/* <span className="font-schoolbell text-xl font-bold tracking-widest capitalize dark:text-white">Transparency Co.</span> */}
                             </a>
@@ -472,7 +473,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     <a
                                         key={item.name}
                                         href={item.href}
-                                        className="font-milk text-foreground hover:bg-muted/90 m-0 rounded-lg py-2 text-base uppercase transition-all duration-300 ease-in-out lg:px-4 dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                        className="font-milk text-foreground m-0 rounded-lg py-2 text-base uppercase transition-all duration-300 ease-in-out hover:border-none hover:bg-[#ecf0f3] hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] hover:outline-none hover:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] lg:px-4 dark:text-[#e0e0e5] dark:hover:bg-[#181a1b] dark:hover:text-[#f3f4f6] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:hover:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {item.name}
@@ -526,7 +527,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     setShowSuggestions(false);
                                                 }
                                             }}
-                                            className="font-milk [&::placeholder]:font-milk h-9 w-full !rounded-2xl bg-[#f0f0f0] pr-8 pl-8 text-xs text-[#1b1b18] uppercase transition-all duration-300 ease-in-out lg:h-12 lg:pr-10 lg:pl-14 lg:text-sm dark:bg-[#282828] dark:text-white"
+                                            className="font-milk [&::placeholder]:font-milk h-9 w-full !rounded-2xl border-none bg-[#ecf0f3] pr-8 pl-8 text-xs text-[#1b1b18] uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] transition-all duration-300 ease-in-out outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] lg:h-12 lg:pr-10 lg:pl-14 lg:text-sm dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:text-white dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                             autoComplete="off"
                                             aria-label="Search for products, companies, or categories"
                                             aria-autocomplete="list"
@@ -639,7 +640,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     <a
                                         key={item.name}
                                         href={item.href}
-                                        className="font-milk text-foreground hover:bg-muted/40 m-0 rounded-lg px-4 py-2 text-base uppercase transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                        className="font-milk text-foreground m-0 rounded-lg px-4 py-2 text-base uppercase transition-all duration-300 ease-in-out hover:border-none hover:bg-[#ecf0f3] hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] hover:outline-none hover:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:text-[#e0e0e5] dark:hover:bg-[#181a1b] dark:hover:text-[#f3f4f6] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:hover:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {item.name}
@@ -779,7 +780,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 setShowSuggestions(false);
                                             }
                                         }}
-                                        className="font-milk [&::placeholder]:font-milk h-11 w-full !rounded-2xl bg-[#f0f0f0] pr-8 pl-10 text-xs text-[#1b1b18] uppercase transition-all duration-300 ease-in-out dark:bg-[#282828] dark:text-white"
+                                        className="font-milk [&::placeholder]:font-milk h-11 w-full !rounded-2xl border-none bg-[#ecf0f3] pr-8 pl-10 text-xs uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] transition-all duration-300 ease-in-out outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                         autoComplete="off"
                                         aria-label="Search for products, companies, or categories"
                                         disabled={searchInProgress}
@@ -926,13 +927,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 <SheetContent
                                     side="left"
                                     hideDefaultClose={true}
-                                    className="bg-background text-foreground flex h-full w-[270px] max-w-[90vw] flex-col rounded-r-2xl p-0 shadow-xl transition-all duration-500 ease-in-out dark:bg-[#1a1a1f] dark:text-[#e0e0e5]"
+                                    className="text-foreground flex h-full w-[270px] max-w-[90vw] flex-col overflow-hidden rounded-[12px] bg-[#ecf0f3] p-0 shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-500 ease-in-out dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                                 >
                                     {/* Top Bar: Dark Mode Toggle & Close Button */}
                                     <div className="flex items-center justify-between px-4 pt-4 pb-2 uppercase">
                                         <AppearanceToggleDropdown />
                                         <SheetTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="ml-auto">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="ml-auto border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
+                                            >
                                                 <span className="sr-only">Close menu</span>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -949,7 +954,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                                     {/* Profile Section */}
                                     <div className="border-border/20 flex flex-col items-center border-b px-4 py-4 uppercase dark:border-white/10">
-                                        <Avatar className="mb-2 h-16 w-16 ring-4 ring-white/20">
+                                        <Avatar className="mb-2 h-16 w-16 overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]">
                                             <AvatarImage src="/placeholder.svg?height=64&width=64" alt={auth.user?.name || 'User'} />
                                             <AvatarFallback>{auth.user?.name ? auth.user.name[0].toUpperCase() : 'U'}</AvatarFallback>
                                         </Avatar>
@@ -963,7 +968,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 <a
                                                     key={item.name}
                                                     href={item.href}
-                                                    className="font-milk text-foreground hover:bg-muted/40 rounded-lg px-3 py-2 text-base uppercase transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                    className="font-milk text-foreground rounded-lg px-3 py-2 text-base uppercase transition-all duration-300 ease-in-out hover:border-none hover:bg-[#ecf0f3] hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] hover:outline-none hover:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:text-[#e0e0e5] dark:hover:bg-[#181a1b] dark:hover:text-[#f3f4f6] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:hover:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                                     onClick={() => setIsOpen(false)}
                                                 >
                                                     {item.name}
@@ -976,7 +981,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     {hasAdminRole ? (
                                                         <a
                                                             href={route('dashboard')}
-                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                            className="font-milk text-foreground flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out hover:border-none hover:bg-[#ecf0f3] hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] hover:outline-none hover:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:text-[#e0e0e5] dark:hover:bg-[#181a1b] dark:hover:text-[#f3f4f6] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:hover:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                                             onClick={() => setIsOpen(false)}
                                                         >
                                                             Dashboard
@@ -984,7 +989,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     ) : (
                                                         <a
                                                             href={route('profile.edit')}
-                                                            className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                            className="font-milk text-foreground flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out hover:border-none hover:bg-[#ecf0f3] hover:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] hover:outline-none hover:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:text-[#e0e0e5] dark:hover:bg-[#181a1b] dark:hover:text-[#f3f4f6] dark:hover:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:hover:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                                                             onClick={() => setIsOpen(false)}
                                                         >
                                                             Profile
@@ -994,7 +999,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                         href={route('logout')}
                                                         method="post"
                                                         as="button"
-                                                        className="font-milk bg-muted/40 text-foreground hover:bg-muted/60 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-base uppercase transition-all duration-300 ease-in-out dark:bg-white/10 dark:text-[#e0e0e5] dark:hover:bg-white/20"
+                                                        className="font-milk text-foreground flex w-full items-center gap-3 overflow-hidden rounded-[12px] bg-[#ecf0f3] px-3 py-2 text-base uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 ease-in-out hover:border-none hover:outline-none dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:text-[#f3f4f6]"
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         <LogOut className="h-5 w-5" />
@@ -1005,14 +1010,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                 <>
                                                     <a
                                                         href={route('login')}
-                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                        className="font-milk text-foreground flex items-center gap-3 overflow-hidden rounded-[12px] bg-[#ecf0f3] px-3 py-2 text-base shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 ease-in-out hover:border-none hover:outline-none dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:text-[#f3f4f6]"
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         Log in
                                                     </a>
                                                     <a
                                                         href={route('register')}
-                                                        className="font-milk text-foreground hover:bg-muted/40 flex items-center gap-3 rounded-lg px-3 py-2 text-base transition-all duration-300 ease-in-out dark:text-[#e0e0e5] dark:hover:bg-white/10"
+                                                        className="font-milk text-foreground flex items-center gap-3 overflow-hidden rounded-[12px] bg-[#ecf0f3] px-3 py-2 text-base shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 ease-in-out hover:border-none hover:outline-none dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:text-[#f3f4f6]"
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         Sign up

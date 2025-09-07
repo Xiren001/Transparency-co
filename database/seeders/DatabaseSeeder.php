@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
         // Seed roles first!
         $this->call([
             RolesSeeder::class,
-            PermissionsSeeder::class,
         ]);
 
         // Now create the user
@@ -28,10 +27,9 @@ class DatabaseSeeder extends Seeder
         // Assign the admin role to the user
         $user->assignRole('admin');
 
-        // Seed sample data
+        // Seed roles first!
         $this->call([
-            CompanySeeder::class,
-            VideoSeeder::class,
+            PermissionsSeeder::class,
         ]);
     }
 }

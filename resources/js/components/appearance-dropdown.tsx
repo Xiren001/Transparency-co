@@ -39,7 +39,7 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
                 size="icon"
                 onClick={handleToggle}
                 disabled={isAnimating}
-                className="appearance-toggle relative h-9 w-9 overflow-hidden rounded-md transition-all duration-400 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95 dark:focus:ring-blue-400"
+                className="appearance-toggle relative h-9 w-9 overflow-hidden rounded-md border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] transition-all duration-400 outline-none hover:scale-105 focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] active:scale-95 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
                 aria-label="Toggle theme"
             >
                 {/* Background toggle with sliding animation */}

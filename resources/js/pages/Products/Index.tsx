@@ -94,30 +94,7 @@ export default function Index({ products, companies, auth }: Props) {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Helper function to check if current user has a specific permission
-    const hasPermission = (permissionName: string): boolean => {
-        if (!auth.user) return false;
-
-        const userPermissions = auth.user.permissions;
-        if (!userPermissions) return false;
-
-        return userPermissions.some((permission: any) =>
-            typeof permission === 'string' ? permission === permissionName : permission.name === permissionName,
-        );
-    };
-
-    // Helper functions for product permissions
-    const canCreateProducts = (): boolean => {
-        return hasPermission('create products');
-    };
-
-    const canEditProducts = (): boolean => {
-        return hasPermission('edit products');
-    };
-
-    const canDeleteProducts = (): boolean => {
-        return hasPermission('delete products');
-    };
+    // Permission checks removed - all admin users can perform all actions
 
     // Add new state variables for filters
     const [searchQuery, setSearchQuery] = useState('');
@@ -542,7 +519,6 @@ export default function Index({ products, companies, auth }: Props) {
                             resetForm();
                             setIsCreateModalOpen(true);
                         }}
-                        disabled={!canCreateProducts()}
                     >
                         Add Product
                     </Button>
@@ -736,22 +712,10 @@ export default function Index({ products, companies, auth }: Props) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-end space-x-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleEditProduct(product)}
-                                                className="h-8 px-3"
-                                                disabled={!canEditProducts()}
-                                            >
+                                            <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)} className="h-8 px-3">
                                                 Edit
                                             </Button>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDelete(product)}
-                                                className="h-8 px-3"
-                                                disabled={!canDeleteProducts()}
-                                            >
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(product)} className="h-8 px-3">
                                                 Delete
                                             </Button>
                                         </div>

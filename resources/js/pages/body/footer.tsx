@@ -103,7 +103,7 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="relative rounded-lg bg-white py-16 dark:bg-[#1a1a1f]">
+        <footer className="relative overflow-hidden rounded-[12px] bg-[#ecf0f3] py-16 shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]">
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 rounded-lg bg-cover bg-center bg-no-repeat" style={{ backgroundColor: '#EDBFB7' }}>
                 <div className="absolute inset-0 rounded-lg bg-black/20 dark:bg-black/40"></div>
@@ -126,8 +126,8 @@ export default function Footer() {
                                     setError(null);
                                 }}
                                 placeholder="Enter your email"
-                                className={`font-milk focus:border-primary focus:ring-primary w-full rounded-lg border bg-[#e0e0e5] px-4 py-3 text-sm uppercase focus:ring-1 focus:outline-none dark:border-[#e0e0e5] dark:bg-[#e0e0e5] dark:text-[#e0e0e5] dark:placeholder-[#6b6b75] ${
-                                    error ? 'border-red-500 dark:border-red-500' : 'border-gray-300'
+                                className={`font-milk w-full rounded-lg border-none bg-[#ecf0f3] px-4 py-3 text-sm uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526] ${
+                                    error ? 'border-red-500 dark:border-red-500' : ''
                                 }`}
                                 required
                             />
@@ -155,17 +155,17 @@ export default function Footer() {
                         <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-[#e0e0e5]">Company</h3>
                         <ul className="space-y-2 text-sm text-gray-600 dark:text-[#b8b8c0]">
                             <li>
-                                <a href="#" className="hover:text-primary transition-colors">
+                                <a href="/about" className="hover:text-primary transition-colors">
                                     About Us
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary transition-colors">
-                                    Careers
+                                <a href="/services" className="hover:text-primary transition-colors">
+                                    Services
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary transition-colors">
+                                <a href="/contact" className="hover:text-primary transition-colors">
                                     Contact Us
                                 </a>
                             </li>

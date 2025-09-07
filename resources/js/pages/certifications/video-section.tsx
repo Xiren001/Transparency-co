@@ -1,5 +1,6 @@
 import { Instagram, Play } from 'lucide-react';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Video {
     id: number;
@@ -54,7 +55,7 @@ export default function VideoSection({ selectedCategory, videos = [] }: VideoSec
                                 <div
                                     key={video.id}
                                     onClick={() => handleVideoClick(video)}
-                                    className="group relative cursor-pointer touch-manipulation rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.98] dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50"
+                                    className="group relative cursor-pointer touch-manipulation overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 hover:shadow-md active:scale-[0.98] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                                 >
                                     <div className="relative aspect-video overflow-hidden rounded-lg">
                                         <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -92,52 +93,58 @@ export default function VideoSection({ selectedCategory, videos = [] }: VideoSec
                 </div>
             </div>
 
-            {/* Video Modal */}
-            {selectedVideo && (
-                <div
-                    className={`fixed inset-0 top-20 z-50 flex items-center justify-center p-4 ${isModalOpen ? 'opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-300`}
-                >
-                    <div className="absolute inset-0 bg-black/90" onClick={() => setIsModalOpen(false)} />
-                    <div className="relative z-10 max-h-[90vh] w-full max-w-[95vw] overflow-hidden rounded-lg bg-white p-4 sm:max-h-[85vh] sm:max-w-2xl sm:p-6 md:max-h-[80vh] md:max-w-2xl md:p-6 lg:max-h-[85vh] lg:max-w-lg lg:p-6 dark:bg-[#23232a]">
-                        <div className="absolute top-2 right-2 z-20 sm:top-4 sm:right-4">
-                            <button
-                                onClick={() => setIsModalOpen(false)}
-                                className="rounded-full bg-gray-100 p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:bg-[#282828] dark:hover:bg-[#2d2d35] dark:hover:text-[#e0e0e5]"
-                            >
-                                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
+            {/* Video Modal - Using Portal */}
+            {selectedVideo &&
+                isModalOpen &&
+                createPortal(
+                    <div
+                        className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#ecf0f3] p-4 dark:bg-[#181a1b]"
+                        onClick={() => setIsModalOpen(false)}
+                    >
+                        <div
+                            className="relative z-10 max-h-[90vh] w-full max-w-[95vw] overflow-hidden rounded-[12px] bg-[#ecf0f3] p-4 shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] sm:max-h-[85vh] sm:max-w-2xl sm:p-6 md:max-h-[80vh] md:max-w-2xl md:p-6 lg:max-h-[85vh] lg:max-w-lg lg:p-6 dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="absolute top-2 right-2 z-20 sm:top-4 sm:right-4">
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="rounded-full border-none bg-[#ecf0f3] p-2 text-gray-400 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none hover:bg-[#ecf0f3] hover:text-gray-600 focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:hover:bg-[#181a1b] dark:hover:text-[#e0e0e5] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
+                                >
+                                    <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                        <div className="w-full">
-                            <div className="aspect-[9/16] w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-[#2d2d35]">
-                                {selectedVideo.instagram_url ? (
-                                    <iframe
-                                        key={`${selectedVideo.id}-${isModalOpen}`}
-                                        src={getDirectVideoEmbed(selectedVideo.instagram_url)}
-                                        className="h-full w-full"
-                                        frameBorder="0"
-                                        allowFullScreen
-                                        title="Instagram Video"
-                                        style={{
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            boxShadow: 'none',
-                                            margin: '0',
-                                            padding: '0',
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="flex h-full items-center justify-center">
-                                        <p className="text-gray-500 dark:text-gray-400">Video not available</p>
-                                    </div>
-                                )}
+                            <div className="w-full">
+                                <div className="aspect-[9/16] w-full overflow-hidden rounded-lg border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
+                                    {selectedVideo.instagram_url ? (
+                                        <iframe
+                                            key={`${selectedVideo.id}-${isModalOpen}`}
+                                            src={getDirectVideoEmbed(selectedVideo.instagram_url)}
+                                            className="h-full w-full"
+                                            frameBorder="0"
+                                            allowFullScreen
+                                            title="Instagram Video"
+                                            style={{
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                boxShadow: 'none',
+                                                margin: '0',
+                                                padding: '0',
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center">
+                                            <p className="text-gray-500 dark:text-gray-400">Video not available</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                    </div>,
+                    document.body,
+                )}
         </>
     );
 }

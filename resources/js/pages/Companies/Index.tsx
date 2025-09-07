@@ -51,30 +51,7 @@ export default function Index({ companies, auth }: Props) {
     const [sortBy, setSortBy] = useState('created_at');
     const [sortDirection, setSortDirection] = useState('desc');
 
-    // Helper function to check if current user has a specific permission
-    const hasPermission = (permissionName: string): boolean => {
-        if (!auth.user) return false;
-
-        const userPermissions = auth.user.permissions;
-        if (!userPermissions) return false;
-
-        return userPermissions.some((permission: any) =>
-            typeof permission === 'string' ? permission === permissionName : permission.name === permissionName,
-        );
-    };
-
-    // Helper functions for company permissions
-    const canCreateCompanies = (): boolean => {
-        return hasPermission('create companies');
-    };
-
-    const canEditCompanies = (): boolean => {
-        return hasPermission('edit companies');
-    };
-
-    const canDeleteCompanies = (): boolean => {
-        return hasPermission('delete companies');
-    };
+    // Permission checks removed - all admin users can perform all actions
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -390,7 +367,7 @@ export default function Index({ companies, auth }: Props) {
             <div className="container mx-auto px-2 py-10">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Companies</h1>
-                    <Button onClick={() => setIsAddDialogOpen(true)} disabled={!canCreateCompanies()}>
+                    <Button onClick={() => setIsAddDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
                         Add Company
                     </Button>
@@ -500,23 +477,11 @@ export default function Index({ companies, auth }: Props) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-end space-x-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleEditCompany(company)}
-                                                className="h-8 px-3"
-                                                disabled={!canEditCompanies()}
-                                            >
+                                            <Button variant="outline" size="sm" onClick={() => handleEditCompany(company)} className="h-8 px-3">
                                                 <Pencil className="mr-1 h-4 w-4" />
                                                 Edit
                                             </Button>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDelete(company)}
-                                                className="h-8 px-3"
-                                                disabled={!canDeleteCompanies()}
-                                            >
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(company)} className="h-8 px-3">
                                                 <Trash2 className="mr-1 h-4 w-4" />
                                                 Delete
                                             </Button>
@@ -948,7 +913,7 @@ export default function Index({ companies, auth }: Props) {
                             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isSubmitting}>
                                 Cancel
                             </Button>
-                            <Button variant="destructive" onClick={confirmDelete} disabled={isSubmitting || !canDeleteCompanies()}>
+                            <Button variant="destructive" onClick={confirmDelete} disabled={isSubmitting}>
                                 {isSubmitting ? 'Deleting...' : 'Delete'}
                             </Button>
                         </div>

@@ -75,32 +75,7 @@ export default function UsersIndex() {
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [isPermissionDialogOpen, setIsPermissionDialogOpen] = useState(false);
 
-    // Helper function to check if current user has a specific permission
-    const hasPermission = (permissionName: string): boolean => {
-        if (!auth.user) return false;
-
-        const userPermissions = auth.user.permissions;
-        if (!userPermissions) return false;
-
-        return userPermissions.some((permission: any) =>
-            typeof permission === 'string' ? permission === permissionName : permission.name === permissionName,
-        );
-    };
-
-    // Helper function to check if current user can assign roles
-    const canAssignRoles = (): boolean => {
-        return hasPermission('assign roles');
-    };
-
-    // Helper function to check if current user can assign permissions
-    const canAssignPermissions = (): boolean => {
-        return hasPermission('assign permissions');
-    };
-
-    // Helper function to check if current user can view users
-    const canViewUsers = (): boolean => {
-        return hasPermission('view users');
-    };
+    // Permission checks removed - all admin users can perform all actions
 
     const roleForm = useForm({
         role: '',
@@ -233,11 +208,7 @@ export default function UsersIndex() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <Select
-                                                value={getCurrentRole(user)}
-                                                onValueChange={(value) => handleRoleChange(user, value)}
-                                                disabled={!canAssignRoles()}
-                                            >
+                                            <Select value={getCurrentRole(user)} onValueChange={(value) => handleRoleChange(user, value)}>
                                                 <SelectTrigger className="w-40">
                                                     <SelectValue />
                                                 </SelectTrigger>
@@ -265,12 +236,7 @@ export default function UsersIndex() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handlePermissionClick(user)}
-                                                disabled={!canAssignPermissions()}
-                                            >
+                                            <Button variant="outline" size="sm" onClick={() => handlePermissionClick(user)}>
                                                 <Shield className="mr-2 h-4 w-4" />
                                                 Manage
                                             </Button>
@@ -297,7 +263,7 @@ export default function UsersIndex() {
                             <Button variant="outline" onClick={() => setIsConfirmationOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button onClick={confirmRoleAssignment} disabled={roleForm.processing || !canAssignRoles()}>
+                            <Button onClick={confirmRoleAssignment} disabled={roleForm.processing}>
                                 {roleForm.processing ? 'Assigning...' : 'Confirm Assignment'}
                             </Button>
                         </DialogFooter>
@@ -391,7 +357,7 @@ export default function UsersIndex() {
                             <Button variant="outline" onClick={() => setIsPermissionDialogOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button onClick={confirmPermissionAssignment} disabled={permissionForm.processing || !canAssignPermissions()}>
+                            <Button onClick={confirmPermissionAssignment} disabled={permissionForm.processing}>
                                 {permissionForm.processing ? 'Assigning...' : 'Assign Permissions'}
                             </Button>
                         </DialogFooter>

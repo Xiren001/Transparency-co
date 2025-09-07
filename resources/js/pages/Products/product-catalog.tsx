@@ -68,7 +68,7 @@ const DEBOUNCE_DELAY = 300; // 300ms delay
 // Shimmer Card Component
 const ShimmerCard = ({ gridView }: { gridView: string }) => (
     <div
-        className={`group animate-pulse cursor-pointer rounded-lg bg-gray-200 shadow-sm transition-shadow duration-300 duration-2000 ease-in-out dark:bg-[#2d2d35]/50 ${gridView === 'list' ? 'flex flex-row' : ''}`}
+        className={`group animate-pulse cursor-pointer overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-shadow duration-300 duration-2000 ease-in-out dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] ${gridView === 'list' ? 'flex flex-row' : ''} ${gridView === 'mobile' ? 'w-[280px] flex-shrink-0' : ''}`}
     >
         <div
             className={`relative flex-shrink-0 overflow-hidden bg-gray-300 dark:bg-[#3d3d45] ${gridView === 'list' ? 'h-24 w-24 rounded-l-lg sm:h-40 sm:w-40' : 'aspect-[4/3] rounded-t-lg'}`}
@@ -525,19 +525,19 @@ export default function CustomerView({ products: initialProducts, filters: initi
     };
 
     return (
-        <div className="h-auto rounded-lg bg-white sm:min-h-screen dark:bg-[#121212]">
-            <div className="container mx-auto px-4 py-8">
+        <div className="h-auto rounded-lg bg-transparent sm:min-h-screen dark:bg-transparent">
+            <div className="container mx-auto px-4 py-4">
                 <div className="flex flex-col gap-8 lg:flex-row">
                     <div className="w-full lg:hidden">
                         <Collapsible className="w-full">
-                            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-white p-4 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#282828]">
+                            <CollapsibleTrigger className="flex w-full items-center justify-between overflow-hidden rounded-[12px] bg-[#ecf0f3] p-4 shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526]">
                                 <div className="flex items-center gap-2">
                                     <Filter className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
                                     <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">FILTERS</span>
                                 </div>
                                 <ChevronDown className="h-4 w-4 text-gray-900 dark:text-[#e0e0e5]" />
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2 rounded-lg bg-white p-4 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#282828]">
+                            <CollapsibleContent className="mt-2 overflow-hidden rounded-[12px] bg-[#ecf0f3] p-4 shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526]">
                                 <div className="mb-8">
                                     <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">CERTIFICATES</h3>
                                     <div className="space-y-3">
@@ -606,7 +606,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                     </div>
 
                     <div className="hidden w-64 flex-shrink-0 lg:block">
-                        <div className="rounded-lg bg-white p-6 shadow-sm dark:border dark:border-[#2d2d35] dark:bg-[#282828]">
+                        <div className="overflow-hidden rounded-[12px] bg-[#ecf0f3] p-6 shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526]">
                             <div className="mb-6 flex items-center gap-2">
                                 <Filter className="h-4 w-4 text-gray-900 dark:text-[#6298F0]" />
                                 <span className="text-sm font-medium tracking-wider text-gray-900 dark:text-[#6298F0]">FILTER</span>
@@ -688,13 +688,13 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     <DropdownMenuTrigger asChild>
                                         <Button
                                             variant="outline"
-                                            className="gap-2 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                            className="gap-2 overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526] dark:hover:bg-[#2d2d35]"
                                         >
                                             <span className="text-sm tracking-wider">SORT BY</span>
                                             <ChevronDown className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="dark:border-[#2d2d35] dark:bg-[#282828]">
+                                    <DropdownMenuContent className="overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526]">
                                         {sortOptions.map((option) => (
                                             <DropdownMenuItem
                                                 key={option}
@@ -712,7 +712,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         variant={gridView === '2-col' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('2-col')}
-                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#6298F0] dark:hover:bg-[#2d2d35]"
+                                        className="h-8 w-8 overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#6298F0] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526] dark:hover:bg-[#2d2d35]"
                                     >
                                         <Grid2X2 className="h-4 w-4" />
                                     </Button>
@@ -720,7 +720,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         variant={gridView === '3-col' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('3-col')}
-                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#6298F0] dark:hover:bg-[#2d2d35]"
+                                        className="h-8 w-8 overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#6298F0] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526] dark:hover:bg-[#2d2d35]"
                                     >
                                         <Grid3X3 className="h-4 w-4" />
                                     </Button>
@@ -728,7 +728,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                         variant={gridView === 'list' ? 'default' : 'outline'}
                                         size="icon"
                                         onClick={() => setGridView('list')}
-                                        className="h-8 w-8 dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#6298F0] dark:hover:bg-[#2d2d35]"
+                                        className="h-8 w-8 overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#6298F0] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526] dark:hover:bg-[#2d2d35]"
                                     >
                                         <List className="h-4 w-4" />
                                     </Button>
@@ -755,7 +755,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                                 {suggestedProducts.map((product) => (
                                                     <div
                                                         key={product.id}
-                                                        className="group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50"
+                                                        className="group cursor-pointer overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 hover:shadow-md dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                                                         onClick={() => handleProductClick(product)}
                                                     >
                                                         <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
@@ -816,13 +816,13 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                 </>
                             )}
                             <div className="flex overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
-                                <div className="flex gap-4">
+                                <div className="mb-4 flex gap-4">
                                     {isLoading
-                                        ? Array.from({ length: 5 }).map((_, index) => <ShimmerCard key={index} gridView="2-col" />)
+                                        ? Array.from({ length: 5 }).map((_, index) => <ShimmerCard key={index} gridView="mobile" />)
                                         : displayedProducts.map((product) => (
                                               <div
                                                   key={product.id}
-                                                  className="w-[280px] flex-shrink-0 cursor-pointer rounded-lg bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50"
+                                                  className="w-[280px] flex-shrink-0 cursor-pointer overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-shadow duration-300 hover:shadow-md dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                                                   onClick={() => handleProductClick(product)}
                                               >
                                                   <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#2d2d35]">
@@ -944,7 +944,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     : displayedProducts.map((product, index) => (
                                           <div
                                               key={`${product.id}-${Math.floor(index / 9)}`}
-                                              className={`group cursor-pointer rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                              className={`group cursor-pointer overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 hover:shadow-md dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] ${
                                                   gridView === 'list' ? 'flex flex-row' : ''
                                               }`}
                                               style={{
@@ -1072,7 +1072,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                         {/* Back to Top Button */}
                         <button
                             onClick={scrollToTop}
-                            className="fixed right-8 bottom-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 hover:bg-gray-100 dark:border dark:border-[#2d2d35] dark:bg-[#282828] dark:hover:bg-[#2d2d35]"
+                            className="fixed right-8 bottom-8 z-50 flex h-10 w-10 items-center justify-center overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] transition-all duration-300 hover:bg-gray-100 dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526] dark:hover:bg-[#2d2d35]"
                             aria-label="Back to top"
                         >
                             <svg
@@ -1094,7 +1094,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     size="lg"
                                     onClick={handlePageChange}
                                     disabled={isLoading}
-                                    className="font-milk w-full max-w-xs uppercase dark:border-[#2d2d35] dark:bg-[#282828] dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
+                                    className="font-milk w-full max-w-xs overflow-hidden rounded-[12px] bg-[#ecf0f3] uppercase shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526] dark:hover:bg-[#2d2d35]"
                                 >
                                     {isLoading ? (
                                         <div className="flex items-center gap-2">

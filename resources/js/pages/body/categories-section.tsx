@@ -128,6 +128,8 @@ export default function CategoriesSection() {
                 params.set('category', category);
                 params.delete('sub_category');
                 params.delete('item');
+                // Clear search parameter when switching categories to avoid conflicts
+                params.delete('search');
                 setCurrentCategory(category);
                 setSelectedSubCategory(null);
                 setSelectedItem(null);
@@ -151,6 +153,8 @@ export default function CategoriesSection() {
             } else {
                 params.set('sub_category', subCategory);
                 params.delete('item');
+                // Clear search parameter when switching subcategories to avoid conflicts
+                params.delete('search');
                 setSelectedSubCategory(subCategory);
                 setSelectedItem(null);
             }
@@ -170,6 +174,8 @@ export default function CategoriesSection() {
                 setSelectedItem(null);
             } else {
                 params.set('item', item);
+                // Clear search parameter when switching items to avoid conflicts
+                params.delete('search');
                 setSelectedItem(item);
 
                 // Enhanced smooth scroll animation
@@ -248,7 +254,7 @@ export default function CategoriesSection() {
     };
 
     return (
-        <section className="rounded-lg bg-gray-50 bg-white pt-12 dark:bg-[#121212]">
+        <section className="mb-2 rounded-lg bg-gray-50 bg-transparent pt-12 dark:bg-transparent">
             <div className="container mx-auto px-0">
                 {/* Section Title */}
                 <h2 className="mb-8 text-center text-xl font-light tracking-wide text-gray-900 sm:text-3xl md:text-4xl dark:text-[#e0e0e5]">
@@ -267,15 +273,15 @@ export default function CategoriesSection() {
                                     <div
                                         key={category.id}
                                         onClick={() => handleCategoryClick(category.id)}
-                                        className={`group flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                        className={`group flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg p-2 transition-all duration-300 hover:scale-105 ${
                                             isSelected ? 'ring-primary ring-2' : ''
-                                        }`}
+                                        } border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]`}
                                     >
                                         {/* Icon */}
                                         <div
-                                            className={`group-hover:bg-primary/10 dark:group-hover:bg-primary/20 mb-2 rounded-full p-2 transition-colors duration-300 ${
-                                                isSelected ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100 dark:bg-[#121212]'
-                                            }`}
+                                            className={`group-hover:bg-primary/10 dark:group-hover:bg-primary/20 mb-2 overflow-hidden rounded-[12px] p-2 transition-colors duration-300 ${
+                                                isSelected ? 'bg-primary/10 dark:bg-primary/20' : ''
+                                            } bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526]`}
                                         >
                                             <IconComponent
                                                 className={`group-hover:text-primary h-6 w-6 transition-colors duration-300 ${
@@ -307,15 +313,15 @@ export default function CategoriesSection() {
                                 <div
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category.id)}
-                                    className={`group flex cursor-pointer flex-col items-center rounded-lg bg-white p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                    className={`group flex cursor-pointer flex-col items-center rounded-lg p-4 transition-all duration-300 hover:scale-105 ${
                                         isSelected ? 'ring-primary ring-2' : ''
-                                    }`}
+                                    } border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]`}
                                 >
                                     {/* Icon */}
                                     <div
-                                        className={`group-hover:bg-primary/10 dark:group-hover:bg-primary/20 mb-3 rounded-full p-3 transition-colors duration-300 ${
-                                            isSelected ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100 dark:bg-[#121212]'
-                                        }`}
+                                        className={`group-hover:bg-primary/10 dark:group-hover:bg-primary/20 mb-3 overflow-hidden rounded-[12px] p-3 transition-colors duration-300 ${
+                                            isSelected ? 'bg-primary/10 dark:bg-primary/20' : ''
+                                        } bg-[#ecf0f3] shadow-[5px_5px_5px_#d1d9e6,-5px_-5px_5px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[5px_5px_10px_#0e0f10,-5px_-5px_10px_#222526]`}
                                     >
                                         <IconComponent
                                             className={`group-hover:text-primary h-8 w-8 transition-colors duration-300 ${
@@ -354,12 +360,12 @@ export default function CategoriesSection() {
                                         <div
                                             key={subCategory.id}
                                             onClick={() => handleSubCategoryClick(subCategory.id)}
-                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg p-2 transition-all duration-300 hover:scale-105 ${
                                                 selectedSubCategory === subCategory.id ? 'ring-primary ring-2' : ''
-                                            }`}
+                                            } border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]`}
                                         >
                                             {/* Counter Badge */}
-                                            <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:ring-[#3d3d45]">
+                                            <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full border-none bg-[#ecf0f3] text-xs font-medium shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                                                 {subCategoryCounts[subCategory.id] || 0}
                                             </div>
 
@@ -382,12 +388,12 @@ export default function CategoriesSection() {
                                     <div
                                         key={subCategory.id}
                                         onClick={() => handleSubCategoryClick(subCategory.id)}
-                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg bg-white p-3 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg p-3 transition-all duration-300 hover:scale-105 ${
                                             selectedSubCategory === subCategory.id ? 'ring-primary ring-2' : ''
-                                        }`}
+                                        } border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]`}
                                     >
                                         {/* Counter Badge */}
-                                        <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:ring-[#3d3d45]">
+                                        <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full border-none bg-[#ecf0f3] text-sm font-medium shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                                             {subCategoryCounts[subCategory.id] || 0}
                                         </div>
 
@@ -422,12 +428,12 @@ export default function CategoriesSection() {
                                         <div
                                             key={item}
                                             onClick={() => handleItemClick(item)}
-                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg bg-white p-2 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                            className={`group relative flex w-[90px] flex-shrink-0 cursor-pointer flex-col items-center rounded-lg p-2 transition-all duration-300 hover:scale-105 ${
                                                 selectedItem === item ? 'ring-primary ring-2' : ''
-                                            }`}
+                                            } border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]`}
                                         >
                                             {/* Counter Badge */}
-                                            <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:ring-[#3d3d45]">
+                                            <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full border-none bg-[#ecf0f3] text-xs font-medium shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                                                 {formatCount(itemCounts[item] || 0)}
                                             </div>
 
@@ -450,12 +456,12 @@ export default function CategoriesSection() {
                                     <div
                                         key={item}
                                         onClick={() => handleItemClick(item)}
-                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg bg-white p-3 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-[#282828] dark:hover:shadow-[#2d2d35]/50 ${
+                                        className={`group relative flex cursor-pointer flex-col items-center rounded-lg p-3 transition-all duration-300 hover:scale-105 ${
                                             selectedItem === item ? 'ring-primary ring-2' : ''
-                                        }`}
+                                        } border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]`}
                                     >
                                         {/* Counter Badge */}
-                                        <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 dark:bg-[#2d2d35] dark:text-[#e0e0e5] dark:ring-[#3d3d45]">
+                                        <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full border-none bg-[#ecf0f3] text-sm font-medium shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                                             {formatCount(itemCounts[item] || 0)}
                                         </div>
 
