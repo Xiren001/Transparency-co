@@ -1,11 +1,12 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import CatLoader from '@/components/CatLoader';
+import { LogoutConfirmationModal } from '@/components/logout-confirmation-modal';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import Fuse from 'fuse.js';
 import { Bell, Calendar, Home, LogOut, Mail, Menu, MessageSquare, Search, Settings, User } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -206,6 +207,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
     const [suggestionLocked, setSuggestionLocked] = useState(false);
     const [searchInProgress, setSearchInProgress] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+    const handleLogoutClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setShowLogoutModal(true);
+    };
 
     // Check if user has admin role (admin, moderator, or content_manager)
     const hasAdminRole =
@@ -697,15 +704,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     </DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem asChild>
-                                                    <Link
-                                                        href={route('logout')}
-                                                        method="post"
-                                                        as="button"
+                                                    <button
+                                                        onClick={handleLogoutClick}
                                                         className="font-milk flex w-full items-center gap-2 text-sm uppercase dark:text-[#e0e0e5] dark:hover:bg-[#2d2d35]"
                                                     >
                                                         <LogOut className="h-4 w-4" />
                                                         Logout
-                                                    </Link>
+                                                    </button>
                                                 </DropdownMenuItem>
                                             </>
                                         ) : (
@@ -995,16 +1000,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                             Profile
                                                         </a>
                                                     )}
-                                                    <Link
-                                                        href={route('logout')}
-                                                        method="post"
-                                                        as="button"
+                                                    <button
+                                                        onClick={(e) => {
+                                                            handleLogoutClick(e);
+                                                            setIsOpen(false);
+                                                        }}
                                                         className="font-milk text-foreground flex w-full items-center gap-3 overflow-hidden rounded-[12px] bg-[#ecf0f3] px-3 py-2 text-base uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-300 ease-in-out hover:border-none hover:outline-none dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:text-[#f3f4f6]"
-                                                        onClick={() => setIsOpen(false)}
                                                     >
                                                         <LogOut className="h-5 w-5" />
                                                         Log Out
-                                                    </Link>
+                                                    </button>
                                                 </>
                                             ) : (
                                                 <>
@@ -1038,6 +1043,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </div>
                 <div className="hidden h-4 lg:block"></div>
             </div>
+            <LogoutConfirmationModal isOpen={showLogoutModal} onOpenChange={setShowLogoutModal} />
         </>
     );
 }

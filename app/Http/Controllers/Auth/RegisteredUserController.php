@@ -19,9 +19,15 @@ class RegisteredUserController extends Controller
     /**
      * Show the registration page.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('auth/register');
+        $googleUser = $request->session()->get('google_user');
+
+        return Inertia::render('auth/register', [
+            'googleUser' => $googleUser,
+            'message' => $request->session()->get('message'),
+            'messageType' => $request->session()->get('message_type'),
+        ]);
     }
 
     /**
@@ -31,17 +37,30 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $googleUser = $request->session()->get('google_user');
+
+        // Both Google and regular users need to set a password
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-        ]);
+        ];
+
+        // Add Google data if this is a Google user
+        if ($googleUser) {
+            $userData['google_id'] = $googleUser['google_id'];
+            $userData['google_token'] = $googleUser['google_token'];
+            $userData['google_refresh_token'] = $googleUser['google_refresh_token'];
+            $userData['email_verified_at'] = now(); // Google users are pre-verified
+        }
+
+        $user = User::create($userData);
 
         // Assign default 'user' role
         $user->assignRole('user');
@@ -54,6 +73,9 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        // Clear Google user data from session
+        $request->session()->forget('google_user');
 
         // Redirect based on role
         if ($user->hasRole(['admin', 'moderator', 'content_manager'])) {
