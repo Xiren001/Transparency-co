@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Baby, Heart, Home, Leaf, Shirt, Sparkles } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 // Import separated components with correct paths
@@ -465,6 +465,23 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
     const [activeTab, setActiveTab] = useState('certifications');
     const [selectedCert, setSelectedCert] = useState<(typeof certifications)[number] | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isContentVisible, setIsContentVisible] = useState(false);
+
+    // Handle content animation timing
+    useEffect(() => {
+        if (isModalOpen) {
+            // Reset content visibility when modal opens
+            setIsContentVisible(false);
+            // Show content after a short delay for smooth entrance
+            const timer = setTimeout(() => {
+                setIsContentVisible(true);
+            }, 150);
+            return () => clearTimeout(timer);
+        } else {
+            // Hide content immediately when modal closes
+            setIsContentVisible(false);
+        }
+    }, [isModalOpen]);
 
     // Group certifications by category for reference
     const groupedCertifications = useMemo(() => {
@@ -661,11 +678,16 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
                         style={{ position: 'fixed', zIndex: 999999 }}
                     >
                         <div
-                            className="font-milk max-h-[95vh] w-full overflow-hidden overflow-y-auto rounded-[12px] bg-[#ecf0f3] px-3 py-6 tracking-tighter uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] sm:w-[95vw] sm:max-w-5xl sm:px-4 md:px-8 md:py-10 dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
+                            className="font-milk animate-in fade-in-0 zoom-in-95 max-h-[95vh] w-full overflow-hidden overflow-y-auto rounded-[12px] bg-[#ecf0f3] px-3 py-6 tracking-tighter uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] duration-300 sm:w-[95vw] sm:max-w-5xl sm:px-4 md:px-8 md:py-10 dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Modal Header */}
-                            <div className="mb-4 flex items-start justify-between sm:mb-6">
+                            <div
+                                className={`mb-4 flex items-start justify-between transition-all duration-500 ease-out sm:mb-6 ${
+                                    isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                }`}
+                                style={{ transitionDelay: isContentVisible ? '200ms' : '0ms' }}
+                            >
                                 <div className="flex items-start gap-3 sm:gap-4">
                                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 sm:h-16 sm:w-16 dark:border-[#2d2d35] dark:bg-[#2d2d35]">
                                         <img
@@ -699,11 +721,21 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
                             </div>
 
                             {/* Modal Content */}
-                            <div className="grid grid-cols-1 gap-6 sm:gap-8">
+                            <div
+                                className={`grid grid-cols-1 gap-6 transition-all duration-500 ease-out sm:gap-8 ${
+                                    isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                                }`}
+                                style={{ transitionDelay: isContentVisible ? '300ms' : '0ms' }}
+                            >
                                 {/* Detailed Information */}
                                 <div className="space-y-4 sm:space-y-6">
                                     {/* Standards & Criteria */}
-                                    <div className="space-y-2 sm:space-y-3">
+                                    <div
+                                        className={`space-y-2 transition-all duration-500 ease-out sm:space-y-3 ${
+                                            isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                        }`}
+                                        style={{ transitionDelay: isContentVisible ? '400ms' : '0ms' }}
+                                    >
                                         <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">Standards & Criteria</h3>
                                         <ul className="space-y-1.5 sm:space-y-2">
                                             {selectedCert.standards?.map((standard, index) => (
@@ -723,7 +755,12 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
                                     </div>
 
                                     {/* Why It Matters */}
-                                    <div className="space-y-2 sm:space-y-3">
+                                    <div
+                                        className={`space-y-2 transition-all duration-500 ease-out sm:space-y-3 ${
+                                            isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                        }`}
+                                        style={{ transitionDelay: isContentVisible ? '500ms' : '0ms' }}
+                                    >
                                         <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">Why It Matters</h3>
                                         <p className="text-xs leading-relaxed text-gray-600 sm:text-sm dark:text-gray-200">
                                             {selectedCert.whyItMatters || 'Impact information not available'}
@@ -731,7 +768,12 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
                                     </div>
 
                                     {/* Brands */}
-                                    <div className="space-y-2 sm:space-y-3">
+                                    <div
+                                        className={`space-y-2 transition-all duration-500 ease-out sm:space-y-3 ${
+                                            isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                        }`}
+                                        style={{ transitionDelay: isContentVisible ? '600ms' : '0ms' }}
+                                    >
                                         <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">Brands That Use It</h3>
                                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {selectedCert.brands?.map((brand, index) => (
@@ -754,7 +796,12 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
                                     </div>
 
                                     {/* What It Means */}
-                                    <div className="space-y-2 sm:space-y-3">
+                                    <div
+                                        className={`space-y-2 transition-all duration-500 ease-out sm:space-y-3 ${
+                                            isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                        }`}
+                                        style={{ transitionDelay: isContentVisible ? '700ms' : '0ms' }}
+                                    >
                                         <h3 className="text-base font-semibold text-gray-900 sm:text-lg dark:text-[#e0e0e5]">What It Means</h3>
                                         <p className="text-xs leading-relaxed text-gray-600 sm:text-sm dark:text-gray-200">
                                             {selectedCert.description}
@@ -763,20 +810,32 @@ export default function CertificationsPage({ videos = [], harmfulContents = [] }
 
                                     {/* Learn More Button */}
                                     {selectedCert.learnMore && (
-                                        <Button
-                                            asChild
-                                            className="font-milk text-dark w-full overflow-hidden rounded-[12px] bg-[#ecf0f3] py-2.5 text-sm font-medium uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] hover:shadow-[12px_12px_12px_#d1d9e6,-12px_-12px_12px_#f9f9f9] sm:py-3 sm:text-base dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:text-white dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:bg-[#cccccc] dark:hover:shadow-[12px_12px_24px_#0e0f10,-12px_-12px_24px_#222526]"
+                                        <div
+                                            className={`transition-all duration-500 ease-out ${
+                                                isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                            }`}
+                                            style={{ transitionDelay: isContentVisible ? '800ms' : '0ms' }}
                                         >
-                                            <a href={selectedCert.learnMore} target="_blank" rel="noopener noreferrer ">
-                                                Learn More
-                                            </a>
-                                        </Button>
+                                            <Button
+                                                asChild
+                                                className="font-milk text-dark w-full overflow-hidden rounded-[12px] bg-[#ecf0f3] py-2.5 text-sm font-medium uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] hover:shadow-[12px_12px_12px_#d1d9e6,-12px_-12px_12px_#f9f9f9] sm:py-3 sm:text-base dark:bg-[#181a1b] dark:text-[#e0e0e5] dark:text-white dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:bg-[#cccccc] dark:hover:shadow-[12px_12px_24px_#0e0f10,-12px_-12px_24px_#222526]"
+                                            >
+                                                <a href={selectedCert.learnMore} target="_blank" rel="noopener noreferrer ">
+                                                    Learn More
+                                                </a>
+                                            </Button>
+                                        </div>
                                     )}
                                 </div>
                             </div>
 
                             {/* Footer Info */}
-                            <div className="mt-6 border-t border-gray-200 pt-4 sm:mt-8 sm:pt-6 dark:border-[#2d2d35]">
+                            <div
+                                className={`mt-6 border-t border-gray-200 pt-4 transition-all duration-500 ease-out sm:mt-8 sm:pt-6 dark:border-[#2d2d35] ${
+                                    isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                }`}
+                                style={{ transitionDelay: isContentVisible ? '900ms' : '0ms' }}
+                            >
                                 <p className="text-center text-xs text-gray-500 dark:text-[#b8b8c0]">
                                     This certification ensures product safety and quality standards.{' '}
                                     <a href="#" className="underline hover:text-gray-700 dark:hover:text-[#e0e0e5]">

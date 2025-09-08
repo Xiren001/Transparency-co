@@ -40,6 +40,39 @@ export default function Welcome() {
         <MainLayout>
             {/* Global Loading Spinner Overlay and Head can be removed from here, now in MainLayout */}
             <div className="flex w-full items-start justify-center opacity-100 transition-opacity duration-750 starting:opacity-0">
+                {/* Background Decorative Circles */}
+                <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+                    {/* Massive Circle - Top Right (half in middle, half outside) */}
+                    <div className="absolute top-16 right-1/4 h-64 w-64 rounded-full border-none bg-[#ecf0f3] opacity-20 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Large Circle - Center Left (half in middle, half outside) */}
+                    <div className="absolute top-1/2 left-1/4 h-48 w-48 rounded-full border-none bg-[#ecf0f3] opacity-25 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Extra Large Circle - Bottom Right (half in middle, half outside) */}
+                    <div className="absolute right-1/4 bottom-16 h-56 w-56 rounded-full border-none bg-[#ecf0f3] opacity-30 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Huge Circle - Top Left (half in middle, half outside) */}
+                    <div className="absolute top-20 left-1/4 h-80 w-80 rounded-full border-none bg-[#ecf0f3] opacity-15 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Large Circle - Center Right (half in middle, half outside) */}
+                    <div className="absolute top-1/3 right-1/4 h-40 w-40 rounded-full border-none bg-[#ecf0f3] opacity-35 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Medium Circle - Bottom Left (half in middle, half outside) */}
+                    <div className="absolute bottom-20 left-1/4 h-32 w-32 rounded-full border-none bg-[#ecf0f3] opacity-40 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Additional Circle - Top Center (half in middle, half outside) */}
+                    <div className="absolute top-10 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full border-none bg-[#ecf0f3] opacity-20 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Additional Circle - Bottom Center (half in middle, half outside) */}
+                    <div className="absolute bottom-10 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full border-none bg-[#ecf0f3] opacity-25 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Additional Circle - Left Center (half in middle, half outside) */}
+                    <div className="absolute top-1/4 left-1/4 h-36 w-36 rounded-full border-none bg-[#ecf0f3] opacity-30 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+
+                    {/* Additional Circle - Right Center (half in middle, half outside) */}
+                    <div className="absolute top-2/3 right-1/4 h-28 w-28 rounded-full border-none bg-[#ecf0f3] opacity-35 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"></div>
+                </div>
+
                 <main className="z-0 flex w-full max-w-[1000px] flex-col lg:max-w-[2000px] lg:flex-col">
                     <HeroSection />
 

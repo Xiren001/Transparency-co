@@ -580,7 +580,7 @@ export default function CustomerView({ products: initialProducts, filters: initi
                                     </div>
                                 </div>
 
-                                <div>
+                                <div className="transition-all duration-300 ease-in-out">
                                     <h3 className="mb-4 text-sm font-medium tracking-wider text-gray-900 dark:text-[#e0e0e5]">PRICE</h3>
                                     <div className="space-y-3">
                                         {priceRanges.map((range) => (

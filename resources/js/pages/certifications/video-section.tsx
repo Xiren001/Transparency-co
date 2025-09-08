@@ -1,5 +1,5 @@
 import { Instagram, Play } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 interface Video {
@@ -18,6 +18,23 @@ interface VideoSectionProps {
 export default function VideoSection({ selectedCategory, videos = [] }: VideoSectionProps) {
     const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isContentVisible, setIsContentVisible] = useState(false);
+
+    // Handle content animation timing
+    useEffect(() => {
+        if (isModalOpen) {
+            // Reset content visibility when modal opens
+            setIsContentVisible(false);
+            // Show content after a short delay for smooth entrance
+            const timer = setTimeout(() => {
+                setIsContentVisible(true);
+            }, 150);
+            return () => clearTimeout(timer);
+        } else {
+            // Hide content immediately when modal closes
+            setIsContentVisible(false);
+        }
+    }, [isModalOpen]);
 
     // Filter videos by active status only and limit to 3
     const filteredVideos = videos.filter((video) => video.is_active).slice(0, 3);
@@ -102,7 +119,7 @@ export default function VideoSection({ selectedCategory, videos = [] }: VideoSec
                         onClick={() => setIsModalOpen(false)}
                     >
                         <div
-                            className="relative z-10 max-h-[90vh] w-full max-w-[95vw] overflow-hidden rounded-[12px] bg-[#ecf0f3] p-4 shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] sm:max-h-[85vh] sm:max-w-2xl sm:p-6 md:max-h-[80vh] md:max-w-2xl md:p-6 lg:max-h-[85vh] lg:max-w-lg lg:p-6 dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
+                            className="relative z-10 max-h-[90vh] w-full max-w-[95vw] overflow-hidden rounded-[12px] bg-[#ecf0f3] p-4 shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] sm:max-h-[85vh] sm:max-w-2xl sm:p-6 md:max-h-[80vh] md:max-w-2xl md:p-6 lg:max-h-[85vh] lg:max-w-lg lg:p-6 dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] animate-in fade-in-0 zoom-in-95 duration-300"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="absolute top-2 right-2 z-20 sm:top-4 sm:right-4">
@@ -116,7 +133,9 @@ export default function VideoSection({ selectedCategory, videos = [] }: VideoSec
                                 </button>
                             </div>
 
-                            <div className="w-full">
+                            <div className={`w-full transition-all duration-500 ease-out ${
+                                isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                            }`} style={{ transitionDelay: isContentVisible ? '200ms' : '0ms' }}>
                                 <div className="aspect-[9/16] w-full overflow-hidden rounded-lg border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                                     {selectedVideo.instagram_url ? (
                                         <iframe

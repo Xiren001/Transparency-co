@@ -2,7 +2,7 @@ import ContentRenderer from '@/components/editor/ContentRenderer';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface HarmfulContent {
     id: number;
@@ -25,6 +25,23 @@ interface HarmfulIngredientsSectionProps {
 export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIngredientsSectionProps) {
     const [viewingContent, setViewingContent] = useState<HarmfulContent | null>(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isContentVisible, setIsContentVisible] = useState(false);
+
+    // Handle content animation timing
+    useEffect(() => {
+        if (isViewModalOpen) {
+            // Reset content visibility when modal opens
+            setIsContentVisible(false);
+            // Show content after a short delay for smooth entrance
+            const timer = setTimeout(() => {
+                setIsContentVisible(true);
+            }, 150);
+            return () => clearTimeout(timer);
+        } else {
+            // Hide content immediately when modal closes
+            setIsContentVisible(false);
+        }
+    }, [isViewModalOpen]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -199,16 +216,25 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
 
             {/* View Modal */}
             <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-                <DialogContent className="font-milk max-h-[90vh] max-w-4xl overflow-y-auto rounded-[12px] bg-[#ecf0f3] uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] dark:border-[#2d2d35] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] [&>button]:border-0 [&>button]:bg-[#ecf0f3] [&>button]:p-2 [&>button]:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] [&>button]:outline-none [&>button]:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] [&>button]:dark:bg-[#181a1b] [&>button]:dark:text-[#f3f4f6] [&>button]:dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] [&>button]:dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
+                <DialogContent className="font-milk animate-in fade-in-0 zoom-in-95 max-h-[90vh] max-w-4xl overflow-y-auto rounded-[12px] bg-[#ecf0f3] uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] duration-300 dark:border-[#2d2d35] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] [&>button]:border-0 [&>button]:bg-[#ecf0f3] [&>button]:p-2 [&>button]:shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] [&>button]:outline-none [&>button]:focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] [&>button]:dark:bg-[#181a1b] [&>button]:dark:text-[#f3f4f6] [&>button]:dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] [&>button]:dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
                     {viewingContent && (
-                        <div className="font-milk space-y-6 text-gray-900 dark:text-gray-100">
+                        <div
+                            className={`font-milk space-y-6 text-gray-900 transition-all duration-500 ease-out dark:text-gray-100 ${
+                                isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                            }`}
+                        >
                             {/* Blog Card Display */}
                             <div
                                 className="preview-card overflow-hidden rounded-[12px] bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]"
                                 style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
                                 {/* Card Content */}
-                                <div className="flex">
+                                <div
+                                    className={`flex transition-all duration-500 ease-out ${
+                                        isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                    }`}
+                                    style={{ transitionDelay: isContentVisible ? '200ms' : '0ms' }}
+                                >
                                     {/* Left - Image */}
                                     <div className="flex h-64 w-1/3 items-center justify-center bg-gray-200 dark:bg-[#2d2d35]">
                                         {(() => {
@@ -227,7 +253,12 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                     </div>
 
                                     {/* Right - Full Text Content */}
-                                    <div className="w-2/3 min-w-0 p-6">
+                                    <div
+                                        className={`w-2/3 min-w-0 p-6 transition-all duration-500 ease-out ${
+                                            isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                        }`}
+                                        style={{ transitionDelay: isContentVisible ? '300ms' : '0ms' }}
+                                    >
                                         <div className="mb-3">
                                             {viewingContent.category && (
                                                 <Badge
@@ -259,7 +290,12 @@ export default function HarmfulIngredientsSection({ harmfulContents }: HarmfulIn
                                 </div>
 
                                 {/* Bottom Section - Metadata */}
-                                <div className="flex items-center justify-between border-t bg-gray-50 px-6 py-4 dark:border-[#2d2d35] dark:bg-[#282828]">
+                                <div
+                                    className={`flex items-center justify-between border-t bg-gray-50 px-6 py-4 transition-all duration-500 ease-out dark:border-[#2d2d35] dark:bg-[#282828] ${
+                                        isContentVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+                                    }`}
+                                    style={{ transitionDelay: isContentVisible ? '400ms' : '0ms' }}
+                                >
                                     <div className="text-sm text-gray-600 dark:text-[#6298F0]">
                                         <div className="font-semibold text-gray-700 dark:text-[#6298F0]">
                                             {new Date(viewingContent.created_at).getDate().toString().padStart(2, '0')}
