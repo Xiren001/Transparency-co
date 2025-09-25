@@ -1,3 +1,5 @@
+import OptimizedImage from '@/components/OptimizedImage';
+
 export default function HeroSection() {
     return (
         <section className="-z-10 my-2 min-h-[100px] w-full rounded-[12px] rounded-lg bg-[#ecf0f3] shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] sm:my-2 sm:min-h-[100px] md:my-4 md:min-h-[150px] lg:my-6 lg:min-h-[150px] xl:my-8 xl:min-h-[200px] 2xl:my-10 2xl:min-h-[200px] dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]">
@@ -56,14 +58,16 @@ export default function HeroSection() {
             <div className="relative z-10 container mx-auto px-4 py-8 text-center sm:py-8 md:py-10 lg:py-12 xl:py-20 2xl:py-20 dark:bg-transparent">
                 {/* Main Heading */}
                 <h1 className="font-milk text-primary mb-4 text-4xl font-light tracking-[-0.10em] break-words sm:mb-6 sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl dark:text-white">
-                    <span className="span-animate-1 relative z-0">Transparency</span> <span className="span-animate-2 relative z-30">Co.</span>
+                    <span className="relative z-0">Transparency</span> <span className="relative z-30">Co.</span>
                     <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg">
                         {/* Extra extra small screens (xxs) */}
-                        <img
+                        <OptimizedImage
                             src="/images/website-image/Chair Design - 773x1024.png"
                             alt="Chair Design - Modern Armchair"
                             className="xs:hidden show-below-sm shake-gentle z-10 h-auto max-h-[150px] w-auto max-w-[100px] translate-x-45 -rotate-12 object-contain"
                             style={{ '--rotation': '-12deg' } as React.CSSProperties}
+                            lazy={false}
+                            showPlaceholder={false}
                         />
 
                         {/* Extra small screens (xs) */}

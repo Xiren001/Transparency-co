@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Spatie\Permission\Models\Role;
 
 class GoogleAuthController extends Controller
 {
@@ -45,18 +46,22 @@ class GoogleAuthController extends Controller
                     ]);
                     Auth::login($existingUser);
                 } else {
-                    // No account exists - redirect to sign up with Google data
-                    return redirect()->route('register')->with([
-                        'google_user' => [
-                            'name' => $googleUser->name,
-                            'email' => $googleUser->email,
-                            'google_id' => $googleUser->id,
-                            'google_token' => $googleUser->token,
-                            'google_refresh_token' => $googleUser->refreshToken,
-                        ],
-                        'message' => 'No account found with this Google account. Please complete your registration below.',
-                        'message_type' => 'info'
+                    // Create new user directly with Google data (no password required)
+                    $newUser = User::create([
+                        'name' => $googleUser->name,
+                        'email' => $googleUser->email,
+                        'google_id' => $googleUser->id,
+                        'google_token' => $googleUser->token,
+                        'google_refresh_token' => $googleUser->refreshToken,
+                        'email_verified_at' => now(), // Google users are pre-verified
+                        'password' => null, // No password needed for Google users
                     ]);
+
+                    // Assign default 'user' role
+                    $newUser->assignRole('user');
+                    
+                    // Log the user in
+                    Auth::login($newUser);
                 }
             }
 

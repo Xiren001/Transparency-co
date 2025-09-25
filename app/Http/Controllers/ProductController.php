@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Company;
 use App\Models\ProductClick;
+use App\Services\ProductSearchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,96 +14,17 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+    protected $searchService;
+
+    public function __construct(ProductSearchService $searchService)
+    {
+        $this->searchService = $searchService;
+    }
+
     public function index(Request $request)
     {
-        $query = Product::query();
-
-        // Enhanced Search - Search through everything related to products
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                // Product basic fields
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('category', 'like', "%{$search}%")
-                    ->orWhere('sub_category', 'like', "%{$search}%")
-                    ->orWhere('item', 'like', "%{$search}%")
-                    ->orWhere('product_link', 'like', "%{$search}%")
-
-                    // Search in product details (JSON field)
-                    ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].name')", ["%{$search}%"])
-                    ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].value')", ["%{$search}%"])
-
-                    // Search in certificates (JSON field)
-                    ->orWhereRaw("JSON_SEARCH(LOWER(certificates), 'one', ?, null, '$[*]')", ["%{$search}%"])
-
-                    // Search in company information
-                    ->orWhereHas('company', function ($companyQuery) use ($search) {
-                        $companyQuery->where('name', 'like', "%{$search}%")
-                            ->orWhere('description', 'like', "%{$search}%")
-                            ->orWhere('link', 'like', "%{$search}%");
-                    })
-
-                    // Search price as text (for price-related searches)
-                    ->orWhereRaw("CAST(price AS CHAR) LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("CAST(original_price AS CHAR) LIKE ?", ["%{$search}%"])
-
-                    // Search for "new" products
-                    ->orWhere(function ($newQuery) use ($search) {
-                        if (stripos($search, 'new') !== false) {
-                            $newQuery->where('is_new', true);
-                        }
-                    });
-            });
-        }
-
-        // Company filter
-        if ($request->has('company')) {
-            $query->whereHas('company', function ($q) use ($request) {
-                $q->where('name', $request->company);
-            });
-        }
-
-        // Category filter
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
-
-        // Sub-category filter
-        if ($request->has('sub_category')) {
-            $query->where('sub_category', $request->sub_category);
-        }
-
-        // Item filter
-        if ($request->has('item')) {
-            $query->where('item', $request->item);
-        }
-
-        // Price range filter
-        if ($request->has('min_price') || $request->has('max_price')) {
-            $minPrice = $request->input('min_price', 0);
-            $maxPrice = $request->input('max_price', PHP_FLOAT_MAX);
-            $query->whereBetween('price', [$minPrice, $maxPrice]);
-        }
-
-        // Certificates filter
-        if ($request->has('certificates')) {
-            $certificates = json_decode($request->certificates, true);
-            if (is_array($certificates) && !empty($certificates)) {
-                $query->where(function ($q) use ($certificates) {
-                    foreach ($certificates as $cert) {
-                        $q->orWhereJsonContains('certificates', $cert);
-                    }
-                });
-            }
-        }
-
-        // Sort
-        $sortBy = $request->input('sort_by', 'created_at');
-        $sortDirection = $request->input('sort_direction', 'desc');
-        $query->orderBy($sortBy, $sortDirection);
-
-        $products = $query->with('company')->paginate(10);
+        // Use the search service to get filtered products
+        $products = $this->searchService->getFilteredProducts($request, 10);
         $companies = Company::all();
 
         // Get current user with roles and permissions

@@ -24,7 +24,7 @@ export default function Footer() {
         setError(null);
 
         try {
-            const response = await fetch(route('newsletter.subscribe'), {
+            const response = await fetch('/newsletter/subscribe', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

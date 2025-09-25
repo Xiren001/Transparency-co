@@ -17,6 +17,28 @@ class ImageController extends Controller
             abort(404);
         }
 
-        return response()->file(storage_path('app/public/' . $path));
+        $fullPath = storage_path('app/public/' . $path);
+        
+        // Get file info for caching headers
+        $lastModified = filemtime($fullPath);
+        $etag = md5_file($fullPath);
+        
+        // Set cache headers for better performance
+        $headers = [
+            'Cache-Control' => 'public, max-age=31536000', // 1 year
+            'Last-Modified' => gmdate('D, d M Y H:i:s', $lastModified) . ' GMT',
+            'ETag' => '"' . $etag . '"',
+        ];
+        
+        // Check if client has cached version
+        $ifModifiedSince = request()->header('If-Modified-Since');
+        $ifNoneMatch = request()->header('If-None-Match');
+        
+        if (($ifModifiedSince && strtotime($ifModifiedSince) >= $lastModified) ||
+            ($ifNoneMatch && $ifNoneMatch === '"' . $etag . '"')) {
+            return response('', 304, $headers);
+        }
+
+        return response()->file($fullPath, $headers);
     }
 }

@@ -188,7 +188,25 @@ function highlightMatch(text: string, query: string) {
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const { auth } = usePage<PageProps>().props;
     const [isOpen, setIsOpen] = React.useState(false);
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = React.useState(() => {
+        // Check if this is the first visit using cookies
+        if (typeof window !== 'undefined') {
+            const getCookie = (name: string): string | null => {
+                const nameEQ = name + '=';
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            };
+
+            const hasVisited = getCookie('hasVisitedBefore');
+            return !hasVisited; // Only show loader if user hasn't visited before
+        }
+        return true; // Default to true for SSR
+    });
 
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
@@ -225,14 +243,29 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         auth.user && (auth.user.roles?.some((role: any) => role.name === 'admin') || auth.user.roles?.some((role: any) => role === 'admin'));
 
     React.useEffect(() => {
-        if (document.readyState === 'complete') {
+        // Only proceed if we should show the loader (first visit)
+        if (!loading) return;
+
+        const markAsVisited = () => {
             setLoading(false);
+            // Mark that user has visited the site using cookies
+            const setCookie = (name: string, value: string, days: number = 365) => {
+                const expires = new Date();
+                expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+                document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+            };
+            setCookie('hasVisitedBefore', 'true', 365); // Cookie expires in 1 year
+        };
+
+        if (document.readyState === 'complete') {
+            markAsVisited();
             return;
         }
-        const handleLoad = () => setLoading(false);
+
+        const handleLoad = () => markAsVisited();
         window.addEventListener('load', handleLoad);
         return () => window.removeEventListener('load', handleLoad);
-    }, []);
+    }, [loading]);
 
     // On mount, set searchQuery from URL param if present
     useEffect(() => {

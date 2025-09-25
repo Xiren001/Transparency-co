@@ -39,6 +39,12 @@
         <link rel="preload" href="/fonts/Schoolbell/Schoolbell-Regular.woff" as="font" type="font/woff" crossorigin="anonymous" />
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        
+        {{-- Preload critical hero section images --}}
+        <link rel="preload" href="/images/website-image/Chair Design - 773x1024.png" as="image" type="image/png" />
+        <link rel="preload" href="/images/website-image/shoes.png" as="image" type="image/png" />
+        <link rel="preload" href="/images/website-image/towel.png" as="image" type="image/png" />
+        <link rel="preload" href="/placeholder.svg" as="image" type="image/svg+xml" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         @routes

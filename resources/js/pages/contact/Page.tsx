@@ -1,12 +1,21 @@
 'use client';
 
 import MainLayout from '@/layouts/MainLayout';
-import { Head } from '@inertiajs/react';
-import { ArrowRight, CheckCircle, Clock, Mail, MapPin, Phone, Users } from 'lucide-react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { ArrowRight, CheckCircle, Mail, Phone, Users } from 'lucide-react';
 import { useState } from 'react';
 import Footer from '../body/footer';
 
+interface PageProps {
+    flash?: {
+        success?: string;
+        error?: string;
+    };
+    [key: string]: any;
+}
+
 export default function Contact() {
+    const { flash } = usePage<PageProps>().props;
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -14,7 +23,11 @@ export default function Contact() {
         message: '',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    // Check if form was successfully submitted
+    const isSubmitted = !!flash?.success;
+    const submitError = flash?.error || '';
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -22,18 +35,34 @@ export default function Contact() {
             ...prev,
             [name]: value,
         }));
+
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors((prev) => ({
+                ...prev,
+                [name]: '',
+            }));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setErrors({});
 
-        // Simulate form submission
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setIsSubmitted(true);
-        setIsSubmitting(false);
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        router.post('/contact', formData, {
+            onSuccess: () => {
+                setFormData({ name: '', email: '', subject: '', message: '' });
+            },
+            onError: (errors) => {
+                if (typeof errors === 'object' && errors !== null) {
+                    setErrors(errors as Record<string, string>);
+                }
+            },
+            onFinish: () => {
+                setIsSubmitting(false);
+            },
+        });
     };
 
     return (
@@ -84,103 +113,122 @@ export default function Contact() {
                                                     Message Sent!
                                                 </h3>
                                                 <p className="text-xs text-emerald-700 sm:text-sm lg:text-base dark:text-emerald-300">
-                                                    Thank you for reaching out. We'll get back to you within 24 hours.
+                                                    {flash?.success}
                                                 </p>
                                             </div>
                                         ) : (
-                                            <form onSubmit={handleSubmit} className="space-y-4 uppercase sm:space-y-6">
-                                                <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                                            <>
+                                                {submitError && (
+                                                    <div className="mb-4 rounded-xl bg-red-50 p-4 sm:mb-6 dark:bg-red-950/20">
+                                                        <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>
+                                                    </div>
+                                                )}
+                                                <form onSubmit={handleSubmit} className="space-y-4 uppercase sm:space-y-6">
+                                                    <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                                                        <div>
+                                                            <label
+                                                                htmlFor="name"
+                                                                className="mb-2 block text-sm font-semibold text-gray-700 uppercase dark:text-gray-300"
+                                                            >
+                                                                Name
+                                                            </label>
+                                                            <input
+                                                                type="text"
+                                                                id="name"
+                                                                name="name"
+                                                                value={formData.name}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                                className={`w-full rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526] ${errors.name ? 'shadow-[inset_2px_2px_4px_#dc2626,inset_-2px_-2px_4px_#f87171]' : ''}`}
+                                                                placeholder="Your name"
+                                                            />
+                                                            {errors.name && (
+                                                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                htmlFor="email"
+                                                                className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                                            >
+                                                                Email
+                                                            </label>
+                                                            <input
+                                                                type="email"
+                                                                id="email"
+                                                                name="email"
+                                                                value={formData.email}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                                className={`w-full rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526] ${errors.email ? 'shadow-[inset_2px_2px_4px_#dc2626,inset_-2px_-2px_4px_#f87171]' : ''}`}
+                                                                placeholder="your@email.com"
+                                                            />
+                                                            {errors.email && (
+                                                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                     <div>
                                                         <label
-                                                            htmlFor="name"
-                                                            className="mb-2 block text-sm font-semibold text-gray-700 uppercase dark:text-gray-300"
+                                                            htmlFor="subject"
+                                                            className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
                                                         >
-                                                            Name
+                                                            Subject
                                                         </label>
                                                         <input
                                                             type="text"
-                                                            id="name"
-                                                            name="name"
-                                                            value={formData.name}
+                                                            id="subject"
+                                                            name="subject"
+                                                            value={formData.subject}
                                                             onChange={handleInputChange}
                                                             required
-                                                            className="w-full rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
-                                                            placeholder="Your name"
+                                                            className={`w-full rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526] ${errors.subject ? 'shadow-[inset_2px_2px_4px_#dc2626,inset_-2px_-2px_4px_#f87171]' : ''}`}
+                                                            placeholder="What's this about?"
                                                         />
+                                                        {errors.subject && (
+                                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.subject}</p>
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <label
-                                                            htmlFor="email"
+                                                            htmlFor="message"
                                                             className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
                                                         >
-                                                            Email
+                                                            Message
                                                         </label>
-                                                        <input
-                                                            type="email"
-                                                            id="email"
-                                                            name="email"
-                                                            value={formData.email}
+                                                        <textarea
+                                                            id="message"
+                                                            name="message"
+                                                            rows={5}
+                                                            value={formData.message}
                                                             onChange={handleInputChange}
                                                             required
-                                                            className="w-full rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
-                                                            placeholder="your@email.com"
+                                                            className={`sm:rows-6 w-full resize-none rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526] ${errors.message ? 'shadow-[inset_2px_2px_4px_#dc2626,inset_-2px_-2px_4px_#f87171]' : ''}`}
+                                                            placeholder="Tell us more about your inquiry..."
                                                         />
+                                                        {errors.message && (
+                                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.message}</p>
+                                                        )}
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        htmlFor="subject"
-                                                        className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                                    <button
+                                                        type="submit"
+                                                        disabled={isSubmitting}
+                                                        className="group flex w-full items-center justify-center overflow-hidden rounded-[12px] bg-[#ecf0f3] px-6 py-3 text-base font-semibold text-gray-900 uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-200 hover:shadow-[12px_12px_12px_#d1d9e6,-12px_-12px_12px_#f9f9f9] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:px-8 sm:py-4 sm:text-lg dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:shadow-[12px_12px_24px_#0e0f10,-12px_-12px_24px_#222526]"
                                                     >
-                                                        Subject
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        id="subject"
-                                                        name="subject"
-                                                        value={formData.subject}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                        className="w-full rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
-                                                        placeholder="What's this about?"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        htmlFor="message"
-                                                        className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
-                                                    >
-                                                        Message
-                                                    </label>
-                                                    <textarea
-                                                        id="message"
-                                                        name="message"
-                                                        rows={5}
-                                                        value={formData.message}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                        className="sm:rows-6 w-full resize-none rounded-xl border-none bg-[#ecf0f3] px-3 py-3 text-gray-900 uppercase shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none placeholder:text-[#a0a5a8] focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:px-4 sm:py-4 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:placeholder:text-[#6b7280] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]"
-                                                        placeholder="Tell us more about your inquiry..."
-                                                    />
-                                                </div>
-                                                <button
-                                                    type="submit"
-                                                    disabled={isSubmitting}
-                                                    className="group flex w-full items-center justify-center overflow-hidden rounded-[12px] bg-[#ecf0f3] px-6 py-3 text-base font-semibold text-gray-900 uppercase shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] transition-all duration-200 hover:shadow-[12px_12px_12px_#d1d9e6,-12px_-12px_12px_#f9f9f9] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:px-8 sm:py-4 sm:text-lg dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526] dark:hover:shadow-[12px_12px_24px_#0e0f10,-12px_-12px_24px_#222526]"
-                                                >
-                                                    {isSubmitting ? (
-                                                        <>
-                                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent sm:mr-3 sm:h-5 sm:w-5"></div>
-                                                            Sending...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            Send Message
-                                                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 sm:h-5 sm:w-5" />
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </form>
+                                                        {isSubmitting ? (
+                                                            <>
+                                                                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent sm:mr-3 sm:h-5 sm:w-5"></div>
+                                                                Sending...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                Send Message
+                                                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 sm:h-5 sm:w-5" />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </form>
+                                            </>
                                         )}
                                     </div>
                                 </div>
@@ -199,10 +247,10 @@ export default function Contact() {
                                                     <div>
                                                         <p className="text-sm font-medium sm:text-base">Email us</p>
                                                         <a
-                                                            href="mailto:hello@transparencyco.com"
+                                                            href="mailto:michael@topshelf.life"
                                                             className="text-sm text-gray-700 hover:text-gray-900 sm:text-base"
                                                         >
-                                                            hello@transparencyco.com
+                                                            michael@topshelf.life
                                                         </a>
                                                     </div>
                                                 </div>
@@ -212,49 +260,13 @@ export default function Contact() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium sm:text-base">Call us</p>
-                                                        <a href="tel:+1-555-0123" className="text-sm text-gray-700 hover:text-gray-900 sm:text-base">
-                                                            +1 (555) 012-3456
+                                                        <a
+                                                            href="tel:+1 (630) 639-1833"
+                                                            className="text-sm text-gray-700 hover:text-gray-900 sm:text-base"
+                                                        >
+                                                            +1 (630) 639-1833
                                                         </a>
                                                     </div>
-                                                </div>
-                                                <div className="flex items-center space-x-3 sm:space-x-4">
-                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:h-12 sm:w-12 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
-                                                        <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium sm:text-base">Visit us</p>
-                                                        <p className="text-sm text-gray-700 sm:text-base">
-                                                            123 Transparency Street
-                                                            <br />
-                                                            Ethical District, ED 12345
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Business Hours */}
-                                        <div className="overflow-hidden rounded-[12px] bg-[#ecf0f3] p-4 shadow-[10px_10px_10px_#d1d9e6,-10px_-10px_10px_#f9f9f9] sm:p-5 lg:p-6 dark:bg-[#181a1b] dark:shadow-[10px_10px_20px_#0e0f10,-10px_-10px_20px_#222526]">
-                                            <div className="mb-3 flex items-center space-x-3 sm:mb-4">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full border-none bg-[#ecf0f3] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#f9f9f9] outline-none focus:shadow-[inset_4px_4px_4px_#d1d9e6,inset_-4px_-4px_4px_#f9f9f9] sm:h-10 sm:w-10 dark:bg-[#181a1b] dark:text-[#f3f4f6] dark:shadow-[inset_2px_2px_4px_#0e0f10,inset_-2px_-2px_4px_#222526] dark:focus:shadow-[inset_4px_4px_6px_#0e0f10,inset_-4px_-4px_6px_#222526]">
-                                                    <Clock className="h-4 w-4 text-emerald-600 sm:h-5 sm:w-5 dark:text-emerald-400" />
-                                                </div>
-                                                <h4 className="font-milk text-sm font-semibold text-gray-900 sm:text-base lg:text-lg dark:text-white">
-                                                    Business Hours
-                                                </h4>
-                                            </div>
-                                            <div className="space-y-1.5 text-xs text-gray-600 sm:space-y-2 sm:text-sm dark:text-gray-300">
-                                                <div className="flex flex-col justify-between sm:flex-row">
-                                                    <span>Monday - Friday</span>
-                                                    <span className="font-medium">9:00 AM - 6:00 PM EST</span>
-                                                </div>
-                                                <div className="flex flex-col justify-between sm:flex-row">
-                                                    <span>Saturday</span>
-                                                    <span className="font-medium">10:00 AM - 2:00 PM EST</span>
-                                                </div>
-                                                <div className="flex flex-col justify-between sm:flex-row">
-                                                    <span>Sunday</span>
-                                                    <span className="font-medium">Closed</span>
                                                 </div>
                                             </div>
                                         </div>

@@ -5,6 +5,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HarmfulContentController;
+use App\Http\Controllers\ContactController;
+use App\Services\ProductSearchService;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Controllers\ImageController;
@@ -14,48 +16,9 @@ use App\Http\Controllers\Api\SearchSuggestionController;
 use App\Models\Video;
 
 Route::get('/', function (Request $request) {
-    $query = Product::query();
-
-    // Enhanced Search - Search through everything related to products
-    if ($request->has('search')) {
-        $search = $request->input('search');
-        $query->where(function ($q) use ($search) {
-            // Product basic fields
-            $q->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%")
-                ->orWhere('category', 'like', "%{$search}%")
-                ->orWhere('sub_category', 'like', "%{$search}%")
-                ->orWhere('item', 'like', "%{$search}%")
-                ->orWhere('product_link', 'like', "%{$search}%")
-
-                // Search in product details (JSON field)
-                ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].name')", ["%{$search}%"])
-                ->orWhereRaw("JSON_SEARCH(LOWER(product_details), 'one', ?, null, '$[*].value')", ["%{$search}%"])
-
-                // Search in certificates (JSON field)
-                ->orWhereRaw("JSON_SEARCH(LOWER(certificates), 'one', ?, null, '$[*]')", ["%{$search}%"])
-
-                // Search in company information
-                ->orWhereHas('company', function ($companyQuery) use ($search) {
-                    $companyQuery->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhere('link', 'like', "%{$search}%");
-                })
-
-                // Search price as text (for price-related searches)
-                ->orWhereRaw("CAST(price AS CHAR) LIKE ?", ["%{$search}%"])
-                ->orWhereRaw("CAST(original_price AS CHAR) LIKE ?", ["%{$search}%"])
-
-                // Search for "new" products
-                ->orWhere(function ($newQuery) use ($search) {
-                    if (stripos($search, 'new') !== false) {
-                        $newQuery->where('is_new', true);
-                    }
-                });
-        });
-    }
-
-    $products = $query->with('company')->latest()->paginate(12);
+    // Use the ProductSearchService for consistent search logic
+    $searchService = app(ProductSearchService::class);
+    $products = $searchService->getFilteredProducts($request, 12);
 
     // Get active videos for the certifications page (limit to 3)
     $videos = Video::active()->take(3)->get();
@@ -92,6 +55,9 @@ Route::get('/services', function () {
 Route::get('/contact', function () {
     return Inertia::render('contact/Page');
 })->name('contact');
+
+// Contact form submission
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 // Certifications page with videos
 Route::get('/certifications', function () {
@@ -208,3 +174,4 @@ Route::get('/harmful-ingredients', [HarmfulContentController::class, 'customerVi
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
+require __DIR__ . '/clean.php';
